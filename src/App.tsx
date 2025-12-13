@@ -15,6 +15,9 @@ function App() {
             <Link className="hover:text-white" to="/game">
               Jouer
             </Link>
+            <Link className="hover:text-white" to="/tutorial">
+              Tutoriel
+            </Link>
             <Link className="hover:text-white" to="/how-to">
               Règles
             </Link>

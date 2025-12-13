@@ -18,6 +18,12 @@ export function Home() {
             Jouer une partie
           </Link>
           <Link
+            to="/tutorial"
+            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
+          >
+            Mini tutoriel
+          </Link>
+          <Link
             to="/how-to"
             className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
           >

@@ -43,7 +43,10 @@ export function CardView({ card, draggable = false, onDrop, feedback, feedbackKe
     >
       <div className="flex items-center justify-between gap-2">
         <span className="truncate">{card.word}</span>
-        <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600">?</span>
+        <span className="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-800 ring-1 ring-amber-200">
+          <span className="mr-1 align-middle text-[9px] text-amber-700">◇</span>
+          <span className="align-middle">?</span>
+        </span>
       </div>
     </motion.div>
   )

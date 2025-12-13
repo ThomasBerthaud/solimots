@@ -7,6 +7,7 @@ import { Game } from './routes/Game.tsx'
 import { Home } from './routes/Home.tsx'
 import { HowTo } from './routes/HowTo.tsx'
 import { NotFound } from './routes/NotFound.tsx'
+import { Tutorial } from './routes/Tutorial.tsx'
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ const router = createBrowserRouter([
       { path: '/', element: <Home /> },
       { path: '/game', element: <Game /> },
       { path: '/how-to', element: <HowTo /> },
+      { path: '/tutorial', element: <Tutorial /> },
       { path: '*', element: <NotFound /> },
     ],
   },
