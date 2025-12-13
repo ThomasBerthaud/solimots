@@ -1,0 +1,49 @@
+import { Link } from 'react-router-dom'
+
+export function Home() {
+  return (
+    <div className="space-y-6">
+      <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+        <p className="text-sm uppercase tracking-wider text-white/70">Solitaire d’associations</p>
+        <h1 className="mt-2 text-2xl font-semibold leading-tight md:text-3xl">
+          Associe les mots à la bonne catégorie.
+        </h1>
+        <p className="mt-2 text-white/75">
+          Un feeling “solitaire”, mais avec des mots. Déplace, teste, progresse.
+        </p>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <Link
+            to="/game"
+            className="inline-flex items-center justify-center rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-black shadow hover:bg-amber-300 active:bg-amber-500"
+          >
+            Jouer une partie
+          </Link>
+          <Link
+            to="/how-to"
+            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
+          >
+            Voir les règles
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+          <p className="text-sm font-semibold">Mobile-first</p>
+          <p className="mt-1 text-sm text-white/75">
+            Conçu pour être agréable au pouce, avec une mise en page claire sur desktop.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
+          <p className="text-sm font-semibold">Niveaux rejouables</p>
+          <p className="mt-1 text-sm text-white/75">
+            Génération locale de niveaux (4 catégories × 6 mots).
+          </p>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+

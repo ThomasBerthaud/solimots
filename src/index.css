@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Solitaire-like theme tokens */
+:root {
+  --felt-900: 150 45% 9%;
+  --felt-800: 150 42% 12%;
+  --felt-700: 150 38% 16%;
+  --card: 0 0% 100%;
+  --card-ink: 222 22% 12%;
+  --muted-ink: 215 16% 35%;
+  --gold: 43 84% 55%;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 30% 0%, hsl(var(--felt-700)), hsl(var(--felt-900)));
+  color: hsl(var(--card));
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+}
+
+/* Improve mobile drag interactions */
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@layer components {
+  .surface {
+    @apply rounded-2xl border border-white/10 bg-black/20 shadow-[0_12px_40px_rgba(0,0,0,0.35)];
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition;
+  }
+  .btn-primary {
+    @apply btn bg-amber-400 text-black shadow hover:bg-amber-300 active:bg-amber-500;
+  }
+  .btn-ghost {
+    @apply btn border border-white/15 bg-white/5 text-white/90 hover:bg-white/10 active:bg-white/15;
+  }
+}
