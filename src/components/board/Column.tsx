@@ -5,7 +5,7 @@ import { CardView } from '../cards/CardView'
 export type ColumnProps = {
   level: LevelState
   columnIndex: number
-  onDropCard: (from: MoveSource, point: { x: number; y: number }) => void
+  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => void
   errorCardId?: string
   errorAt?: number
 }
@@ -33,7 +33,9 @@ export function Column({ level, columnIndex, onDropCard, errorCardId, errorAt }:
               <CardView
                 card={card}
                 draggable={isTop}
-                onDrop={(point) => onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y })}
+                onDrop={(point, draggedEl) =>
+                  onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
+                }
                 feedback={isTop && errorCardId === id ? 'error' : undefined}
                 feedbackKey={isTop && errorCardId === id ? errorAt : undefined}
                 className={isTop ? '' : 'opacity-95'}

@@ -4,7 +4,7 @@ import { Column } from './Column'
 
 export type TableauProps = {
   level: LevelState
-  onDropCard: (from: MoveSource, point: { x: number; y: number }) => void
+  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => void
   errorCardId?: string
   errorAt?: number
 }

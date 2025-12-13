@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useEffect } from 'react'
-import { CardView } from '../components/cards/CardView'
 import { Tableau } from '../components/board/Tableau'
+import { CardView } from '../components/cards/CardView'
 import { Foundations } from '../components/foundations/Foundations'
 import { useGameStore } from '../store/gameStore'
 
@@ -22,25 +22,43 @@ export function Game() {
 
   if (!level) return null
 
-  const resolveDropTarget = (point: { x: number; y: number }) => {
-    const el = document.elementFromPoint(point.x, point.y) as HTMLElement | null
-    const target = el?.closest('[data-drop-target]') as HTMLElement | null
-    if (!target) return null
+  const resolveDropTarget = (point: { x: number; y: number }, ignoreEl?: HTMLElement | null) => {
+    // The dragged card can “block” hit-testing on some browsers. Temporarily
+    // remove it from pointer hit-testing so we can reliably detect what is beneath.
+    const prevPointerEvents = ignoreEl?.style.pointerEvents
+    if (ignoreEl) ignoreEl.style.pointerEvents = 'none'
 
-    const kind = target.dataset.dropTarget
-    if (kind === 'tableau') {
-      const idx = Number(target.dataset.columnIndex)
-      if (Number.isFinite(idx)) return { type: 'tableau' as const, column: idx }
+    try {
+      const els = document.elementsFromPoint(point.x, point.y)
+      for (const el of els) {
+        const node = el as unknown as Node
+        if (ignoreEl && (el === ignoreEl || ignoreEl.contains(node) || node.contains(ignoreEl))) continue
+
+        const target = (el as HTMLElement).closest?.('[data-drop-target]') as HTMLElement | null
+        if (!target) continue
+
+        const kind = target.dataset.dropTarget
+        if (kind === 'tableau') {
+          const idx = Number(target.dataset.columnIndex)
+          if (Number.isFinite(idx)) return { type: 'tableau' as const, column: idx }
+        }
+        if (kind === 'foundation') {
+          const categoryId = target.dataset.categoryId
+          if (categoryId) return { type: 'foundation' as const, categoryId }
+        }
+      }
+      return null
+    } finally {
+      if (ignoreEl) ignoreEl.style.pointerEvents = prevPointerEvents ?? ''
     }
-    if (kind === 'foundation') {
-      const categoryId = target.dataset.categoryId
-      if (categoryId) return { type: 'foundation' as const, categoryId }
-    }
-    return null
   }
 
-  const onDropCard = (from: Parameters<typeof moveCard>[0], point: { x: number; y: number }) => {
-    const to = resolveDropTarget(point)
+  const onDropCard = (
+    from: Parameters<typeof moveCard>[0],
+    point: { x: number; y: number },
+    draggedEl?: HTMLElement | null,
+  ) => {
+    const to = resolveDropTarget(point, draggedEl)
     if (!to) return
     moveCard(from, to)
   }
@@ -94,7 +112,7 @@ export function Game() {
               <CardView
                 card={level.cardsById[level.waste[level.waste.length - 1]]}
                 draggable
-                onDrop={(point) => onDropCard({ type: 'waste' }, { x: point.x, y: point.y })}
+                onDrop={(point, draggedEl) => onDropCard({ type: 'waste' }, { x: point.x, y: point.y }, draggedEl)}
                 feedback={lastError?.cardId === level.waste[level.waste.length - 1] ? 'error' : undefined}
                 feedbackKey={lastError?.cardId === level.waste[level.waste.length - 1] ? lastError.at : undefined}
               />
