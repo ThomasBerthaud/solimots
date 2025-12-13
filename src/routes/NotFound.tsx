@@ -11,5 +11,3 @@ export function NotFound() {
     </div>
   )
 }
-
-

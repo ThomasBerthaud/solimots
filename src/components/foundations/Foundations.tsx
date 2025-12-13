@@ -23,5 +23,3 @@ export function Foundations({ level, placedCategoryId, placedAt }: FoundationsPr
     </section>
   )
 }
-
-

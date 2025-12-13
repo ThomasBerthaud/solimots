@@ -9,9 +9,7 @@ export type MoveSource =
   | { type: 'waste' }
   | { type: 'foundation'; categoryId: CategoryId }
 
-export type MoveTarget =
-  | { type: 'tableau'; column: number }
-  | { type: 'foundation'; categoryId: CategoryId }
+export type MoveTarget = { type: 'tableau'; column: number } | { type: 'foundation'; categoryId: CategoryId }
 
 type HistoryEntry = {
   level: LevelState
@@ -126,9 +124,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       const nextStatus = computeStatus(next)
       const nextAction =
-        to.type === 'foundation'
-          ? { type: 'placed' as const, cardId, categoryId: to.categoryId, at: Date.now() }
-          : null
+        to.type === 'foundation' ? { type: 'placed' as const, cardId, categoryId: to.categoryId, at: Date.now() } : null
       return {
         ...state,
         history: [prev, ...state.history].slice(0, 200),
@@ -204,5 +200,3 @@ function computeStatus(level: LevelState): GameStatus {
   if (totalPlaced === totalCards) return 'won'
   return 'inProgress'
 }
-
-

@@ -12,14 +12,7 @@ export type CardViewProps = {
 }
 
 // English comments per project rule.
-export function CardView({
-  card,
-  draggable = false,
-  onDrop,
-  feedback,
-  feedbackKey,
-  className,
-}: CardViewProps) {
+export function CardView({ card, draggable = false, onDrop, feedback, feedbackKey, className }: CardViewProps) {
   return (
     <motion.div
       key={`${card.id}-${feedbackKey ?? 0}`}
@@ -50,12 +43,8 @@ export function CardView({
     >
       <div className="flex items-center justify-between gap-2">
         <span className="truncate">{card.word}</span>
-        <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600">
-          ?
-        </span>
+        <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600">?</span>
       </div>
     </motion.div>
   )
 }
-
-

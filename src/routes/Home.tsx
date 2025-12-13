@@ -8,9 +8,7 @@ export function Home() {
         <h1 className="mt-2 text-2xl font-semibold leading-tight md:text-3xl">
           Associe les mots à la bonne catégorie.
         </h1>
-        <p className="mt-2 text-white/75">
-          Un feeling “solitaire”, mais avec des mots. Déplace, teste, progresse.
-        </p>
+        <p className="mt-2 text-white/75">Un feeling “solitaire”, mais avec des mots. Déplace, teste, progresse.</p>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Link
@@ -37,13 +35,9 @@ export function Home() {
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
           <p className="text-sm font-semibold">Niveaux rejouables</p>
-          <p className="mt-1 text-sm text-white/75">
-            Génération locale de niveaux (4 catégories × 6 mots).
-          </p>
+          <p className="mt-1 text-sm text-white/75">Génération locale de niveaux (4 catégories × 6 mots).</p>
         </div>
       </section>
     </div>
   )
 }
-
-

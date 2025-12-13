@@ -9,9 +9,7 @@ export function HowTo() {
         <ul className="list-disc space-y-2 pl-5 text-white/85">
           <li>Tu as 4 catégories et 24 cartes-mots (4 × 6).</li>
           <li>Tu peux déplacer une carte visible vers n’importe quelle colonne du tableau.</li>
-          <li>
-            Pour marquer des points, dépose une carte dans la bonne pile Catégorie (si elle correspond).
-          </li>
+          <li>Pour marquer des points, dépose une carte dans la bonne pile Catégorie (si elle correspond).</li>
           <li>Si tu te trompes, la carte revient (feedback visuel).</li>
           <li>Le niveau est gagné quand toutes les cartes sont rangées dans les catégories.</li>
         </ul>
@@ -26,5 +24,3 @@ export function HowTo() {
     </div>
   )
 }
-
-

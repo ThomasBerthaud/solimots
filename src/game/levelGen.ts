@@ -78,10 +78,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const stock = cardsShuffled.slice(tableauDealCount).map((c) => c.id)
   const waste: CardId[] = []
 
-  const foundations = Object.fromEntries(categories.map((c) => [c.id, [] as CardId[]])) as Record<
-    string,
-    CardId[]
-  >
+  const foundations = Object.fromEntries(categories.map((c) => [c.id, [] as CardId[]])) as Record<string, CardId[]>
 
   return {
     seed,
@@ -109,5 +106,3 @@ function pickTheme(themeId: string | undefined, rnd: () => number): ThemeDef {
 function uniqueWords(words: string[]): string[] {
   return Array.from(new Set(words.map((w) => w.trim()).filter(Boolean)))
 }
-
-

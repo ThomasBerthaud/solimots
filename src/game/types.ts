@@ -41,5 +41,3 @@ export type LevelState = {
   /** Final piles by category. */
   foundations: Record<CategoryId, CardId[]>
 }
-
-

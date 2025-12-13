@@ -33,12 +33,7 @@ export function Column({ level, columnIndex, onDropCard, errorCardId, errorAt }:
               <CardView
                 card={card}
                 draggable={isTop}
-                onDrop={(point) =>
-                  onDropCard(
-                    { type: 'tableau', column: columnIndex },
-                    { x: point.x, y: point.y },
-                  )
-                }
+                onDrop={(point) => onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y })}
                 feedback={isTop && errorCardId === id ? 'error' : undefined}
                 feedbackKey={isTop && errorCardId === id ? errorAt : undefined}
                 className={isTop ? '' : 'opacity-95'}
@@ -58,5 +53,3 @@ export function Column({ level, columnIndex, onDropCard, errorCardId, errorAt }:
     </div>
   )
 }
-
-

@@ -28,5 +28,3 @@ export function Tableau({ level, onDropCard, errorCardId, errorAt }: TableauProp
     </section>
   )
 }
-
-

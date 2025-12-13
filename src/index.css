@@ -22,8 +22,16 @@ body {
   margin: 0;
   background: radial-gradient(1200px 600px at 30% 0%, hsl(var(--felt-700)), hsl(var(--felt-900)));
   color: hsl(var(--card));
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial,
-    'Apple Color Emoji', 'Segoe UI Emoji';
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Arial,
+    'Apple Color Emoji',
+    'Segoe UI Emoji';
 }
 
 /* Improve mobile drag interactions */

@@ -15,7 +15,17 @@ export function FoundationPile({ category, count, placedAt }: FoundationPileProp
       data-drop-target="foundation"
       data-category-id={category.id}
       className="rounded-2xl border border-white/10 bg-black/20 p-3 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
-      animate={placedAt ? { boxShadow: ['0 10px 30px rgba(0,0,0,0.25)', '0 10px 40px rgba(251,191,36,0.25)', '0 10px 30px rgba(0,0,0,0.25)'] } : undefined}
+      animate={
+        placedAt
+          ? {
+              boxShadow: [
+                '0 10px 30px rgba(0,0,0,0.25)',
+                '0 10px 40px rgba(251,191,36,0.25)',
+                '0 10px 30px rgba(0,0,0,0.25)',
+              ],
+            }
+          : undefined
+      }
       transition={placedAt ? { duration: 0.5, ease: 'easeOut' } : undefined}
     >
       <p className="text-xs font-semibold uppercase tracking-wider text-white/70">{category.label}</p>
@@ -26,5 +36,3 @@ export function FoundationPile({ category, count, placedAt }: FoundationPileProp
     </motion.div>
   )
 }
-
-

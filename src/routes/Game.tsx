@@ -39,10 +39,7 @@ export function Game() {
     return null
   }
 
-  const onDropCard = (
-    from: Parameters<typeof moveCard>[0],
-    point: { x: number; y: number },
-  ) => {
+  const onDropCard = (from: Parameters<typeof moveCard>[0], point: { x: number; y: number }) => {
     const to = resolveDropTarget(point)
     if (!to) return
     moveCard(from, to)
@@ -76,12 +73,7 @@ export function Game() {
       />
 
       {/* Tableau */}
-      <Tableau
-        level={level}
-        onDropCard={onDropCard}
-        errorCardId={lastError?.cardId}
-        errorAt={lastError?.at}
-      />
+      <Tableau level={level} onDropCard={onDropCard} errorCardId={lastError?.cardId} errorAt={lastError?.at} />
 
       {/* Stock / Waste */}
       <section className="grid grid-cols-2 gap-3">
@@ -104,9 +96,7 @@ export function Game() {
                 draggable
                 onDrop={(point) => onDropCard({ type: 'waste' }, { x: point.x, y: point.y })}
                 feedback={lastError?.cardId === level.waste[level.waste.length - 1] ? 'error' : undefined}
-                feedbackKey={
-                  lastError?.cardId === level.waste[level.waste.length - 1] ? lastError.at : undefined
-                }
+                feedbackKey={lastError?.cardId === level.waste[level.waste.length - 1] ? lastError.at : undefined}
               />
             ) : (
               <div className="flex h-14 items-center justify-center text-xs text-white/50">Vide</div>
@@ -161,5 +151,3 @@ export function Game() {
     </div>
   )
 }
-
-
