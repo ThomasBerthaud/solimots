@@ -24,25 +24,31 @@ export function Column({ level, columnIndex, onDropCard, errorCardId, errorAt }:
       <div className="mb-2 h-9 rounded-xl border border-white/10 bg-black/20" />
 
       <div className="relative">
-        {visible.map((id, idx) => {
-          const card = level.cardsById[id]
-          const isTop = id === ids.at(-1)
-          const y = idx * 14
-          return (
-            <div key={id} className="absolute left-0 right-0" style={{ top: y }}>
-              <CardView
-                card={card}
-                draggable={isTop}
-                onDrop={(point, draggedEl) =>
-                  onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
-                }
-                feedback={isTop && errorCardId === id ? 'error' : undefined}
-                feedbackKey={isTop && errorCardId === id ? errorAt : undefined}
-                className={isTop ? '' : 'opacity-95'}
-              />
-            </div>
-          )
-        })}
+        {visible.length ? (
+          visible.map((id, idx) => {
+            const card = level.cardsById[id]
+            const isTop = id === ids.at(-1)
+            const y = idx * 14
+            return (
+              <div key={id} className="absolute left-0 right-0" style={{ top: y }}>
+                <CardView
+                  card={card}
+                  draggable={isTop}
+                  onDrop={(point, draggedEl) =>
+                    onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
+                  }
+                  feedback={isTop && errorCardId === id ? 'error' : undefined}
+                  feedbackKey={isTop && errorCardId === id ? errorAt : undefined}
+                  className={isTop ? '' : 'opacity-95'}
+                />
+              </div>
+            )
+          })
+        ) : (
+          <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-white/15 bg-black/10 text-xs text-white/50">
+            Vide
+          </div>
+        )}
         {/* Reserve height for the stack */}
         <div style={{ height: Math.max(1, visible.length) * 14 + 80 }} />
       </div>

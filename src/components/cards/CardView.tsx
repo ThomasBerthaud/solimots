@@ -29,6 +29,7 @@ function getClientPoint(event: MouseEvent | TouchEvent | PointerEvent, fallback:
 // English comments per project rule.
 export function CardView({ card, draggable = false, onDrop, feedback, feedbackKey, className }: CardViewProps) {
   const ref = useRef<HTMLDivElement | null>(null)
+  const isCategory = card.kind === 'category'
   return (
     <motion.div
       ref={ref}
@@ -53,8 +54,10 @@ export function CardView({ card, draggable = false, onDrop, feedback, feedbackKe
       }
       transition={feedback ? { duration: 0.35, ease: 'easeOut' } : undefined}
       className={[
-        'select-none rounded-2xl bg-white px-3 py-3 text-sm font-semibold text-slate-900 shadow',
-        'ring-1 ring-black/5',
+        'select-none rounded-2xl px-3 py-3 text-sm font-semibold shadow',
+        isCategory
+          ? 'bg-amber-100 text-amber-950 ring-1 ring-amber-200'
+          : 'bg-white text-slate-900 ring-1 ring-black/5',
         draggable ? 'cursor-grab active:cursor-grabbing' : '',
         className ?? '',
       ].join(' ')}
@@ -63,9 +66,13 @@ export function CardView({ card, draggable = false, onDrop, feedback, feedbackKe
     >
       <div className="flex items-center justify-between gap-2">
         <span className="truncate">{card.word}</span>
-        <span className="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-800 ring-1 ring-amber-200">
-          <span className="mr-1 align-middle text-[9px] text-amber-700">◇</span>
-          <span className="align-middle">?</span>
+        <span
+          className={[
+            'shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ring-1',
+            isCategory ? 'bg-amber-200 text-amber-900 ring-amber-300' : 'bg-slate-100 text-slate-700 ring-slate-200',
+          ].join(' ')}
+        >
+          <span className="align-middle">{isCategory ? 'CAT' : 'MOT'}</span>
         </span>
       </div>
     </motion.div>

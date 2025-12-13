@@ -17,12 +17,28 @@ export type ThemeDef = {
 
 export type CardId = string
 
+export type CardKind = 'word' | 'category'
+
 export type Card = {
   id: CardId
   word: string
+  kind: CardKind
+  /**
+   * For word cards: the category the word belongs to.
+   * For category cards: the category this card represents.
+   */
   categoryId: CategoryId
   /** All cards are face-up in the MVP for simplicity. */
   faceUp: boolean
+}
+
+export type SlotState = {
+  /** The placed category card that unlocks the slot, or null if empty. */
+  categoryCardId: CardId | null
+  /** Word cards placed under the category (top is last). */
+  pile: CardId[]
+  /** When true, the slot is playing a completion animation and is temporarily locked. */
+  isCompleting?: boolean
 }
 
 export type LevelState = {
@@ -30,6 +46,7 @@ export type LevelState = {
   themeId: string
   categories: CategoryDef[]
   cardsById: Record<CardId, Card>
+  wordsPerCategory: number
 
   /** 4 columns for the MVP. Each column is a stack of card ids (top is last). */
   tableau: CardId[][]
@@ -38,6 +55,6 @@ export type LevelState = {
   stock: CardId[]
   waste: CardId[]
 
-  /** Final piles by category. */
-  foundations: Record<CategoryId, CardId[]>
+  /** 4 free slots that accept a category card, then its matching words. */
+  slots: SlotState[]
 }

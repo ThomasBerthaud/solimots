@@ -30,8 +30,10 @@ function pickN<T>(arr: T[], n: number, rnd: () => number): T[] {
 
 export type GenerateLevelOptions = {
   seed?: number
-  /** Fixed MVP size: 4 categories × 6 words. */
+  /** Fixed MVP size: 6 words per category. */
   wordsPerCategory?: number
+  /** How many categories are included in the level (must be > 4 for slot gameplay). */
+  categoryCount?: number
   /** Fixed MVP: 4 columns. */
   tableauColumns?: number
   /** Fixed MVP: deal this many cards on the tableau (rest goes to stock). */
@@ -45,21 +47,32 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const rnd = mulberry32(seed)
 
   const wordsPerCategory = options.wordsPerCategory ?? 6
+  const categoryCount = options.categoryCount ?? 8
   const tableauColumns = options.tableauColumns ?? 4
   const tableauDealCount = options.tableauDealCount ?? 12 // 4 columns × 3 cards
 
   const theme = pickTheme(options.themeId, rnd)
-  const selectedCategories = pickN(theme.categories, 4, rnd)
+  const selectedCategories = pickN(theme.categories, Math.max(5, categoryCount), rnd)
 
   const categories: CategoryDef[] = selectedCategories.map((c) => ({ id: c.id, label: c.label }))
 
   const cards: Card[] = []
   for (const cat of selectedCategories) {
+    // The category itself is a card in the deck.
+    cards.push({
+      id: `card_${cards.length}`,
+      word: cat.label,
+      kind: 'category',
+      categoryId: cat.id,
+      faceUp: true,
+    })
+
     const words = pickN(uniqueWords(cat.words), wordsPerCategory, rnd)
     for (const w of words) {
       cards.push({
         id: `card_${cards.length}`,
         word: w,
+        kind: 'word',
         categoryId: cat.id,
         faceUp: true,
       })
@@ -78,17 +91,21 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const stock = cardsShuffled.slice(tableauDealCount).map((c) => c.id)
   const waste: CardId[] = []
 
-  const foundations = Object.fromEntries(categories.map((c) => [c.id, [] as CardId[]])) as Record<string, CardId[]>
+  const slots: LevelState['slots'] = Array.from({ length: 4 }, () => ({
+    categoryCardId: null,
+    pile: [],
+  }))
 
   return {
     seed,
     themeId: theme.id,
     categories,
     cardsById,
+    wordsPerCategory,
     tableau,
     stock,
     waste,
-    foundations,
+    slots,
   }
 }
 

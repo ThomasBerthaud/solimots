@@ -4,29 +4,32 @@ import type { CardId, CategoryId, LevelState } from '../game/types'
 
 export type GameStatus = 'idle' | 'inProgress' | 'won'
 
-export type MoveSource =
-  | { type: 'tableau'; column: number }
-  | { type: 'waste' }
-  | { type: 'foundation'; categoryId: CategoryId }
+export type MoveSource = { type: 'tableau'; column: number } | { type: 'waste' }
 
-export type MoveTarget = { type: 'tableau'; column: number } | { type: 'foundation'; categoryId: CategoryId }
+export type MoveTarget = { type: 'tableau'; column: number } | { type: 'slot'; slotIndex: number }
 
 type HistoryEntry = {
   level: LevelState
   status: GameStatus
 }
 
+export type LastAction =
+  | { type: 'slotPlaced'; cardId: CardId; slotIndex: number; at: number }
+  | { type: 'slotCompleted'; slotIndex: number; categoryId: CategoryId; at: number }
+  | null
+
 type GameStore = {
   level: LevelState | null
   status: GameStatus
   history: HistoryEntry[]
   lastError: { message: string; cardId?: CardId; at: number } | null
-  lastAction: { type: 'placed'; cardId: CardId; categoryId: CategoryId; at: number } | null
+  lastAction: LastAction
 
   newGame: (seed?: number) => void
   resetLevel: () => void
   draw: () => void
   moveCard: (from: MoveSource, to: MoveTarget) => void
+  finalizeSlotCompletion: (slotIndex: number, completedAt: number) => void
   undo: () => void
   clearError: () => void
 }
@@ -111,10 +114,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
-      const ok = pushTo(next, cardId, to)
-      if (!ok) {
+      const now = Date.now()
+      const res = pushTo(next, cardId, to, now)
+      if (!res.ok) {
         // Revert pop if invalid push.
-        pushTo(next, cardId, fromToTarget(from))
+        pushBack(next, cardId, from)
         return {
           ...state,
           lastError: { message: 'Déplacement invalide', cardId, at: Date.now() },
@@ -123,8 +127,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       const nextStatus = computeStatus(next)
-      const nextAction =
-        to.type === 'foundation' ? { type: 'placed' as const, cardId, categoryId: to.categoryId, at: Date.now() } : null
+      const nextAction = res.action
+
+      if (res.completedSlotIndex != null) {
+        const slotIndex = res.completedSlotIndex
+        const completedAt = res.completedAt ?? now
+        // Allow the UI to play a completion animation before clearing the slot.
+        window.setTimeout(() => {
+          get().finalizeSlotCompletion(slotIndex, completedAt)
+        }, 380)
+      }
       return {
         ...state,
         history: [prev, ...state.history].slice(0, 200),
@@ -132,6 +144,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         status: nextStatus,
         lastError: null,
         lastAction: nextAction,
+      }
+    })
+  },
+
+  finalizeSlotCompletion: (slotIndex, _completedAt) => {
+    const { level, status } = get()
+    if (!level || status !== 'inProgress') return
+
+    set((state) => {
+      if (!state.level) return state
+      const slot = state.level.slots[slotIndex]
+      if (!slot?.isCompleting) return state
+
+      const next = cloneLevel(state.level)
+      const nextSlot = next.slots[slotIndex]
+      if (!nextSlot) return state
+      if (!nextSlot.isCompleting) return state
+
+      nextSlot.categoryCardId = null
+      nextSlot.pile = []
+      delete nextSlot.isCompleting
+
+      return {
+        ...state,
+        level: next,
+        status: computeStatus(next),
+        lastError: null,
+        // Keep lastAction so the UI can still reference the completion timestamp if needed.
+        lastAction: state.lastAction,
       }
     })
   },
@@ -160,43 +201,87 @@ function cloneLevel(level: LevelState): LevelState {
     tableau: level.tableau.map((col) => col.slice()),
     stock: level.stock.slice(),
     waste: level.waste.slice(),
-    foundations: Object.fromEntries(
-      Object.entries(level.foundations).map(([k, v]) => [k, v.slice()]),
-    ) as LevelState['foundations'],
+    slots: level.slots.map((s) => ({
+      categoryCardId: s.categoryCardId,
+      pile: s.pile.slice(),
+      isCompleting: s.isCompleting,
+    })),
   }
 }
 
 function popFrom(level: LevelState, from: MoveSource): CardId | null {
   if (from.type === 'waste') return level.waste.pop() ?? null
   if (from.type === 'tableau') return level.tableau[from.column]?.pop() ?? null
-  if (from.type === 'foundation') return level.foundations[from.categoryId]?.pop() ?? null
   return null
 }
 
-function pushTo(level: LevelState, cardId: CardId, to: MoveTarget): boolean {
-  if (to.type === 'tableau') {
-    level.tableau[to.column]?.push(cardId)
-    return true
+function pushBack(level: LevelState, cardId: CardId, from: MoveSource): void {
+  if (from.type === 'waste') {
+    level.waste.push(cardId)
+    return
   }
-  if (to.type === 'foundation') {
-    const card = level.cardsById[cardId]
-    if (!card) return false
-    if (card.categoryId !== to.categoryId) return false
-    level.foundations[to.categoryId]?.push(cardId)
-    return true
+  if (from.type === 'tableau') {
+    level.tableau[from.column]?.push(cardId)
   }
-  return false
 }
 
-function fromToTarget(from: MoveSource): MoveTarget {
-  if (from.type === 'waste') return { type: 'tableau', column: 0 }
-  if (from.type === 'tableau') return { type: 'tableau', column: from.column }
-  return { type: 'foundation', categoryId: from.categoryId }
+function pushTo(
+  level: LevelState,
+  cardId: CardId,
+  to: MoveTarget,
+  now: number,
+): { ok: boolean; action: LastAction; completedSlotIndex?: number; completedAt?: number } {
+  if (to.type === 'tableau') {
+    level.tableau[to.column]?.push(cardId)
+    return { ok: true, action: null }
+  }
+  if (to.type === 'slot') {
+    const slot = level.slots[to.slotIndex]
+    if (!slot) return { ok: false, action: null }
+    if (slot.isCompleting) return { ok: false, action: null }
+
+    const card = level.cardsById[cardId]
+    if (!card) return { ok: false, action: null }
+
+    if (slot.categoryCardId == null) {
+      if (card.kind !== 'category') return { ok: false, action: null }
+      slot.categoryCardId = cardId
+      slot.pile = []
+      return { ok: true, action: { type: 'slotPlaced', cardId, slotIndex: to.slotIndex, at: now } }
+    }
+
+    const categoryCard = level.cardsById[slot.categoryCardId]
+    if (!categoryCard || categoryCard.kind !== 'category') return { ok: false, action: null }
+    if (card.kind !== 'word') return { ok: false, action: null }
+    if (card.categoryId !== categoryCard.categoryId) return { ok: false, action: null }
+
+    slot.pile.push(cardId)
+
+    if (slot.pile.length >= level.wordsPerCategory) {
+      slot.isCompleting = true
+      return {
+        ok: true,
+        action: { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: categoryCard.categoryId, at: now },
+        completedSlotIndex: to.slotIndex,
+        completedAt: now,
+      }
+    }
+
+    return { ok: true, action: null }
+  }
+  return { ok: false, action: null }
 }
 
 function computeStatus(level: LevelState): GameStatus {
-  const totalPlaced = Object.values(level.foundations).reduce((acc, pile) => acc + pile.length, 0)
-  const totalCards = Object.keys(level.cardsById).length
-  if (totalPlaced === totalCards) return 'won'
+  const tableauRemaining = level.tableau.reduce((acc, col) => acc + col.length, 0)
+  const stockRemaining = level.stock.length
+  const wasteRemaining = level.waste.length
+  const slotsRemaining = level.slots.reduce(
+    // isCompleting is a transient UI flag, not an actual card to count.
+    (acc, s) => acc + (s.categoryCardId ? 1 : 0) + s.pile.length,
+    0,
+  )
+
+  if (tableauRemaining + stockRemaining + wasteRemaining + slotsRemaining === 0) return 'won'
   return 'inProgress'
 }
