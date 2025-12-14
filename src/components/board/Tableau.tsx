@@ -12,8 +12,8 @@ export type TableauProps = {
 // English comments per project rule.
 export function Tableau({ level, onDropCard, errorCardId, errorAt }: TableauProps) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-black/10 p-3">
-      <div className="grid grid-cols-4 gap-3">
+    <section className="rounded-xl border border-white/10 bg-black/10 p-2 sm:rounded-2xl sm:p-3">
+      <div className="grid grid-cols-4 gap-2 sm:gap-3">
         {level.tableau.map((_, colIdx) => (
           <Column
             key={colIdx}

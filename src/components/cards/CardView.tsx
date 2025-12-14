@@ -57,7 +57,10 @@ export function CardView({ card, draggable = false, onDrop, feedback, feedbackKe
       }
       transition={feedback ? { duration: 0.35, ease: 'easeOut' } : undefined}
       className={[
-        'select-none rounded-2xl px-3 py-3 text-sm font-semibold shadow',
+        // Standard playing-card ratio with a compact, thumb-friendly size.
+        // Use a responsive fixed width (viewport-dependent) with sensible min/max.
+        // max-w-full ensures we never overflow smaller parents (e.g. stock/waste).
+        'select-none aspect-[63/88] w-[clamp(60px,22vw,110px)] max-w-full rounded-xl p-2 text-[12px] font-semibold leading-tight shadow sm:rounded-2xl sm:p-2.5 sm:text-xs',
         isCategory
           ? 'bg-amber-100 text-amber-950 ring-1 ring-amber-200'
           : 'bg-white text-slate-900 ring-1 ring-black/5',
@@ -71,7 +74,7 @@ export function CardView({ card, draggable = false, onDrop, feedback, feedbackKe
         <span className="truncate">{card.word}</span>
         <span
           className={[
-            'shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ring-1',
+            'shrink-0 rounded-full px-1.5 py-1 text-[9px] font-bold ring-1 sm:px-2 sm:text-[10px]',
             isCategory ? 'bg-amber-200 text-amber-900 ring-amber-300' : 'bg-slate-100 text-slate-700 ring-slate-200',
           ].join(' ')}
           aria-label={kindLabel}

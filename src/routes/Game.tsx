@@ -1,13 +1,16 @@
 import { motion } from 'framer-motion'
-import { Archive, Flag, Inbox, Layers, Palette, Play, RotateCcw, Trophy, Undo2 } from 'lucide-react'
+import { ArrowLeft, Inbox, Layers, Play, RotateCcw, Undo2 } from 'lucide-react'
 import { useEffect } from 'react'
-import { Tableau } from '../components/board/Tableau'
+import { useNavigate } from 'react-router-dom'
+import { Column } from '../components/board/Column'
 import { CardView } from '../components/cards/CardView'
-import { Foundations } from '../components/foundations/Foundations'
+import { FoundationPile } from '../components/foundations/FoundationPile'
+import { ErrorToast } from '../components/ui/ErrorToast'
 import { IconLabel } from '../components/ui/IconLabel'
 import { useGameStore } from '../store/gameStore'
 
 export function Game() {
+  const navigate = useNavigate()
   const level = useGameStore((s) => s.level)
   const status = useGameStore((s) => s.status)
   const lastError = useGameStore((s) => s.lastError)
@@ -23,8 +26,6 @@ export function Game() {
   }, [level, newGame])
 
   if (!level) return null
-
-  const StatusIcon = status === 'won' ? Trophy : Flag
 
   const resolveDropTarget = (point: { x: number; y: number }, ignoreEl?: HTMLElement | null) => {
     // The dragged card can “block” hit-testing on some browsers. Temporarily
@@ -67,11 +68,21 @@ export function Game() {
     moveCard(from, to)
   }
 
+  const wasteTopId = level.waste.at(-1)
+  const wasteTopCard = wasteTopId ? level.cardsById[wasteTopId] : undefined
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold md:text-2xl">Partie</h1>
+    <div className="relative mx-auto flex h-full w-full max-w-5xl flex-col gap-1 [--card-w:clamp(60px,22vw,110px)] sm:gap-2">
+      <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}
+            className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
+            aria-label="Retour"
+            title="Retour"
+          >
+            <IconLabel icon={ArrowLeft} label="Retour" />
+          </button>
           <button
             onClick={undo}
             className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
@@ -89,112 +100,82 @@ export function Game() {
             <IconLabel icon={RotateCcw} label="Réinitialiser" />
           </button>
         </div>
-      </div>
 
-      <section className="grid grid-cols-12 gap-3">
-        <div className="col-span-12 lg:col-span-9">
-          {/* Slots */}
-          <Foundations
-            level={level}
-            placedSlotIndex={lastAction?.type === 'slotPlaced' ? lastAction.slotIndex : undefined}
-            completedSlotIndex={lastAction?.type === 'slotCompleted' ? lastAction.slotIndex : undefined}
-            actionAt={lastAction ? lastAction.at : undefined}
-          />
-        </div>
-
-        {/* Stock / Waste (top-right) */}
-        <div className="col-span-12 lg:col-span-3">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
-            <button
-              onClick={draw}
-              className="rounded-2xl border border-white/10 bg-black/20 p-3 text-left hover:bg-black/30 active:bg-black/40"
-              aria-label="Pioche"
-              title="Pioche"
-            >
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
-                <span className="inline-flex items-center gap-2">
-                  <Layers aria-hidden="true" className="shrink-0 opacity-90" size={14} />
-                  <span>Pioche</span>
-                </span>
-              </p>
-              <div className="mt-2 flex items-center gap-3">
-                <div className="h-14 w-24 rounded-xl border border-white/10 bg-gradient-to-br from-white/10 to-black/30" />
-                <div className="text-xs text-white/70">
-                  <div className="inline-flex items-center gap-1.5" aria-label={`Stock: ${level.stock.length}`}>
-                    <Layers aria-hidden="true" className="shrink-0 opacity-90" size={14} />
-                    <span className="hidden sm:inline">Stock</span>
-                    <span className="sr-only sm:hidden">Stock</span>
-                    <span className="tabular-nums">{level.stock.length}</span>
-                  </div>
-                  <div className="inline-flex items-center gap-1.5" aria-label={`Défausse: ${level.waste.length}`}>
-                    <Archive aria-hidden="true" className="shrink-0 opacity-90" size={14} />
-                    <span className="hidden sm:inline">Défausse</span>
-                    <span className="sr-only sm:hidden">Défausse</span>
-                    <span className="tabular-nums">{level.waste.length}</span>
-                  </div>
+        {/* Stock / Waste (top-right), compact single block */}
+        <div className="rounded-xl border border-white/10 bg-black/20 p-2 sm:rounded-2xl">
+          <div className="grid grid-cols-2 gap-2">
+            {/* Waste (left) */}
+            <div className="relative w-[var(--card-w)] max-w-full" aria-label="Défausse">
+              {wasteTopCard ? (
+                <CardView
+                  card={wasteTopCard}
+                  draggable
+                  onDrop={(point, draggedEl) => onDropCard({ type: 'waste' }, { x: point.x, y: point.y }, draggedEl)}
+                  feedback={lastError?.cardId === wasteTopCard.id ? 'error' : undefined}
+                  feedbackKey={lastError?.cardId === wasteTopCard.id ? lastError.at : undefined}
+                />
+              ) : (
+                <div className="flex aspect-[63/88] w-full items-center justify-center rounded-xl border border-dashed border-white/15 bg-black/10 p-2 text-[10px] font-semibold text-white/50">
+                  <span className="sr-only">Défausse vide</span>
+                  <IconLabel icon={Inbox} label="Vide" />
                 </div>
-              </div>
-            </button>
-
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
-                <span className="inline-flex items-center gap-2">
-                  <Archive aria-hidden="true" className="shrink-0 opacity-90" size={14} />
-                  <span>Défausse</span>
-                </span>
-              </p>
-              <div className="mt-2 min-h-14 rounded-xl border border-dashed border-white/20 bg-white/5 p-2">
-                {level.waste.length ? (
-                  <CardView
-                    card={level.cardsById[level.waste[level.waste.length - 1]]}
-                    draggable
-                    onDrop={(point, draggedEl) => onDropCard({ type: 'waste' }, { x: point.x, y: point.y }, draggedEl)}
-                    feedback={lastError?.cardId === level.waste[level.waste.length - 1] ? 'error' : undefined}
-                    feedbackKey={lastError?.cardId === level.waste[level.waste.length - 1] ? lastError.at : undefined}
-                  />
-                ) : (
-                  <div className="flex h-14 items-center justify-center text-xs text-white/50" aria-label="Vide">
-                    <IconLabel icon={Inbox} label="Vide" />
-                  </div>
-                )}
+              )}
+              <div
+                className="pointer-events-none absolute -bottom-1 -right-1 rounded-full border border-white/15 bg-black/70 px-2 py-0.5 text-[10px] font-bold text-white/80"
+                aria-label={`Défausse: ${level.waste.length}`}
+              >
+                {level.waste.length}
               </div>
             </div>
+
+            {/* Stock (right) */}
+            <button
+              onClick={draw}
+              className="relative w-[var(--card-w)] max-w-full"
+              aria-label={`Pioche: ${level.stock.length}`}
+              title="Pioche"
+            >
+              <div className="aspect-[63/88] w-full rounded-xl bg-gradient-to-br from-white/10 to-black/40 ring-1 ring-white/10" />
+              <div className="pointer-events-none absolute -bottom-1 -right-1 rounded-full border border-white/15 bg-black/70 px-2 py-0.5 text-[10px] font-bold text-white/80">
+                <span className="inline-flex items-center gap-1">
+                  <Layers aria-hidden="true" size={12} className="opacity-90" />
+                  <span className="tabular-nums">{level.stock.length}</span>
+                </span>
+              </div>
+            </button>
           </div>
         </div>
-      </section>
-
-      {/* Tableau */}
-      <Tableau level={level} onDropCard={onDropCard} errorCardId={lastError?.cardId} errorAt={lastError?.at} />
-
-      <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 p-3 text-xs text-white/75">
-        <span className="inline-flex items-center gap-2" aria-label={`Thème: ${level.themeId}`}>
-          <Palette aria-hidden="true" className="shrink-0 opacity-90" size={14} />
-          <span className="hidden sm:inline">Thème</span>
-          <span className="sr-only sm:hidden">Thème</span>
-          <span className="tabular-nums">{level.themeId}</span>
-        </span>
-        <span
-          className={['inline-flex items-center gap-2', status === 'won' ? 'text-amber-300' : ''].join(' ')}
-          aria-label={`Statut: ${status}`}
-        >
-          <StatusIcon aria-hidden="true" className="shrink-0 opacity-90" size={14} />
-          <span className="hidden sm:inline">Statut</span>
-          <span className="sr-only sm:hidden">Statut</span>
-          <span className="tabular-nums">{status}</span>
-        </span>
       </div>
 
-      {lastError ? (
-        <motion.div
-          key={lastError.at}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
-          transition={{ duration: 0.35, ease: 'easeOut' }}
-          className="rounded-2xl border border-rose-400/30 bg-rose-500/10 p-3 text-sm text-rose-100"
-        >
-          {lastError.message}
-        </motion.div>
-      ) : null}
+      {/* 4 columns: category slot on top, tableau pile below */}
+      <div className="min-h-0 flex-1">
+        <section className="grid h-full grid-cols-4 justify-items-start gap-1 sm:gap-2">
+          {level.slots.map((slot, idx) => (
+            <div key={idx} className="flex min-h-0 flex-col items-start gap-1 sm:gap-2">
+              <FoundationPile
+                level={level}
+                slotIndex={idx}
+                slot={slot}
+                placedAt={lastAction?.type === 'slotPlaced' && lastAction.slotIndex === idx ? lastAction.at : undefined}
+                completedAt={
+                  lastAction?.type === 'slotCompleted' && lastAction.slotIndex === idx ? lastAction.at : undefined
+                }
+              />
+              <div className="min-h-0 flex-1">
+                <Column
+                  level={level}
+                  columnIndex={idx}
+                  onDropCard={onDropCard}
+                  errorCardId={lastError?.cardId}
+                  errorAt={lastError?.at}
+                />
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+
+      <ErrorToast error={lastError ? { at: lastError.at, message: lastError.message } : null} />
 
       {status === 'won' ? (
         <motion.div

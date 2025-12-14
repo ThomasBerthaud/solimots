@@ -23,7 +23,9 @@ export function FoundationPile({ level, slotIndex, slot, placedAt, completedAt }
       data-drop-target="slot"
       data-slot-index={slotIndex}
       className={[
-        'rounded-2xl border border-white/10 bg-black/20 p-3 shadow-[0_10px_30px_rgba(0,0,0,0.25)]',
+        // Compact slot: standard card for the category + a small strip for the top word.
+        // Keep overflow visible so the category card can "hang" outside the slot like solitaire.
+        'w-[clamp(60px,22vw,110px)] max-w-full rounded-xl border border-white/10 bg-black/15 p-1 shadow-[0_10px_30px_rgba(0,0,0,0.25)] sm:rounded-2xl sm:p-1.5',
         isLocked ? 'opacity-80' : '',
       ].join(' ')}
       animate={
@@ -49,69 +51,73 @@ export function FoundationPile({ level, slotIndex, slot, placedAt, completedAt }
       }
       transition={placedAt || completedAt ? { duration: 0.5, ease: 'easeOut' } : undefined}
     >
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-white/70">Slot {slotIndex + 1}</p>
-        {categoryCard ? (
-          <span className="text-xs font-semibold text-white/90">
-            {count}/{level.wordsPerCategory}
-          </span>
-        ) : null}
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-white/60 sm:text-xs sm:text-white/70">
+          <span className="hidden sm:inline">Slot </span>
+          <span className="tabular-nums">{slotIndex + 1}</span>
+        </p>
+        <span className="text-[10px] font-semibold text-white/80 sm:text-xs sm:text-white/90">
+          <span className="tabular-nums">{count}</span>
+          <span className="opacity-70">/</span>
+          <span className="tabular-nums">{level.wordsPerCategory}</span>
+        </span>
       </div>
 
-      <div className="mt-2 space-y-2">
-        <div className="rounded-xl border border-dashed border-white/20 bg-white/5 p-2">
-          <AnimatePresence mode="popLayout">
-            {categoryCard ? (
-              <motion.div
-                key={categoryCard.id}
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={isLocked ? { opacity: 0, y: -6, scale: 0.985 } : { opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                transition={{ duration: 0.22, ease: 'easeOut' }}
-              >
-                <CardView card={categoryCard} draggable={false} className="px-2 py-2 text-xs" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="empty-category"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="flex h-14 items-center justify-center text-xs text-white/50"
-              >
-                Dépose une catégorie
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+      <div className="grid gap-0.5">
+        <AnimatePresence mode="popLayout">
+          {categoryCard ? (
+            <motion.div
+              key={categoryCard.id}
+              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              animate={isLocked ? { opacity: 0, y: -6, scale: 0.985 } : { opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+            >
+              <div className="-translate-x-1 -translate-y-1 sm:-translate-x-1.5 sm:-translate-y-1.5">
+                <CardView card={categoryCard} draggable={false} />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty-category"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+              className="-translate-x-1 -translate-y-1 flex aspect-[63/88] w-[clamp(60px,22vw,110px)] max-w-full items-center justify-center rounded-xl border border-dashed border-white/15 bg-black/10 p-2 text-[10px] font-semibold text-white/50 sm:-translate-x-1.5 sm:-translate-y-1.5 sm:text-xs"
+            >
+              Catégorie
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <div className="rounded-xl border border-dashed border-white/10 bg-black/20 p-2">
-          <AnimatePresence mode="popLayout">
-            {topWordCard ? (
-              <motion.div
-                key={topWordCard.id}
-                initial={{ opacity: 0, y: 8, scale: 0.99 }}
-                animate={isLocked ? { opacity: 0, y: -6, scale: 0.99 } : { opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                transition={{ duration: 0.22, ease: 'easeOut' }}
-              >
-                <CardView card={topWordCard} draggable={false} className="px-2 py-2 text-xs" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="empty-word"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
-                className="flex h-10 items-center justify-center text-[11px] text-white/45"
-              >
-                {categoryCard ? 'Dépose les mots correspondants' : '—'}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <AnimatePresence mode="popLayout">
+          {topWordCard ? (
+            <motion.div
+              key={topWordCard.id}
+              initial={{ opacity: 0, y: 4 }}
+              animate={isLocked ? { opacity: 0, y: -4 } : { opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="rounded-lg border border-white/10 bg-black/25 px-1.5 py-0.5 text-[10px] font-semibold text-white/75 sm:text-[11px]"
+              aria-label={`Mot du dessus: ${topWordCard.word}`}
+            >
+              <span className="block truncate">{topWordCard.word}</span>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty-word"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+              className="rounded-lg border border-dashed border-white/10 bg-black/10 px-1.5 py-0.5 text-[10px] font-semibold text-white/40 sm:text-[11px]"
+              aria-label="Aucun mot"
+            >
+              {categoryCard ? 'Mots…' : '—'}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   )

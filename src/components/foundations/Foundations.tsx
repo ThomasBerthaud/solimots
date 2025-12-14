@@ -11,7 +11,7 @@ export type FoundationsProps = {
 // English comments per project rule.
 export function Foundations({ level, placedSlotIndex, completedSlotIndex, actionAt }: FoundationsProps) {
   return (
-    <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <section className="grid grid-cols-4 gap-2 sm:gap-3">
       {level.slots.map((slot, idx) => (
         <FoundationPile
           key={idx}

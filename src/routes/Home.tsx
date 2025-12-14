@@ -1,8 +1,18 @@
 import { Dices, GraduationCap, Play, ScrollText, Smartphone } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useCallback } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
+import { useGameStore } from '../store/gameStore'
 
 export function Home() {
+  const navigate = useNavigate()
+  const newGame = useGameStore((s) => s.newGame)
+
+  const startNewGame = useCallback(() => {
+    newGame()
+    navigate('/game')
+  }, [navigate, newGame])
+
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
@@ -18,8 +28,12 @@ export function Home() {
             className="inline-flex items-center justify-center rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-black shadow hover:bg-amber-300 active:bg-amber-500"
             aria-label="Jouer une partie"
             title="Jouer une partie"
+            onClick={(e) => {
+              e.preventDefault()
+              startNewGame()
+            }}
           >
-            <IconLabel icon={Play} label="Jouer une partie" />
+            <IconLabel icon={Play} label="Jouer une partie" hideLabelOnMobile={false} />
           </Link>
           <Link
             to="/tutorial"
@@ -27,7 +41,7 @@ export function Home() {
             aria-label="Mini tutoriel"
             title="Mini tutoriel"
           >
-            <IconLabel icon={GraduationCap} label="Mini tutoriel" />
+            <IconLabel icon={GraduationCap} label="Mini tutoriel" hideLabelOnMobile={false} />
           </Link>
           <Link
             to="/how-to"
@@ -35,7 +49,7 @@ export function Home() {
             aria-label="Voir les règles"
             title="Voir les règles"
           >
-            <IconLabel icon={ScrollText} label="Voir les règles" />
+            <IconLabel icon={ScrollText} label="Voir les règles" hideLabelOnMobile={false} />
           </Link>
         </div>
       </section>

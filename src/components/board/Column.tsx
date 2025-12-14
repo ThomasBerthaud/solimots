@@ -13,51 +13,48 @@ export type ColumnProps = {
 // English comments per project rule.
 export function Column({ level, columnIndex, onDropCard, errorCardId, errorAt }: ColumnProps) {
   const ids = level.tableau[columnIndex] ?? []
-  const visible = ids.slice(Math.max(0, ids.length - 6))
+  const topId = ids.at(-1)
+  const topCard = topId ? level.cardsById[topId] : undefined
+  const hiddenCount = Math.max(0, ids.length - (topId ? 1 : 0))
+  const backLayers = Math.min(4, hiddenCount)
 
   return (
     <div
       data-drop-target="tableau"
       data-column-index={columnIndex}
-      className="relative min-h-[220px] rounded-2xl border border-white/10 bg-black/10 p-2"
+      className="w-[clamp(60px,22vw,110px)] max-w-full rounded-xl border border-white/10 bg-black/10 p-0.5 sm:rounded-2xl sm:p-1"
     >
-      <div className="mb-2 h-9 rounded-xl border border-white/10 bg-black/20" />
-
-      <div className="relative">
-        {visible.length ? (
-          visible.map((id, idx) => {
-            const card = level.cardsById[id]
-            const isTop = id === ids.at(-1)
-            const y = idx * 14
+      {topCard ? (
+        <div className="relative">
+          {/* Draw a few "card backs" behind the top card to hint at hidden cards. */}
+          {Array.from({ length: backLayers }).map((_, i) => {
+            // Solitaire-like stack: each card sits slightly lower.
+            const offsetY = (i + 1) * 7
+            const opacity = 0.75 - i * 0.12
             return (
-              <div key={id} className="absolute left-0 right-0" style={{ top: y }}>
-                <CardView
-                  card={card}
-                  draggable={isTop}
-                  onDrop={(point, draggedEl) =>
-                    onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
-                  }
-                  feedback={isTop && errorCardId === id ? 'error' : undefined}
-                  feedbackKey={isTop && errorCardId === id ? errorAt : undefined}
-                  className={isTop ? '' : 'opacity-95'}
-                />
-              </div>
+              <div
+                key={i}
+                className="pointer-events-none absolute inset-0 -z-10 rounded-xl bg-gradient-to-br from-white/20 via-black/25 to-black/70 ring-1 ring-white/15 shadow-[0_12px_34px_rgba(0,0,0,0.30)] sm:rounded-2xl"
+                style={{ transform: `translateY(${offsetY}px)`, opacity }}
+              />
             )
-          })
-        ) : (
-          <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-white/15 bg-black/10 text-xs text-white/50">
-            Vide
-          </div>
-        )}
-        {/* Reserve height for the stack */}
-        <div style={{ height: Math.max(1, visible.length) * 14 + 80 }} />
-      </div>
+          })}
 
-      {ids.length > visible.length ? (
-        <div className="mt-2 text-center text-[10px] font-semibold text-white/50">
-          +{ids.length - visible.length} cartes
+          <CardView
+            card={topCard}
+            draggable
+            onDrop={(point, draggedEl) =>
+              onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
+            }
+            feedback={errorCardId === topCard.id ? 'error' : undefined}
+            feedbackKey={errorCardId === topCard.id ? errorAt : undefined}
+          />
         </div>
-      ) : null}
+      ) : (
+        <div className="flex aspect-[63/88] w-[clamp(60px,22vw,110px)] max-w-full items-center justify-center rounded-xl border border-dashed border-white/15 bg-black/10 p-2 text-[10px] font-semibold text-white/50 sm:text-xs">
+          Vide
+        </div>
+      )}
     </div>
   )
 }
