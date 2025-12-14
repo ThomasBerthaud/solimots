@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
+import { GraduationCap, Play, ScrollText } from 'lucide-react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
+import { IconLabel } from './components/ui/IconLabel'
 
 function App() {
   const location = useLocation()
@@ -12,14 +14,19 @@ function App() {
             Solimots
           </Link>
           <nav className="flex items-center gap-3 text-sm text-white/80">
-            <Link className="hover:text-white" to="/game">
-              Jouer
+            <Link className="inline-flex items-center hover:text-white" to="/game" aria-label="Jouer" title="Jouer">
+              <IconLabel icon={Play} label="Jouer" />
             </Link>
-            <Link className="hover:text-white" to="/tutorial">
-              Tutoriel
+            <Link
+              className="inline-flex items-center hover:text-white"
+              to="/tutorial"
+              aria-label="Tutoriel"
+              title="Tutoriel"
+            >
+              <IconLabel icon={GraduationCap} label="Tutoriel" />
             </Link>
-            <Link className="hover:text-white" to="/how-to">
-              Règles
+            <Link className="inline-flex items-center hover:text-white" to="/how-to" aria-label="Règles" title="Règles">
+              <IconLabel icon={ScrollText} label="Règles" />
             </Link>
           </nav>
         </div>

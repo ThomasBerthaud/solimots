@@ -1,5 +1,6 @@
 import type { Point } from 'framer-motion'
 import { motion } from 'framer-motion'
+import { Tag, Type } from 'lucide-react'
 import { useRef } from 'react'
 import type { Card } from '../../game/types'
 
@@ -30,6 +31,8 @@ function getClientPoint(event: MouseEvent | TouchEvent | PointerEvent, fallback:
 export function CardView({ card, draggable = false, onDrop, feedback, feedbackKey, className }: CardViewProps) {
   const ref = useRef<HTMLDivElement | null>(null)
   const isCategory = card.kind === 'category'
+  const KindIcon = isCategory ? Tag : Type
+  const kindLabel = isCategory ? 'Catégorie' : 'Mot'
   return (
     <motion.div
       ref={ref}
@@ -71,8 +74,10 @@ export function CardView({ card, draggable = false, onDrop, feedback, feedbackKe
             'shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ring-1',
             isCategory ? 'bg-amber-200 text-amber-900 ring-amber-300' : 'bg-slate-100 text-slate-700 ring-slate-200',
           ].join(' ')}
+          aria-label={kindLabel}
+          title={kindLabel}
         >
-          <span className="align-middle">{isCategory ? 'CAT' : 'MOT'}</span>
+          <KindIcon aria-hidden="true" className="align-middle" size={12} />
         </span>
       </div>
     </motion.div>

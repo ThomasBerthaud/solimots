@@ -149,6 +149,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   finalizeSlotCompletion: (slotIndex, _completedAt) => {
+    // Kept for potential future use (timing / analytics); referenced to satisfy linting.
+    void _completedAt
     const { level, status } = get()
     if (!level || status !== 'inProgress') return
 
