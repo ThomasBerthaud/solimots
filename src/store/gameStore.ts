@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { generateLevel } from '../game/levelGen'
 import type { CardId, CategoryId, LevelState } from '../game/types'
 
@@ -36,166 +37,180 @@ type GameStore = {
 
 // English comments per project rule.
 
-export const useGameStore = create<GameStore>((set, get) => ({
-  level: null,
-  status: 'idle',
-  history: [],
-  lastError: null,
-  lastAction: null,
-
-  newGame: (seed) => {
-    const level = generateLevel({ seed })
-    set({
-      level,
-      status: 'inProgress',
+export const useGameStore = create<GameStore>()(
+  persist(
+    (set, get) => ({
+      level: null,
+      status: 'idle',
       history: [],
       lastError: null,
       lastAction: null,
-    })
-  },
 
-  resetLevel: () => {
-    const current = get().level
-    const seed = current?.seed
-    const level = generateLevel({ seed })
-    set({
-      level,
-      status: 'inProgress',
-      history: [],
-      lastError: null,
-      lastAction: null,
-    })
-  },
-
-  draw: () => {
-    const { level, status } = get()
-    if (!level || status !== 'inProgress') return
-
-    set((state) => {
-      if (!state.level) return state
-      const prev: HistoryEntry = { level: state.level, status: state.status }
-
-      const stock = state.level.stock.slice()
-      const waste = state.level.waste.slice()
-
-      if (stock.length === 0) {
-        // Recycle waste back into stock (solitaire-like).
-        stock.push(...waste.reverse())
-        waste.length = 0
-      } else {
-        const cardId = stock.pop()
-        if (cardId) waste.push(cardId)
-      }
-
-      return {
-        ...state,
-        history: [prev, ...state.history].slice(0, 200),
-        level: { ...state.level, stock, waste },
-        lastError: null,
-        lastAction: null,
-      }
-    })
-  },
-
-  moveCard: (from, to) => {
-    const { level, status } = get()
-    if (!level || status !== 'inProgress') return
-
-    set((state) => {
-      if (!state.level) return state
-      const prev: HistoryEntry = { level: state.level, status: state.status }
-
-      const next = cloneLevel(state.level)
-      const cardId = popFrom(next, from)
-      if (!cardId) {
-        return {
-          ...state,
-          lastError: { message: 'Aucune carte à déplacer', at: Date.now() },
-        }
-      }
-
-      const now = Date.now()
-      const res = pushTo(next, cardId, to, now)
-      if (!res.ok) {
-        // Revert pop if invalid push.
-        pushBack(next, cardId, from)
-        return {
-          ...state,
-          lastError: { message: 'Déplacement invalide', cardId, at: Date.now() },
+      newGame: (seed) => {
+        const level = generateLevel({ seed })
+        set({
+          level,
+          status: 'inProgress',
+          history: [],
+          lastError: null,
           lastAction: null,
-        }
-      }
+        })
+      },
 
-      const nextStatus = computeStatus(next)
-      const nextAction = res.action
+      resetLevel: () => {
+        const current = get().level
+        const seed = current?.seed
+        const level = generateLevel({ seed })
+        set({
+          level,
+          status: 'inProgress',
+          history: [],
+          lastError: null,
+          lastAction: null,
+        })
+      },
 
-      if (res.completedSlotIndex != null) {
-        const slotIndex = res.completedSlotIndex
-        const completedAt = res.completedAt ?? now
-        // Allow the UI to play a completion animation before clearing the slot.
-        window.setTimeout(() => {
-          get().finalizeSlotCompletion(slotIndex, completedAt)
-        }, 380)
-      }
-      return {
-        ...state,
-        history: [prev, ...state.history].slice(0, 200),
-        level: next,
-        status: nextStatus,
-        lastError: null,
-        lastAction: nextAction,
-      }
-    })
-  },
+      draw: () => {
+        const { level, status } = get()
+        if (!level || status !== 'inProgress') return
 
-  finalizeSlotCompletion: (slotIndex, _completedAt) => {
-    // Kept for potential future use (timing / analytics); referenced to satisfy linting.
-    void _completedAt
-    const { level, status } = get()
-    if (!level || status !== 'inProgress') return
+        set((state) => {
+          if (!state.level) return state
+          const prev: HistoryEntry = { level: state.level, status: state.status }
 
-    set((state) => {
-      if (!state.level) return state
-      const slot = state.level.slots[slotIndex]
-      if (!slot?.isCompleting) return state
+          const stock = state.level.stock.slice()
+          const waste = state.level.waste.slice()
 
-      const next = cloneLevel(state.level)
-      const nextSlot = next.slots[slotIndex]
-      if (!nextSlot) return state
-      if (!nextSlot.isCompleting) return state
+          if (stock.length === 0) {
+            // Recycle waste back into stock (solitaire-like).
+            stock.push(...waste.reverse())
+            waste.length = 0
+          } else {
+            const cardId = stock.pop()
+            if (cardId) waste.push(cardId)
+          }
 
-      nextSlot.categoryCardId = null
-      nextSlot.pile = []
-      delete nextSlot.isCompleting
+          return {
+            ...state,
+            history: [prev, ...state.history].slice(0, 200),
+            level: { ...state.level, stock, waste },
+            lastError: null,
+            lastAction: null,
+          }
+        })
+      },
 
-      return {
-        ...state,
-        level: next,
-        status: computeStatus(next),
-        lastError: null,
-        // Keep lastAction so the UI can still reference the completion timestamp if needed.
-        lastAction: state.lastAction,
-      }
-    })
-  },
+      moveCard: (from, to) => {
+        const { level, status } = get()
+        if (!level || status !== 'inProgress') return
 
-  undo: () => {
-    set((state) => {
-      const entry = state.history[0]
-      if (!entry) return state
-      return {
-        ...state,
-        level: entry.level,
-        status: entry.status,
-        history: state.history.slice(1),
-        lastError: null,
-        lastAction: null,
-      }
-    })
-  },
+        set((state) => {
+          if (!state.level) return state
+          const prev: HistoryEntry = { level: state.level, status: state.status }
 
-  clearError: () => set({ lastError: null }),
-}))
+          const next = cloneLevel(state.level)
+          const cardId = popFrom(next, from)
+          if (!cardId) {
+            return {
+              ...state,
+              lastError: { message: 'Aucune carte à déplacer', at: Date.now() },
+            }
+          }
+
+          const now = Date.now()
+          const res = pushTo(next, cardId, to, now)
+          if (!res.ok) {
+            // Revert pop if invalid push.
+            pushBack(next, cardId, from)
+            return {
+              ...state,
+              lastError: { message: 'Déplacement invalide', cardId, at: Date.now() },
+              lastAction: null,
+            }
+          }
+
+          const nextStatus = computeStatus(next)
+          const nextAction = res.action
+
+          if (res.completedSlotIndex != null) {
+            const slotIndex = res.completedSlotIndex
+            const completedAt = res.completedAt ?? now
+            // Allow the UI to play a completion animation before clearing the slot.
+            window.setTimeout(() => {
+              get().finalizeSlotCompletion(slotIndex, completedAt)
+            }, 380)
+          }
+          return {
+            ...state,
+            history: [prev, ...state.history].slice(0, 200),
+            level: next,
+            status: nextStatus,
+            lastError: null,
+            lastAction: nextAction,
+          }
+        })
+      },
+
+      finalizeSlotCompletion: (slotIndex, _completedAt) => {
+        // Kept for potential future use (timing / analytics); referenced to satisfy linting.
+        void _completedAt
+        const { level, status } = get()
+        if (!level || status !== 'inProgress') return
+
+        set((state) => {
+          if (!state.level) return state
+          const slot = state.level.slots[slotIndex]
+          if (!slot?.isCompleting) return state
+
+          const next = cloneLevel(state.level)
+          const nextSlot = next.slots[slotIndex]
+          if (!nextSlot) return state
+          if (!nextSlot.isCompleting) return state
+
+          nextSlot.categoryCardId = null
+          nextSlot.pile = []
+          delete nextSlot.isCompleting
+
+          return {
+            ...state,
+            level: next,
+            status: computeStatus(next),
+            lastError: null,
+            // Keep lastAction so the UI can still reference the completion timestamp if needed.
+            lastAction: state.lastAction,
+          }
+        })
+      },
+
+      undo: () => {
+        set((state) => {
+          const entry = state.history[0]
+          if (!entry) return state
+          return {
+            ...state,
+            level: entry.level,
+            status: entry.status,
+            history: state.history.slice(1),
+            lastError: null,
+            lastAction: null,
+          }
+        })
+      },
+
+      clearError: () => set({ lastError: null }),
+    }),
+    {
+      name: 'solimots-game-v1',
+      version: 1,
+      storage: createJSONStorage(() => localStorage),
+      // Persist only what's needed to resume the current game.
+      partialize: (state) => ({
+        level: state.level,
+        status: state.status,
+      }),
+    },
+  ),
+)
 
 function cloneLevel(level: LevelState): LevelState {
   return {

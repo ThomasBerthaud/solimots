@@ -1,13 +1,17 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import './index.css'
+import { registerSW } from 'virtual:pwa-register'
 import App from './App.tsx'
+import './index.css'
 import { Game } from './routes/Game.tsx'
 import { Home } from './routes/Home.tsx'
 import { HowTo } from './routes/HowTo.tsx'
 import { NotFound } from './routes/NotFound.tsx'
 import { Tutorial } from './routes/Tutorial.tsx'
+
+// Register the service worker for offline support (PWA).
+void registerSW({ immediate: true })
 
 const router = createBrowserRouter([
   {
