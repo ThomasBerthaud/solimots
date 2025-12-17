@@ -33,7 +33,7 @@ export function Tutorial() {
       {
         title: '4) Gagne le niveau',
         body: 'Quand les 24 cartes sont rangées dans les catégories, c’est gagné.',
-        hint: 'Tu peux utiliser Annuler et Réinitialiser si besoin.',
+        hint: 'Tu peux utiliser Annuler si besoin.',
       },
     ],
     [],

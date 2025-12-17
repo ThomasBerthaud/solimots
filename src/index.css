@@ -54,3 +54,24 @@ body {
     @apply btn border border-white/15 bg-white/5 text-white/90 hover:bg-white/10 active:bg-white/15;
   }
 }
+
+@layer utilities {
+  /* Tailwind line-clamp plugin is not enabled; provide minimal clamps used by the UI. */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+}
+
+/* Mobile game sizing variables */
+.mobile-game {
+  --gap: clamp(6px, 1.4vw, 10px);
+  --cardW: clamp(56px, calc((100vw - 24px - (var(--gap) * 3)) / 4), 88px);
+  --cardH: calc(var(--cardW) * 1.38);
+  --stackStep: clamp(10px, 2.2vw, 14px);
+
+  --dockCardW: clamp(64px, 20vw, 84px);
+  --dockCardH: calc(var(--dockCardW) * 1.28);
+}
