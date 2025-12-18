@@ -35,7 +35,8 @@ export function SlotCell({
 
   const isLocked = Boolean(slot.isCompleting)
   const count = slot.pile.length
-  const progress = categoryCard ? `${count}/${level.wordsPerCategory}` : ''
+  const required = categoryCard ? (level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0) : 0
+  const progress = categoryCard ? `${count}/${required}` : ''
 
   const hint =
     selectedCard && !isLocked
@@ -44,11 +45,7 @@ export function SlotCell({
         : slot.categoryCardId != null &&
           (() => {
             const c = level.cardsById[slot.categoryCardId]
-            return (
-              c?.kind === 'category' &&
-              c.categoryId === selectedCard.categoryId &&
-              slot.pile.length < level.wordsPerCategory
-            )
+            return c?.kind === 'category' && c.categoryId === selectedCard.categoryId && slot.pile.length < required
           })()
       : false
 

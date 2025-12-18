@@ -30,6 +30,10 @@ export function StockWaste({
   const topWasteId = level.waste.at(-1)
   const topWasteCard = topWasteId ? level.cardsById[topWasteId] : undefined
   const wasteId = topWasteCard?.id
+  const isStockEmpty = level.stock.length === 0
+  const isWasteEmpty = level.waste.length === 0
+  const canRecycle = isStockEmpty && !isWasteEmpty
+  const isDeckEmpty = isStockEmpty && isWasteEmpty
 
   return (
     <div className="flex items-center gap-3">
@@ -76,9 +80,10 @@ export function StockWaste({
         type="button"
         data-ui-control="true"
         onClick={onDraw}
-        className="relative rounded-[16px] active:scale-[0.99]"
-        aria-label="Stock"
-        title="Stock"
+        disabled={isDeckEmpty}
+        className={['relative rounded-[16px] active:scale-[0.99]', isDeckEmpty ? 'opacity-60' : ''].join(' ')}
+        aria-label={canRecycle ? 'Recycler la défausse' : isDeckEmpty ? 'Pioche vide' : 'Stock'}
+        title={canRecycle ? 'Recycler' : isDeckEmpty ? 'Pioche vide' : 'Stock'}
       >
         <motion.div
           key={level.stock.length}
@@ -88,6 +93,21 @@ export function StockWaste({
         >
           <CardBack className="h-[var(--dockCardH)] w-[var(--dockCardW)]" />
         </motion.div>
+
+        {/* Make stock state explicit when empty. */}
+        {canRecycle ? (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="rounded-full bg-black/45 px-3 py-2 text-xs font-extrabold tracking-wide text-white/90">
+              ↻ Recycler
+            </div>
+          </div>
+        ) : isDeckEmpty ? (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="rounded-full bg-black/45 px-3 py-2 text-xs font-extrabold tracking-wide text-white/90">
+              ∅ Vide
+            </div>
+          </div>
+        ) : null}
         <div className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/75">
           {level.stock.length}
         </div>

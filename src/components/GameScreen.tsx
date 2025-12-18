@@ -43,7 +43,8 @@ function explainInvalidMove(level: LevelState, cardId: CardId, to: MoveTarget): 
   if (!categoryCard || categoryCard.kind !== 'category') return 'Ce slot est invalide.'
 
   if (card.kind !== 'word') return 'Tu dois poser un mot sur ce slot.'
-  if (slot.pile.length >= level.wordsPerCategory) return 'Cette catégorie est déjà complétée.'
+  const required = level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
+  if (slot.pile.length >= required) return 'Cette catégorie est déjà complétée.'
   if (card.categoryId !== categoryCard.categoryId) {
     return `Ce mot n’appartient pas à la catégorie “${categoryCard.word}”.`
   }
@@ -77,8 +78,8 @@ export function GameScreen() {
   }, [level, newGame])
 
   useEffect(() => {
-    // Auto-clear selection after win.
-    if (status === 'won') setSelected(null)
+    // Auto-clear selection after end of game.
+    if (status === 'won' || status === 'lost') setSelected(null)
   }, [status])
 
   useEffect(() => {
@@ -250,6 +251,19 @@ export function GameScreen() {
           />
         ) : null}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {status === 'lost' ? (
+          <LostOverlay
+            key="lost"
+            reduceMotion={reduceMotion}
+            onReplay={() => {
+              setSelected(null)
+              newGame()
+            }}
+          />
+        ) : null}
+      </AnimatePresence>
     </div>
   )
 }
@@ -292,6 +306,52 @@ function WinOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onRepla
         >
           Rejouer
         </button>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function LostOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onReplay: () => void }) {
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-5 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
+        animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+        exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
+      >
+        <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Défaite</p>
+        <h2 className="mt-2 text-2xl font-bold text-white">Bloqué…</h2>
+        <p className="mt-2 text-sm text-white/75">Impossible de compléter une catégorie déjà posée.</p>
+
+        <div className="mt-6 grid gap-2">
+          <button
+            type="button"
+            data-ui-control="true"
+            onClick={onReplay}
+            className="w-full rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-black shadow active:bg-white"
+            aria-label="Rejouer"
+            title="Rejouer"
+          >
+            Rejouer
+          </button>
+
+          <Link
+            to="/"
+            data-ui-control="true"
+            className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-sm font-bold text-white/90 shadow active:bg-black/45"
+            aria-label="Retour à l’accueil"
+            title="Accueil"
+          >
+            Accueil
+          </Link>
+        </div>
       </motion.div>
     </motion.div>
   )

@@ -14,10 +14,6 @@ export default defineConfig({
         // SPA offline support: serve the app shell for navigation requests.
         navigateFallback: '/index.html',
       },
-      // Enable SW in dev to validate offline behavior locally.
-      devOptions: {
-        enabled: true,
-      },
     }),
   ],
 })

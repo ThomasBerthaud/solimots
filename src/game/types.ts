@@ -46,7 +46,11 @@ export type LevelState = {
   themeId: string
   categories: CategoryDef[]
   cardsById: Record<CardId, Card>
-  wordsPerCategory: number
+  /**
+   * Number of word cards required to complete each category.
+   * This value is random per category for each level.
+   */
+  requiredWordsByCategoryId: Record<CategoryId, number>
 
   /** 4 columns for the MVP. Each column is a stack of card ids (top is last). */
   tableau: CardId[][]

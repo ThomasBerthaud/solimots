@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { generateLevel } from '../game/levelGen'
 import type { CardId, CategoryId, LevelState } from '../game/types'
 
-export type GameStatus = 'idle' | 'inProgress' | 'won'
+export type GameStatus = 'idle' | 'inProgress' | 'won' | 'lost'
 
 export type MoveSource = { type: 'tableau'; column: number } | { type: 'waste' }
 
@@ -25,6 +25,11 @@ type GameStore = {
   history: HistoryEntry[]
   lastError: { message: string; cardId?: CardId; at: number } | null
   lastAction: LastAction
+  /**
+   * Tracks repeated draw/recycle states while no legal moves exist.
+   * Not persisted; used to detect Klondike-like "loop" losses.
+   */
+  drawLoopSeen: Record<string, true>
 
   newGame: (seed?: number) => void
   resetLevel: () => void
@@ -45,6 +50,7 @@ export const useGameStore = create<GameStore>()(
       history: [],
       lastError: null,
       lastAction: null,
+      drawLoopSeen: {},
 
       newGame: (seed) => {
         const level = generateLevel({ seed })
@@ -54,6 +60,7 @@ export const useGameStore = create<GameStore>()(
           history: [],
           lastError: null,
           lastAction: null,
+          drawLoopSeen: {},
         })
       },
 
@@ -67,6 +74,7 @@ export const useGameStore = create<GameStore>()(
           history: [],
           lastError: null,
           lastAction: null,
+          drawLoopSeen: {},
         })
       },
 
@@ -90,12 +98,58 @@ export const useGameStore = create<GameStore>()(
             if (cardId) waste.push(cardId)
           }
 
+          const nextLevel: LevelState = { ...state.level, stock, waste }
+          const wonOrInProgress = computeStatus(nextLevel)
+
+          // Klondike-like loss: only declare lost after the player loops through draw/recycle
+          // states without any legal slot move becoming available.
+          if (wonOrInProgress !== 'won') {
+            const anySlotMove = hasAnySlotMove(nextLevel)
+            if (anySlotMove) {
+              return {
+                ...state,
+                history: [prev, ...state.history].slice(0, 200),
+                level: nextLevel,
+                status: 'inProgress',
+                lastError: null,
+                lastAction: null,
+                drawLoopSeen: {},
+              }
+            }
+
+            const key = computeDrawLoopKey(nextLevel)
+            const alreadySeen = Boolean(state.drawLoopSeen[key])
+            if (alreadySeen) {
+              return {
+                ...state,
+                history: [prev, ...state.history].slice(0, 200),
+                level: nextLevel,
+                status: 'lost',
+                lastError: null,
+                lastAction: null,
+                // Keep drawLoopSeen as-is for debugging/consistency (not persisted anyway).
+                drawLoopSeen: state.drawLoopSeen,
+              }
+            }
+            return {
+              ...state,
+              history: [prev, ...state.history].slice(0, 200),
+              level: nextLevel,
+              status: 'inProgress',
+              lastError: null,
+              lastAction: null,
+              drawLoopSeen: { ...state.drawLoopSeen, [key]: true },
+            }
+          }
+
           return {
             ...state,
             history: [prev, ...state.history].slice(0, 200),
-            level: { ...state.level, stock, waste },
+            level: nextLevel,
+            status: wonOrInProgress,
             lastError: null,
             lastAction: null,
+            drawLoopSeen: {},
           }
         })
       },
@@ -147,6 +201,8 @@ export const useGameStore = create<GameStore>()(
             status: nextStatus,
             lastError: null,
             lastAction: nextAction,
+            // Only slot progress breaks a draw loop (tableau moves shouldn't prevent a loss).
+            drawLoopSeen: to.type === 'slot' ? {} : state.drawLoopSeen,
           }
         })
       },
@@ -178,6 +234,7 @@ export const useGameStore = create<GameStore>()(
             lastError: null,
             // Keep lastAction so the UI can still reference the completion timestamp if needed.
             lastAction: state.lastAction,
+            drawLoopSeen: {},
           }
         })
       },
@@ -193,6 +250,7 @@ export const useGameStore = create<GameStore>()(
             history: state.history.slice(1),
             lastError: null,
             lastAction: null,
+            drawLoopSeen: {},
           }
         })
       },
@@ -215,6 +273,7 @@ export const useGameStore = create<GameStore>()(
 function cloneLevel(level: LevelState): LevelState {
   return {
     ...level,
+    requiredWordsByCategoryId: { ...level.requiredWordsByCategoryId },
     tableau: level.tableau.map((col) => col.slice()),
     stock: level.stock.slice(),
     waste: level.waste.slice(),
@@ -249,7 +308,32 @@ function pushTo(
   now: number,
 ): { ok: boolean; action: LastAction; completedSlotIndex?: number; completedAt?: number } {
   if (to.type === 'tableau') {
-    level.tableau[to.column]?.push(cardId)
+    const column = level.tableau[to.column]
+    if (!column) return { ok: false, action: null }
+
+    const card = level.cardsById[cardId]
+    if (!card) return { ok: false, action: null }
+
+    const topId = column.at(-1)
+    const top = topId ? level.cardsById[topId] : undefined
+
+    // Empty tableau piles accept any card (category or word).
+    if (!top) {
+      column.push(cardId)
+      return { ok: true, action: null }
+    }
+
+    // Any category card can be placed on a non-empty pile.
+    if (card.kind === 'category') {
+      column.push(cardId)
+      return { ok: true, action: null }
+    }
+
+    // Word card: can be placed if the top card is a category or word of the same category.
+    if (top.kind !== 'category' && top.kind !== 'word') return { ok: false, action: null }
+    if (top.categoryId !== card.categoryId) return { ok: false, action: null }
+
+    column.push(cardId)
     return { ok: true, action: null }
   }
   if (to.type === 'slot') {
@@ -264,6 +348,17 @@ function pushTo(
       if (card.kind !== 'category') return { ok: false, action: null }
       slot.categoryCardId = cardId
       slot.pile = []
+      const required = level.requiredWordsByCategoryId[card.categoryId] ?? 0
+      // If a category requires 0 words, it completes immediately (avoids confusing UX).
+      if (required <= 0) {
+        slot.isCompleting = true
+        return {
+          ok: true,
+          action: { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: card.categoryId, at: now },
+          completedSlotIndex: to.slotIndex,
+          completedAt: now,
+        }
+      }
       return { ok: true, action: { type: 'slotPlaced', cardId, slotIndex: to.slotIndex, at: now } }
     }
 
@@ -272,9 +367,14 @@ function pushTo(
     if (card.kind !== 'word') return { ok: false, action: null }
     if (card.categoryId !== categoryCard.categoryId) return { ok: false, action: null }
 
+    const required = level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
+    // Keep store validation consistent with UI messaging:
+    // when required <= 0, the category is effectively already complete, so placing words is invalid.
+    if (slot.pile.length >= required) return { ok: false, action: null }
+
     slot.pile.push(cardId)
 
-    if (slot.pile.length >= level.wordsPerCategory) {
+    if (required > 0 && slot.pile.length >= required) {
       slot.isCompleting = true
       return {
         ok: true,
@@ -301,4 +401,49 @@ function computeStatus(level: LevelState): GameStatus {
 
   if (tableauRemaining + stockRemaining + wasteRemaining + slotsRemaining === 0) return 'won'
   return 'inProgress'
+}
+
+function hasAnySlotMove(level: LevelState): boolean {
+  const sources: Array<{ from: MoveSource; cardId: CardId }> = []
+  const wasteTop = level.waste.at(-1)
+  if (wasteTop) sources.push({ from: { type: 'waste' }, cardId: wasteTop })
+
+  level.tableau.forEach((col, idx) => {
+    const top = col.at(-1)
+    if (top) sources.push({ from: { type: 'tableau', column: idx }, cardId: top })
+  })
+
+  for (const src of sources) {
+    for (let slotIndex = 0; slotIndex < level.slots.length; slotIndex++) {
+      if (canPlaceOnSlot(level, src.cardId, slotIndex)) return true
+    }
+  }
+
+  return false
+}
+
+function canPlaceOnSlot(level: LevelState, cardId: CardId, slotIndex: number): boolean {
+  const slot = level.slots[slotIndex]
+  if (!slot) return false
+  if (slot.isCompleting) return false
+  const card = level.cardsById[cardId]
+  if (!card) return false
+
+  if (slot.categoryCardId == null) return card.kind === 'category'
+
+  const categoryCard = level.cardsById[slot.categoryCardId]
+  if (!categoryCard || categoryCard.kind !== 'category') return false
+  if (card.kind !== 'word') return false
+  if (card.categoryId !== categoryCard.categoryId) return false
+
+  const required = level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
+  return slot.pile.length < required
+}
+
+function computeDrawLoopKey(level: LevelState): string {
+  const tableauTops = level.tableau.map((col) => col.at(-1) ?? '').join(',')
+  const slotsKey = level.slots
+    .map((s) => `${s.categoryCardId ?? ''}:${s.pile.length}:${s.isCompleting ? 1 : 0}`)
+    .join(',')
+  return `stock:${level.stock.join(',')}|waste:${level.waste.join(',')}|tops:${tableauTops}|slots:${slotsKey}`
 }
