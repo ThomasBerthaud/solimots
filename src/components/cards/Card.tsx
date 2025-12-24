@@ -1,6 +1,6 @@
 import type { Point } from 'framer-motion'
-import { motion, useReducedMotion } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { motion, useAnimationControls, useReducedMotion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import type { Card as GameCard } from '../../game/types'
 
 export type CardProps = {
@@ -41,15 +41,44 @@ export function Card({
   onClick,
   onDrop,
 }: CardProps) {
-  const reduceMotion = useReducedMotion()
+  const reduceMotion = useReducedMotion() ?? false
+  const controls = useAnimationControls()
   const ref = useRef<HTMLDivElement | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const isCategory = card.kind === 'category'
 
+  useEffect(() => {
+    const transition = { duration: 0.28, ease: 'easeOut' as const }
+
+    if (feedback === 'error') {
+      controls.start(
+        reduceMotion ? { opacity: [1, 0.85, 1], transition } : { x: [0, -8, 8, -6, 6, -3, 3, 0], transition },
+      )
+      return
+    }
+
+    if (feedback === 'success') {
+      controls.start(reduceMotion ? { opacity: 1 } : { y: [0, -2, 0], transition })
+      return
+    }
+
+    if (selected) {
+      controls.start(
+        reduceMotion
+          ? { y: -2, transition }
+          : { y: -3, rotate: isCategory ? -0.4 : 0.25, transition },
+      )
+      return
+    }
+
+    controls.start({ x: 0, y: 0, rotate: 0 })
+  }, [controls, feedback, feedbackKey, isCategory, reduceMotion, selected])
+
+  const dragZIndex = 40
+
   return (
     <motion.div
       ref={ref}
-      key={`${card.id}-${feedbackKey ?? 0}`}
       data-card-interactive={draggable || onClick ? 'true' : 'false'}
       role="button"
       tabIndex={0}
@@ -70,28 +99,14 @@ export function Card({
       dragSnapToOrigin
       whileTap={draggable || onClick ? { scale: 0.98 } : undefined}
       onDragStart={() => setIsDragging(true)}
-      whileDrag={reduceMotion ? { zIndex: 9999 } : { scale: 1.03, rotate: -0.6, zIndex: 9999 }}
+      whileDrag={reduceMotion ? { zIndex: dragZIndex } : { scale: 1.03, rotate: -0.6, zIndex: dragZIndex }}
       onDragEnd={(event, info) => {
         setIsDragging(false)
         const point = getClientPoint(event, info.point)
         onDrop?.(point, ref.current)
       }}
-      animate={
-        feedback === 'error'
-          ? reduceMotion
-            ? { opacity: [1, 0.85, 1] }
-            : { x: [0, -8, 8, -6, 6, -3, 3, 0] }
-          : feedback === 'success'
-            ? reduceMotion
-              ? { opacity: [1, 1, 1] }
-              : { y: [0, -2, 0] }
-            : selected
-              ? reduceMotion
-                ? { y: -2 }
-                : { y: -3, rotate: isCategory ? -0.4 : 0.25 }
-              : { x: 0, y: 0, rotate: 0 }
-      }
-      transition={feedback || selected ? { duration: 0.28, ease: 'easeOut' } : undefined}
+      initial={false}
+      animate={controls}
       className={[
         'relative select-none rounded-[18px] border shadow-[0_14px_34px_rgba(0,0,0,0.22)]',
         isCategory
@@ -101,7 +116,7 @@ export function Card({
         draggable ? 'cursor-grab active:cursor-grabbing' : '',
         className ?? '',
       ].join(' ')}
-      style={{ ...style, zIndex: isDragging ? 9999 : style?.zIndex }}
+      style={{ ...style, zIndex: isDragging ? dragZIndex : style?.zIndex }}
     >
       {/* Subtle “foil” sheen for category cards */}
       {isCategory ? (

@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
 
 export function Home() {
+
+  const resetGame = () => {
+    // Clear any existing game state from localStorage to start a new game.
+    localStorage.removeItem('solimots-game-v1');
+  }
+
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
@@ -18,6 +24,7 @@ export function Home() {
             className="inline-flex items-center justify-center rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-black shadow hover:bg-amber-300 active:bg-amber-500"
             aria-label="Jouer une partie"
             title="Jouer une partie"
+            onClick={resetGame}
           >
             <IconLabel icon={Play} label="Jouer une partie" />
           </Link>

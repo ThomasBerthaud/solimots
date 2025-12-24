@@ -38,6 +38,13 @@ export function SlotCell({
   const required = categoryCard ? (level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0) : 0
   const progress = categoryCard ? `${count}/${required}` : ''
 
+  const flash =
+    completedAt != null
+      ? { key: `completed-${completedAt}`, className: 'ring-2 ring-amber-300/60' }
+      : placedAt != null
+        ? { key: `placed-${placedAt}`, className: 'ring-2 ring-amber-300/40' }
+        : null
+
   const hint =
     selectedCard && !isLocked
       ? selectedCard.kind === 'category'
@@ -61,19 +68,20 @@ export function SlotCell({
       }}
       whileHover={reduceMotion || !hint ? undefined : { scale: 1.01 }}
       whileTap={reduceMotion ? undefined : { scale: 0.99 }}
-      animate={
-        completedAt
-          ? reduceMotion
-            ? { opacity: [1, 1, 1] }
-            : { boxShadow: ['0 0 0 rgba(0,0,0,0)', '0 0 0 8px rgba(251,191,36,0.18)', '0 0 0 rgba(0,0,0,0)'] }
-          : placedAt
-            ? reduceMotion
-              ? { opacity: [1, 1, 1] }
-              : { boxShadow: ['0 0 0 rgba(0,0,0,0)', '0 0 0 6px rgba(251,191,36,0.14)', '0 0 0 rgba(0,0,0,0)'] }
-            : undefined
-      }
-      transition={placedAt || completedAt ? { duration: 0.5, ease: 'easeOut' } : undefined}
     >
+      <AnimatePresence>
+        {flash && !reduceMotion ? (
+          <motion.div
+            key={flash.key}
+            className={['pointer-events-none absolute inset-0 rounded-[18px]', flash.className].join(' ')}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1.02 }}
+            exit={{ opacity: 0, scale: 1.06 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+          />
+        ) : null}
+      </AnimatePresence>
+
       {/* Category label tab (always visible once category is placed) */}
       <AnimatePresence>
         {categoryCard ? (
@@ -167,19 +175,20 @@ export function SlotCell({
   )
 }
 
+const BURST_PARTICLES = [0, 1, 2, 3, 4, 5]
+
 function Burst() {
   // Simple particle burst using divs (no new dependencies).
-  const particles = Array.from({ length: 6 }, (_, i) => i)
   return (
     <div className="relative h-full w-full">
-      {particles.map((i) => (
+      {BURST_PARTICLES.map((i) => (
         <motion.div
           key={i}
           className="absolute left-1/2 top-1/2 h-2.5 w-2.5 rounded-full bg-amber-300/90"
           initial={{ x: -5, y: -5, scale: 0.6, opacity: 0 }}
           animate={{
-            x: -5 + Math.cos((i / particles.length) * Math.PI * 2) * 36,
-            y: -5 + Math.sin((i / particles.length) * Math.PI * 2) * 36,
+            x: -5 + Math.cos((i / BURST_PARTICLES.length) * Math.PI * 2) * 36,
+            y: -5 + Math.sin((i / BURST_PARTICLES.length) * Math.PI * 2) * 36,
             scale: [0.6, 1, 0.2],
             opacity: [0, 1, 0],
           }}

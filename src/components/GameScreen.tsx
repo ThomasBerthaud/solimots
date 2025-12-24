@@ -168,7 +168,7 @@ export function GameScreen() {
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
-      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-b from-emerald-800/35 to-emerald-950/35 blur-[0.2px]" />
+      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-b from-emerald-800/35 to-emerald-950/35" />
 
       <header className="mb-3 flex items-center justify-between">
         <Link

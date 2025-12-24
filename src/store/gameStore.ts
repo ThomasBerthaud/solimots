@@ -40,6 +40,38 @@ type GameStore = {
   clearError: () => void
 }
 
+let gameEpoch = 0
+const slotFinalizeTimers: Record<number, number | undefined> = {}
+
+function cancelAllSlotFinalizeTimers(): void {
+  for (const timerId of Object.values(slotFinalizeTimers)) {
+    if (timerId != null) window.clearTimeout(timerId)
+  }
+  for (const key of Object.keys(slotFinalizeTimers)) {
+    delete slotFinalizeTimers[Number(key)]
+  }
+}
+
+function bumpGameEpoch(): void {
+  gameEpoch += 1
+  cancelAllSlotFinalizeTimers()
+}
+
+function scheduleFinalizeSlot(
+  get: () => GameStore,
+  slotIndex: number,
+  completedAt: number,
+): void {
+  const existing = slotFinalizeTimers[slotIndex]
+  if (existing != null) window.clearTimeout(existing)
+
+  const scheduledEpoch = gameEpoch
+  slotFinalizeTimers[slotIndex] = window.setTimeout(() => {
+    if (gameEpoch !== scheduledEpoch) return
+    get().finalizeSlotCompletion(slotIndex, completedAt)
+  }, 380)
+}
+
 // English comments per project rule.
 
 export const useGameStore = create<GameStore>()(
@@ -53,6 +85,7 @@ export const useGameStore = create<GameStore>()(
       drawLoopSeen: {},
 
       newGame: (seed) => {
+        bumpGameEpoch()
         const level = generateLevel({ seed })
         set({
           level,
@@ -65,6 +98,7 @@ export const useGameStore = create<GameStore>()(
       },
 
       resetLevel: () => {
+        bumpGameEpoch()
         const current = get().level
         const seed = current?.seed
         const level = generateLevel({ seed })
@@ -158,53 +192,45 @@ export const useGameStore = create<GameStore>()(
         const { level, status } = get()
         if (!level || status !== 'inProgress') return
 
-        set((state) => {
-          if (!state.level) return state
-          const prev: HistoryEntry = { level: state.level, status: state.status }
+        const current = get()
+        if (!current.level) return
 
-          const next = cloneLevel(state.level)
-          const cardId = popFrom(next, from)
-          if (!cardId) {
-            return {
-              ...state,
-              lastError: { message: 'Aucune carte à déplacer', at: Date.now() },
-            }
-          }
+        const prev: HistoryEntry = { level: current.level, status: current.status }
+        const next = cloneLevel(current.level)
+        const cardId = popFrom(next, from)
+        if (!cardId) {
+          set({ lastError: { message: 'Aucune carte à déplacer', at: Date.now() } })
+          return
+        }
 
-          const now = Date.now()
-          const res = pushTo(next, cardId, to, now)
-          if (!res.ok) {
-            // Revert pop if invalid push.
-            pushBack(next, cardId, from)
-            return {
-              ...state,
-              lastError: { message: 'Déplacement invalide', cardId, at: Date.now() },
-              lastAction: null,
-            }
-          }
+        const now = Date.now()
+        const res = pushTo(next, cardId, to, now)
+        if (!res.ok) {
+          // Revert pop if invalid push.
+          pushBack(next, cardId, from)
+          set({ lastError: { message: 'Déplacement invalide', cardId, at: Date.now() }, lastAction: null })
+          return
+        }
 
-          const nextStatus = computeStatus(next)
-          const nextAction = res.action
+        const nextStatus = computeStatus(next)
+        const nextAction = res.action
+        const nextHistory = [prev, ...current.history].slice(0, 200)
 
-          if (res.completedSlotIndex != null) {
-            const slotIndex = res.completedSlotIndex
-            const completedAt = res.completedAt ?? now
-            // Allow the UI to play a completion animation before clearing the slot.
-            window.setTimeout(() => {
-              get().finalizeSlotCompletion(slotIndex, completedAt)
-            }, 380)
-          }
-          return {
-            ...state,
-            history: [prev, ...state.history].slice(0, 200),
-            level: next,
-            status: nextStatus,
-            lastError: null,
-            lastAction: nextAction,
-            // Only slot progress breaks a draw loop (tableau moves shouldn't prevent a loss).
-            drawLoopSeen: to.type === 'slot' ? {} : state.drawLoopSeen,
-          }
+        set({
+          history: nextHistory,
+          level: next,
+          status: nextStatus,
+          lastError: null,
+          lastAction: nextAction,
+          // Only slot progress breaks a draw loop (tableau moves shouldn't prevent a loss).
+          drawLoopSeen: to.type === 'slot' ? {} : current.drawLoopSeen,
         })
+
+        if (res.completedSlotIndex != null) {
+          const slotIndex = res.completedSlotIndex
+          const completedAt = res.completedAt ?? now
+          scheduleFinalizeSlot(get, slotIndex, completedAt)
+        }
       },
 
       finalizeSlotCompletion: (slotIndex, _completedAt) => {
@@ -240,6 +266,7 @@ export const useGameStore = create<GameStore>()(
       },
 
       undo: () => {
+        bumpGameEpoch()
         set((state) => {
           const entry = state.history[0]
           if (!entry) return state
