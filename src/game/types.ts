@@ -5,14 +5,10 @@ export type CategoryDef = {
   label: string
 }
 
-export type ThemeDef = {
-  id: string
-  title: string
-  categories: Array<{
-    id: CategoryId
-    label: string
-    words: string[]
-  }>
+export type WordBankCategory = {
+  id: CategoryId
+  label: string
+  words: string[]
 }
 
 export type CardId = string
@@ -43,7 +39,6 @@ export type SlotState = {
 
 export type LevelState = {
   seed: number
-  themeId: string
   categories: CategoryDef[]
   cardsById: Record<CardId, Card>
   /**

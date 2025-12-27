@@ -1,7 +1,11 @@
-import type { Card, CardId, CategoryDef, LevelState, ThemeDef } from './types'
+import type { Card, CardId, CategoryDef, LevelState } from './types'
 import { WORD_BANK } from './wordBank'
 
 // English comments per project rule.
+
+const MIN_WORDS_PER_CATEGORY_IN_BANK = 8
+const MIN_CATEGORIES_PER_LEVEL = 6
+const MAX_CATEGORIES_PER_LEVEL = 12
 
 function mulberry32(seed: number) {
   // Deterministic PRNG suitable for gameplay shuffles.
@@ -28,6 +32,11 @@ function pickN<T>(arr: T[], n: number, rnd: () => number): T[] {
   return shuffle(arr, rnd).slice(0, n)
 }
 
+function randomIntInclusive(min: number, max: number, rnd: () => number): number {
+  if (max < min) return min
+  return min + Math.floor(rnd() * (max - min + 1))
+}
+
 export type GenerateLevelOptions = {
   seed?: number
   /** Min required words to complete a category (inclusive). */
@@ -43,8 +52,6 @@ export type GenerateLevelOptions = {
    * Default: [2, 3, 4, 5].
    */
   tableauDealPattern?: number[]
-  /** Optionally force a theme by id. */
-  themeId?: string
 }
 
 export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
@@ -52,25 +59,42 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const rnd = mulberry32(seed)
 
   const requiredWordsMin = options.requiredWordsMin ?? 3
-  const requiredWordsMax = options.requiredWordsMax ?? 6
-  const categoryCount = options.categoryCount ?? 8
+  const requiredWordsMax = options.requiredWordsMax ?? 8
   const tableauColumns = options.tableauColumns ?? 4
   const tableauDealPattern = options.tableauDealPattern ?? [2, 3, 4, 5]
 
-  const theme = pickTheme(options.themeId, rnd)
-  const playableCategories = theme.categories.filter((c) => uniqueWords(c.words).length > 0)
-  if (playableCategories.length < 5) {
-    throw new Error(`Theme "${theme.id}" does not have enough categories with words (need >= 5).`)
+  validateWordBank(WORD_BANK)
+
+  const playableCategories = WORD_BANK
+  if (playableCategories.length < MIN_CATEGORIES_PER_LEVEL) {
+    throw new Error(
+      `WORD_BANK does not have enough playable categories (need >= ${MIN_CATEGORIES_PER_LEVEL}, got ${playableCategories.length}).`,
+    )
   }
-  const selectedCategories = pickN(playableCategories, Math.max(5, categoryCount), rnd)
+
+  const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, playableCategories.length)
+  let categoryCount: number
+  if (options.categoryCount != null) {
+    categoryCount = Math.floor(options.categoryCount)
+    if (categoryCount < MIN_CATEGORIES_PER_LEVEL || categoryCount > maxPick) {
+      throw new Error(
+        `Invalid categoryCount "${options.categoryCount}". Must be between ${MIN_CATEGORIES_PER_LEVEL} and ${maxPick}.`,
+      )
+    }
+  } else {
+    categoryCount = randomIntInclusive(MIN_CATEGORIES_PER_LEVEL, maxPick, rnd)
+  }
+
+  const selectedCategories = pickN(playableCategories, categoryCount, rnd)
 
   const categories: CategoryDef[] = selectedCategories.map((c) => ({ id: c.id, label: c.label }))
 
   const cards: Card[] = []
   const requiredWordsByCategoryId: LevelState['requiredWordsByCategoryId'] = {}
 
-  const clampMin = Math.max(0, Math.floor(requiredWordsMin))
-  const clampMax = Math.max(clampMin, Math.floor(requiredWordsMax))
+  // Keep gameplay rules consistent: always require between 3 and 8 words per category.
+  const clampMin = Math.min(8, Math.max(3, Math.floor(requiredWordsMin)))
+  const clampMax = Math.min(8, Math.max(clampMin, Math.floor(requiredWordsMax)))
 
   const dealPattern =
     tableauColumns === 4 && tableauDealPattern.length === 4
@@ -139,7 +163,6 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   return {
     seed,
-    themeId: theme.id,
     categories,
     cardsById,
     requiredWordsByCategoryId,
@@ -150,17 +173,32 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   }
 }
 
-function pickTheme(themeId: string | undefined, rnd: () => number): ThemeDef {
-  if (themeId) {
-    const found = WORD_BANK.find((t) => t.id === themeId)
-    if (found) return found
-  }
-  if (WORD_BANK.length === 0) {
-    throw new Error('WORD_BANK is empty')
-  }
-  return WORD_BANK[Math.floor(rnd() * WORD_BANK.length)]
-}
-
 function uniqueWords(words: string[]): string[] {
   return Array.from(new Set(words.map((w) => w.trim()).filter(Boolean)))
+}
+
+function validateWordBank(categories: Array<{ id: string; label: string; words: string[] }>): void {
+  if (categories.length === 0) throw new Error('WORD_BANK is empty')
+
+  const seen = new Set<string>()
+  const bad: Array<{ id: string; label: string; uniqueWordCount: number }> = []
+
+  for (const c of categories) {
+    if (seen.has(c.id)) {
+      throw new Error(`WORD_BANK has a duplicate category id "${c.id}".`)
+    }
+    seen.add(c.id)
+
+    const uniqueCount = uniqueWords(c.words).length
+    if (uniqueCount < MIN_WORDS_PER_CATEGORY_IN_BANK) {
+      bad.push({ id: c.id, label: c.label, uniqueWordCount: uniqueCount })
+    }
+  }
+
+  if (bad.length > 0) {
+    const details = bad.map((c) => `${c.id} (${c.label}): ${c.uniqueWordCount}`).join(', ')
+    throw new Error(
+      `WORD_BANK categories must have at least ${MIN_WORDS_PER_CATEGORY_IN_BANK} unique words. Invalid: ${details}`,
+    )
+  }
 }
