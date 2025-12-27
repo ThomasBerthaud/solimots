@@ -1,11 +1,19 @@
 import { motion } from 'framer-motion'
 import { GraduationCap, Play, ScrollText } from 'lucide-react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { IconLabel } from './components/ui/IconLabel'
+import { useGameStore } from './store/gameStore'
 
 function App() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const newGame = useGameStore((s) => s.newGame)
   const isGame = location.pathname.startsWith('/game')
+
+  const handlePlay = () => {
+    newGame()
+    navigate('/game')
+  }
 
   return (
     <div className="min-h-dvh">
@@ -16,9 +24,15 @@ function App() {
               Solimots
             </Link>
             <nav className="flex items-center gap-3 text-sm text-white/80">
-              <Link className="inline-flex items-center hover:text-white" to="/game" aria-label="Jouer" title="Jouer">
+              <button
+                type="button"
+                onClick={handlePlay}
+                className="inline-flex items-center hover:text-white"
+                aria-label="Jouer"
+                title="Jouer"
+              >
                 <IconLabel icon={Play} label="Jouer" />
-              </Link>
+              </button>
               <Link
                 className="inline-flex items-center hover:text-white"
                 to="/tutorial"
