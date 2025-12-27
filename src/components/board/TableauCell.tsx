@@ -4,7 +4,7 @@ import type { MoveSource, MoveTarget } from '../../store/gameStore'
 import { Card } from '../cards/Card'
 import { CardBack } from '../cards/CardBack'
 
-type Selected = { source: MoveSource; cardId: CardId } | null
+type Selected = { source: MoveSource; cardIds: CardId[] } | null
 
 export type TableauCellProps = {
   level: LevelState
@@ -14,7 +14,7 @@ export type TableauCellProps = {
   selectedCard: GameCard | null
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   tryMoveTo: (target: MoveTarget) => void
-  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => void
+  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
   errorCardId?: string
   errorAt?: number
 }
@@ -59,15 +59,18 @@ export function TableauCell({
             const top = `calc(var(--stackStep) * ${idx})`
             return (
               <div key={id} className="absolute left-0 right-0" style={{ top }}>
-                {isTop ? (
+                {card?.faceUp ? (
                   <Card
                     card={card}
-                    draggable
-                    onDrop={(point, draggedEl) =>
-                      onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
+                    draggable={isTop}
+                    onDrop={
+                      isTop
+                        ? (point, draggedEl) =>
+                            onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
+                        : undefined
                     }
                     onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, id)}
-                    selected={selected?.cardId === id}
+                    selected={selected?.cardIds.includes(id) ?? false}
                     feedback={errorCardId === id ? 'error' : undefined}
                     feedbackKey={errorCardId === id ? errorAt : undefined}
                     className="h-[var(--cardH)] w-[var(--cardW)]"

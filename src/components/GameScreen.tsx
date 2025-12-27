@@ -10,7 +10,7 @@ import { TableauRow } from './board/TableauRow'
 import { ThumbDock } from './dock/ThumbDock'
 import { HelpModal } from './modals/HelpModal'
 
-type Selected = { source: MoveSource; cardId: CardId } | null
+type Selected = { source: MoveSource; cardIds: CardId[] } | null
 type Toast = { key: number; message: string } | null
 
 function isEventInside(el: EventTarget | null, selector: string): boolean {
@@ -22,6 +22,17 @@ function topCardIdFromSource(level: LevelState, from: MoveSource): CardId | null
   if (from.type === 'waste') return level.waste.at(-1) ?? null
   if (from.type === 'tableau') return level.tableau[from.column]?.at(-1) ?? null
   return null
+}
+
+function computeContiguousSelection(level: LevelState, source: MoveSource, clickedId: CardId): CardId[] {
+  if (source.type !== 'tableau') return [clickedId]
+  const col = level.tableau[source.column] ?? []
+  const idx = col.indexOf(clickedId)
+  if (idx < 0) return [clickedId]
+  const segment = col.slice(idx)
+  // Only revealed cards can be selected/moved.
+  const firstHidden = segment.findIndex((id) => !level.cardsById[id]?.faceUp)
+  return firstHidden >= 0 ? segment.slice(0, firstHidden) : segment
 }
 
 function explainInvalidMove(level: LevelState, cardId: CardId, to: MoveTarget): string | null {
@@ -63,6 +74,7 @@ export function GameScreen() {
   const draw = useGameStore((s) => s.draw)
   const undo = useGameStore((s) => s.undo)
   const moveCard = useGameStore((s) => s.moveCard)
+  const moveCards = useGameStore((s) => s.moveCards)
 
   const [selected, setSelected] = useState<Selected>(null)
   const [helpOpen, setHelpOpen] = useState(false)
@@ -123,28 +135,62 @@ export function GameScreen() {
     }
   }, [])
 
-  const onDropCard = (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => {
+  const onDropCard = (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null): boolean => {
     const to = resolveDropTarget(point, draggedEl)
-    if (!to) return
+    if (!to) return false
+    // Dropping onto the same source is a no-op; treat it as invalid so the UI snaps back.
+    if (from.type === 'tableau' && to.type === 'tableau' && from.column === to.column) return false
+
+    // If the user has a contiguous selection from this same source, drag should move the whole pack.
+    const sel = selected
+    const canUseSelection =
+      Boolean(sel) &&
+      sel!.source.type === from.type &&
+      ((from.type === 'waste' && sel!.source.type === 'waste') ||
+        (from.type === 'tableau' && sel!.source.type === 'tableau' && sel!.source.column === from.column)) &&
+      sel!.cardIds.length > 0
+
+    if (canUseSelection) {
+      const bottomId = sel!.cardIds[0]
+      lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, bottomId, to) }
+      const ok = sel!.cardIds.length === 1 ? moveCard(from, to) : moveCards(from, to, sel!.cardIds)
+      if (ok) setSelected(null)
+      return ok
+    }
+
     const cardId = topCardIdFromSource(level!, from)
     lastAttemptRef.current = cardId ? { at: Date.now(), message: explainInvalidMove(level!, cardId, to) } : null
-    moveCard(from, to)
+    const ok = moveCard(from, to)
+    if (ok) setSelected(null)
+    return ok
   }
 
   const onSelectSource = (source: MoveSource, cardId: CardId) => {
     setSelected((prev) => {
-      if (prev?.cardId === cardId) return null
-      return { source, cardId }
+      // Toggle off if same exact selection is clicked again.
+      if (prev?.source.type === source.type) {
+        if (source.type === 'waste' && prev.source.type === 'waste' && prev.cardIds.length === 1 && prev.cardIds[0] === cardId) {
+          return null
+        }
+        if (source.type === 'tableau' && prev.source.type === 'tableau' && prev.source.column === source.column) {
+          const nextIds = computeContiguousSelection(level!, source, cardId)
+          if (prev.cardIds.length === nextIds.length && prev.cardIds.every((id, i) => id === nextIds[i])) return null
+        }
+      }
+      const card = level!.cardsById[cardId]
+      if (!card?.faceUp) return prev
+      if (source.type === 'waste') return { source, cardIds: [cardId] }
+      return { source, cardIds: computeContiguousSelection(level!, source, cardId) }
     })
   }
 
   const tryMoveTo = (target: MoveTarget) => {
     const sel = selected
     if (!sel) return
-    lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, sel.cardId, target) }
-    moveCard(sel.source, target)
-    const err = useGameStore.getState().lastError
-    if (!err) setSelected(null)
+    const bottomId = sel.cardIds[0]
+    lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, bottomId, target) }
+    const ok = sel.cardIds.length === 1 ? moveCard(sel.source, target) : moveCards(sel.source, target, sel.cardIds)
+    if (ok) setSelected(null)
   }
 
   const onPointerDownCapture = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -160,7 +206,7 @@ export function GameScreen() {
   }
 
   if (!level) return null
-  const selectedCard = selected ? level.cardsById[selected.cardId] : null
+  const selectedCard = selected ? level.cardsById[selected.cardIds[0]] : null
 
   return (
     <div

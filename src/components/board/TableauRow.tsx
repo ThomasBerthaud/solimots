@@ -2,7 +2,7 @@ import type { Card, CardId, LevelState } from '../../game/types'
 import type { MoveSource, MoveTarget } from '../../store/gameStore'
 import { TableauCell } from './TableauCell'
 
-type Selected = { source: MoveSource; cardId: CardId } | null
+type Selected = { source: MoveSource; cardIds: CardId[] } | null
 
 export type TableauRowProps = {
   level: LevelState
@@ -10,7 +10,7 @@ export type TableauRowProps = {
   selectedCard: Card | null
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   tryMoveTo: (target: MoveTarget) => void
-  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => void
+  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
   errorCardId?: string
   errorAt?: number
 }

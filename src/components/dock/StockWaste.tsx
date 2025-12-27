@@ -4,14 +4,14 @@ import type { MoveSource } from '../../store/gameStore'
 import { Card } from '../cards/Card'
 import { CardBack } from '../cards/CardBack'
 
-type Selected = { source: MoveSource; cardId: CardId } | null
+type Selected = { source: MoveSource; cardIds: CardId[] } | null
 
 export type StockWasteProps = {
   level: LevelState
   selected: Selected
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   onDraw: () => void
-  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => void
+  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
   errorCardId?: string
   errorAt?: number
 }
@@ -53,7 +53,7 @@ export function StockWaste({
                 draggable
                 onDrop={(point, draggedEl) => onDropCard({ type: 'waste' }, { x: point.x, y: point.y }, draggedEl)}
                 onClick={() => onSelectSource({ type: 'waste' }, topWasteCard.id)}
-                selected={selected?.cardId === topWasteCard.id}
+                selected={selected?.cardIds.length === 1 && selected.cardIds[0] === topWasteCard.id}
                 feedback={errorCardId === topWasteCard.id ? 'error' : undefined}
                 feedbackKey={errorCardId === topWasteCard.id ? errorAt : undefined}
                 className="h-[var(--dockCardH)] w-[var(--dockCardW)]"

@@ -4,7 +4,7 @@ import type { CardId, LevelState } from '../../game/types'
 import type { MoveSource } from '../../store/gameStore'
 import { StockWaste } from './StockWaste'
 
-type Selected = { source: MoveSource; cardId: CardId } | null
+type Selected = { source: MoveSource; cardIds: CardId[] } | null
 type Toast = { key: number; message: string } | null
 
 export type ThumbDockProps = {
@@ -13,7 +13,7 @@ export type ThumbDockProps = {
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   onDraw: () => void
   onUndo: () => void
-  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => void
+  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
   errorCardId?: string
   errorAt?: number
   undoIcon: ReactNode

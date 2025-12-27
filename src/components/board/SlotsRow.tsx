@@ -3,7 +3,7 @@ import type { Card, CardId, LevelState } from '../../game/types'
 import type { MoveSource, MoveTarget } from '../../store/gameStore'
 import { SlotCell } from './SlotCell'
 
-type Selected = { source: MoveSource; cardId: CardId } | null
+type Selected = { source: MoveSource; cardIds: CardId[] } | null
 
 export type SlotsRowProps = {
   level: LevelState

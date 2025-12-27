@@ -34,7 +34,8 @@ type GameStore = {
   newGame: (seed?: number) => void
   resetLevel: () => void
   draw: () => void
-  moveCard: (from: MoveSource, to: MoveTarget) => void
+  moveCard: (from: MoveSource, to: MoveTarget) => boolean
+  moveCards: (from: MoveSource, to: MoveTarget, cardIds: CardId[]) => boolean
   finalizeSlotCompletion: (slotIndex: number, completedAt: number) => void
   undo: () => void
   clearError: () => void
@@ -86,19 +87,26 @@ export const useGameStore = create<GameStore>()(
           if (!state.level) return state
           const prev: HistoryEntry = { level: state.level, status: state.status }
 
-          const stock = state.level.stock.slice()
-          const waste = state.level.waste.slice()
+          const nextLevel = cloneLevel(state.level)
 
-          if (stock.length === 0) {
-            // Recycle waste back into stock (solitaire-like).
-            stock.push(...waste.reverse())
-            waste.length = 0
+          if (nextLevel.stock.length === 0) {
+            // Recycle waste back into stock (solitaire-like, face-down).
+            const recycled = nextLevel.waste.slice().reverse()
+            nextLevel.stock.push(...recycled)
+            nextLevel.waste.length = 0
+            for (const id of recycled) {
+              const c = nextLevel.cardsById[id]
+              if (c) c.faceUp = false
+            }
           } else {
-            const cardId = stock.pop()
-            if (cardId) waste.push(cardId)
+            const cardId = nextLevel.stock.pop()
+            if (cardId) {
+              nextLevel.waste.push(cardId)
+              const c = nextLevel.cardsById[cardId]
+              if (c) c.faceUp = true
+            }
           }
 
-          const nextLevel: LevelState = { ...state.level, stock, waste }
           const wonOrInProgress = computeStatus(nextLevel)
 
           // Klondike-like loss: only declare lost after the player loops through draw/recycle
@@ -156,8 +164,9 @@ export const useGameStore = create<GameStore>()(
 
       moveCard: (from, to) => {
         const { level, status } = get()
-        if (!level || status !== 'inProgress') return
+        if (!level || status !== 'inProgress') return false
 
+        let ok = false
         set((state) => {
           if (!state.level) return state
           const prev: HistoryEntry = { level: state.level, status: state.status }
@@ -165,6 +174,7 @@ export const useGameStore = create<GameStore>()(
           const next = cloneLevel(state.level)
           const cardId = popFrom(next, from)
           if (!cardId) {
+            ok = false
             return {
               ...state,
               lastError: { message: 'Aucune carte à déplacer', at: Date.now() },
@@ -176,6 +186,7 @@ export const useGameStore = create<GameStore>()(
           if (!res.ok) {
             // Revert pop if invalid push.
             pushBack(next, cardId, from)
+            ok = false
             return {
               ...state,
               lastError: { message: 'Déplacement invalide', cardId, at: Date.now() },
@@ -183,8 +194,15 @@ export const useGameStore = create<GameStore>()(
             }
           }
 
+          // Any moved card becomes revealed.
+          const moved = next.cardsById[cardId]
+          if (moved) moved.faceUp = true
+          // Reveal the new tableau top after removing a card/stack.
+          revealTopAfterMove(next, from)
+
           const nextStatus = computeStatus(next)
           const nextAction = res.action
+          ok = true
 
           if (res.completedSlotIndex != null) {
             const slotIndex = res.completedSlotIndex
@@ -205,6 +223,176 @@ export const useGameStore = create<GameStore>()(
             drawLoopSeen: to.type === 'slot' ? {} : state.drawLoopSeen,
           }
         })
+        return ok
+      },
+
+      moveCards: (from, to, cardIds) => {
+        const { level, status } = get()
+        if (!level || status !== 'inProgress') return false
+        if (!cardIds.length) return false
+
+        let ok = false
+        set((state) => {
+          if (!state.level) return state
+          const prev: HistoryEntry = { level: state.level, status: state.status }
+          const next = cloneLevel(state.level)
+
+          const now = Date.now()
+
+          // Validate and remove the segment from the source.
+          if (from.type === 'waste') {
+            const top = next.waste.at(-1)
+            if (cardIds.length !== 1 || !top || top !== cardIds[0]) {
+              ok = false
+              return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+            }
+            next.waste.pop()
+          } else if (from.type === 'tableau') {
+            const col = next.tableau[from.column]
+            if (!col) {
+              ok = false
+              return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+            }
+            const tail = col.slice(-cardIds.length)
+            if (tail.length !== cardIds.length || tail.some((id, i) => id !== cardIds[i])) {
+              ok = false
+              return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+            }
+            for (const id of cardIds) {
+              const c = next.cardsById[id]
+              if (!c?.faceUp) {
+                ok = false
+                return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+              }
+            }
+            // Remove cards
+            col.splice(col.length - cardIds.length, cardIds.length)
+          }
+
+          // Apply move to destination.
+          let action: LastAction = null
+          let completedSlotIndex: number | undefined
+          let completedAt: number | undefined
+
+          if (to.type === 'tableau') {
+            const dest = next.tableau[to.column]
+            if (!dest) {
+              // Revert source removal.
+              pushBackMany(next, cardIds, from)
+              ok = false
+              return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+            }
+            const bottomId = cardIds[0]
+            if (!canPlaceOnTableau(next, bottomId, dest.at(-1) ?? null)) {
+              pushBackMany(next, cardIds, from)
+              ok = false
+              return { ...state, lastError: { message: 'Déplacement invalide', cardId: bottomId, at: now }, lastAction: null }
+            }
+            dest.push(...cardIds)
+            for (const id of cardIds) {
+              const c = next.cardsById[id]
+              if (c) c.faceUp = true
+            }
+          } else if (to.type === 'slot') {
+            const slot = next.slots[to.slotIndex]
+            if (!slot || slot.isCompleting) {
+              pushBackMany(next, cardIds, from)
+              ok = false
+              return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+            }
+
+            // Case A: placing a category onto an empty slot.
+            if (slot.categoryCardId == null) {
+              if (cardIds.length !== 1) {
+                pushBackMany(next, cardIds, from)
+                ok = false
+                return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+              }
+              const card = next.cardsById[cardIds[0]]
+              if (!card || card.kind !== 'category') {
+                pushBackMany(next, cardIds, from)
+                ok = false
+                return { ...state, lastError: { message: 'Déplacement invalide', cardId: cardIds[0], at: now }, lastAction: null }
+              }
+              slot.categoryCardId = cardIds[0]
+              slot.pile = []
+              card.faceUp = true
+              const required = next.requiredWordsByCategoryId[card.categoryId] ?? 0
+              if (required <= 0) {
+                slot.isCompleting = true
+                action = { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: card.categoryId, at: now }
+                completedSlotIndex = to.slotIndex
+                completedAt = now
+              } else {
+                action = { type: 'slotPlaced', cardId: cardIds[0], slotIndex: to.slotIndex, at: now }
+              }
+            } else {
+              // Case B: placing words onto an existing category slot.
+              const categoryCard = next.cardsById[slot.categoryCardId]
+              if (!categoryCard || categoryCard.kind !== 'category') {
+                pushBackMany(next, cardIds, from)
+                ok = false
+                return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+              }
+              const required = next.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
+              if (required <= 0) {
+                pushBackMany(next, cardIds, from)
+                ok = false
+                return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+              }
+              if (slot.pile.length + cardIds.length > required) {
+                pushBackMany(next, cardIds, from)
+                ok = false
+                return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
+              }
+              for (const id of cardIds) {
+                const c = next.cardsById[id]
+                if (!c || c.kind !== 'word' || c.categoryId !== categoryCard.categoryId) {
+                  pushBackMany(next, cardIds, from)
+                  ok = false
+                  return { ...state, lastError: { message: 'Déplacement invalide', cardId: id, at: now }, lastAction: null }
+                }
+              }
+              slot.pile.push(...cardIds)
+              for (const id of cardIds) {
+                const c = next.cardsById[id]
+                if (c) c.faceUp = true
+              }
+              if (slot.pile.length >= required) {
+                slot.isCompleting = true
+                action = { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: categoryCard.categoryId, at: now }
+                completedSlotIndex = to.slotIndex
+                completedAt = now
+              }
+            }
+          }
+
+          // Reveal the new tableau top after removing a card/stack.
+          revealTopAfterMove(next, from)
+
+          const nextStatus = computeStatus(next)
+          ok = true
+
+          if (completedSlotIndex != null) {
+            const slotIndex = completedSlotIndex
+            const when = completedAt ?? now
+            window.setTimeout(() => {
+              get().finalizeSlotCompletion(slotIndex, when)
+            }, 380)
+          }
+
+          return {
+            ...state,
+            history: [prev, ...state.history].slice(0, 200),
+            level: next,
+            status: nextStatus,
+            lastError: null,
+            lastAction: action,
+            drawLoopSeen: to.type === 'slot' ? {} : state.drawLoopSeen,
+          }
+        })
+
+        return ok
       },
 
       finalizeSlotCompletion: (slotIndex, _completedAt) => {
@@ -274,6 +462,7 @@ function cloneLevel(level: LevelState): LevelState {
   return {
     ...level,
     requiredWordsByCategoryId: { ...level.requiredWordsByCategoryId },
+    cardsById: Object.fromEntries(Object.entries(level.cardsById).map(([id, c]) => [id, { ...c }])),
     tableau: level.tableau.map((col) => col.slice()),
     stock: level.stock.slice(),
     waste: level.waste.slice(),
@@ -301,6 +490,47 @@ function pushBack(level: LevelState, cardId: CardId, from: MoveSource): void {
   }
 }
 
+function pushBackMany(level: LevelState, cardIds: CardId[], from: MoveSource): void {
+  // Restore order exactly as it was (cardIds are ordered from bottom->top in our selection).
+  if (from.type === 'waste') {
+    for (const id of cardIds) level.waste.push(id)
+    return
+  }
+  if (from.type === 'tableau') {
+    const col = level.tableau[from.column]
+    if (!col) return
+    col.push(...cardIds)
+  }
+}
+
+function revealTopAfterMove(level: LevelState, from: MoveSource): void {
+  if (from.type !== 'tableau') return
+  const col = level.tableau[from.column]
+  const topId = col?.at(-1)
+  if (!topId) return
+  const top = level.cardsById[topId]
+  if (top) top.faceUp = true
+}
+
+function canPlaceOnTableau(level: LevelState, movingId: CardId, destTopId: CardId | null): boolean {
+  const card = level.cardsById[movingId]
+  if (!card) return false
+
+  // Empty tableau piles accept any card.
+  if (!destTopId) return true
+  const top = level.cardsById[destTopId]
+  if (!top) return false
+
+  // Category card: can be placed only on a word of the same category (rule update).
+  if (card.kind === 'category') {
+    return top.kind === 'word' && top.categoryId === card.categoryId
+  }
+
+  // Word card: can be placed if the top card is a category or word of the same category.
+  if (top.kind !== 'category' && top.kind !== 'word') return false
+  return top.categoryId === card.categoryId
+}
+
 function pushTo(
   level: LevelState,
   cardId: CardId,
@@ -311,27 +541,8 @@ function pushTo(
     const column = level.tableau[to.column]
     if (!column) return { ok: false, action: null }
 
-    const card = level.cardsById[cardId]
-    if (!card) return { ok: false, action: null }
-
     const topId = column.at(-1)
-    const top = topId ? level.cardsById[topId] : undefined
-
-    // Empty tableau piles accept any card (category or word).
-    if (!top) {
-      column.push(cardId)
-      return { ok: true, action: null }
-    }
-
-    // Any category card can be placed on a non-empty pile.
-    if (card.kind === 'category') {
-      column.push(cardId)
-      return { ok: true, action: null }
-    }
-
-    // Word card: can be placed if the top card is a category or word of the same category.
-    if (top.kind !== 'category' && top.kind !== 'word') return { ok: false, action: null }
-    if (top.categoryId !== card.categoryId) return { ok: false, action: null }
+    if (!canPlaceOnTableau(level, cardId, topId ?? null)) return { ok: false, action: null }
 
     column.push(cardId)
     return { ok: true, action: null }

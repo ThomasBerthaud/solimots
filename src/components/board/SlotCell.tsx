@@ -4,7 +4,7 @@ import type { CardId, Card as GameCard, LevelState, SlotState } from '../../game
 import type { MoveSource, MoveTarget } from '../../store/gameStore'
 import { Card } from '../cards/Card'
 
-type Selected = { source: MoveSource; cardId: CardId } | null
+type Selected = { source: MoveSource; cardIds: CardId[] } | null
 
 export type SlotCellProps = {
   level: LevelState
@@ -115,7 +115,7 @@ export function SlotCell({
               <Card
                 card={categoryCard}
                 draggable={false}
-                selected={selected?.cardId === categoryCard.id}
+                selected={selected?.cardIds.includes(categoryCard.id) ?? false}
                 className="h-full w-full"
               />
             </div>
@@ -134,7 +134,7 @@ export function SlotCell({
                   <Card
                     card={topWordCard}
                     draggable={false}
-                    selected={selected?.cardId === topWordCard.id}
+                    selected={selected?.cardIds.includes(topWordCard.id) ?? false}
                     className="h-[calc(var(--cardH)-16px)] w-[calc(var(--cardW)-16px)]"
                   />
                 </motion.div>

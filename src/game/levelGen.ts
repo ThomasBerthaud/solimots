@@ -114,7 +114,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
       word: cat.label,
       kind: 'category',
       categoryId: cat.id,
-      faceUp: true,
+      faceUp: false,
     })
 
     const words = pickN(availableWords, required, rnd)
@@ -124,7 +124,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
         word: w,
         kind: 'word',
         categoryId: cat.id,
-        faceUp: true,
+        faceUp: false,
       })
     }
   }
@@ -155,6 +155,14 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   const stock = cardsShuffled.slice(tableauDealCount).map((c) => c.id)
   const waste: CardId[] = []
+
+  // Reveal the top card of each tableau column (solitaire-like).
+  for (let col = 0; col < tableau.length; col++) {
+    const topId = tableau[col]?.at(-1)
+    if (!topId) continue
+    const top = cardsById[topId]
+    if (top) top.faceUp = true
+  }
 
   const slots: LevelState['slots'] = Array.from({ length: 4 }, () => ({
     categoryCardId: null,
