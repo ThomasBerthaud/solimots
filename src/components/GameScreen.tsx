@@ -230,7 +230,7 @@ export function GameScreen() {
 
         <div className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">Solimots</p>
-          <p className="text-sm font-semibold text-white/90">{level.themeId}</p>
+          <p className="text-sm font-semibold text-white/90">Partie #{level.seed}</p>
         </div>
 
         <button
