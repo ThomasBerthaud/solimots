@@ -93,9 +93,9 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const requiredWordsByCategoryId: LevelState['requiredWordsByCategoryId'] = {}
 
   // New distribution logic: Majority of categories should have 3-4 words.
-  // Up to 3 categories can have 5 words, but this is not a strict limit.
+  // Between 0-3 categories can have 5 words (randomized for variety).
   // If custom min/max are provided, we fall back to random distribution for compatibility.
-  const useNewDistribution = 
+  const useNewDistribution =
     options.requiredWordsMin === undefined && options.requiredWordsMax === undefined
 
   // Determine how many categories will have 5 words (large categories)
