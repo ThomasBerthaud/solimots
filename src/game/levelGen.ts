@@ -39,10 +39,6 @@ function randomIntInclusive(min: number, max: number, rnd: () => number): number
 
 export type GenerateLevelOptions = {
   seed?: number
-  /** Min required words to complete a category (inclusive). */
-  requiredWordsMin?: number
-  /** Max required words to complete a category (inclusive). */
-  requiredWordsMax?: number
   /** How many categories are included in the level (must be > 4 for slot gameplay). */
   categoryCount?: number
   /** Fixed MVP: 4 columns. */
@@ -58,8 +54,6 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const seed = options.seed ?? Date.now()
   const rnd = mulberry32(seed)
 
-  const requiredWordsMin = options.requiredWordsMin ?? 3
-  const requiredWordsMax = options.requiredWordsMax ?? 8
   const tableauColumns = options.tableauColumns ?? 4
   const tableauDealPattern = options.tableauDealPattern ?? [2, 3, 4, 5]
 
@@ -92,18 +86,40 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const cards: Card[] = []
   const requiredWordsByCategoryId: LevelState['requiredWordsByCategoryId'] = {}
 
-  // Keep gameplay rules consistent: always require between 3 and 8 words per category.
-  const clampMin = Math.min(8, Math.max(3, Math.floor(requiredWordsMin)))
-  const clampMax = Math.min(8, Math.max(clampMin, Math.floor(requiredWordsMax)))
+  // New distribution logic: Majority of categories should have 3-4 words.
+  // Between 0-3 categories can have 5 words (randomized for variety).
+  const maxLargeCategories = 3
+  const largeCategoriesToCreate = Math.min(
+    maxLargeCategories,
+    Math.floor(rnd() * (maxLargeCategories + 1)),
+  )
+
+  // Create an array of word counts for each category
+  const wordCounts: number[] = []
+
+  // Add large categories (5 words each)
+  for (let i = 0; i < largeCategoriesToCreate; i++) {
+    wordCounts.push(5)
+  }
+
+  // Add remaining small categories (3-4 words each)
+  for (let i = largeCategoriesToCreate; i < categoryCount; i++) {
+    // Randomly choose between 3 or 4 words
+    wordCounts.push(rnd() < 0.5 ? 3 : 4)
+  }
+
+  // Shuffle the word counts to distribute them randomly among categories
+  shuffle(wordCounts, rnd)
 
   const dealPattern =
     tableauColumns === 4 && tableauDealPattern.length === 4
       ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n)))
       : null
 
-  for (const cat of selectedCategories) {
+  for (let idx = 0; idx < selectedCategories.length; idx++) {
+    const cat = selectedCategories[idx]
     const availableWords = uniqueWords(cat.words)
-    const requiredRaw = clampMin + Math.floor(rnd() * (clampMax - clampMin + 1))
+    const requiredRaw = wordCounts[idx]
     // Clamp required to not exceed the available unique words for that category.
     const required = Math.min(requiredRaw, availableWords.length)
     requiredWordsByCategoryId[cat.id] = required
