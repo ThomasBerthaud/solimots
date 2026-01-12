@@ -39,10 +39,6 @@ function randomIntInclusive(min: number, max: number, rnd: () => number): number
 
 export type GenerateLevelOptions = {
   seed?: number
-  /** Min required words to complete a category (inclusive). */
-  requiredWordsMin?: number
-  /** Max required words to complete a category (inclusive). */
-  requiredWordsMax?: number
   /** How many categories are included in the level (must be > 4 for slot gameplay). */
   categoryCount?: number
   /** Fixed MVP: 4 columns. */
