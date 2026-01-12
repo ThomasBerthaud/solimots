@@ -66,7 +66,7 @@ export function TableauCell({
             const top = `calc(var(--stackStep) * ${idx})`
             const isDraggable = card?.faceUp && canDragCard(id)
             return (
-              <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx }}>
+              <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx + 1 }}>
                 {card?.faceUp ? (
                   <Card
                     card={card}
