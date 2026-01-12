@@ -169,7 +169,12 @@ export function GameScreen() {
     setSelected((prev) => {
       // Toggle off if same exact selection is clicked again.
       if (prev?.source.type === source.type) {
-        if (source.type === 'waste' && prev.source.type === 'waste' && prev.cardIds.length === 1 && prev.cardIds[0] === cardId) {
+        if (
+          source.type === 'waste' &&
+          prev.source.type === 'waste' &&
+          prev.cardIds.length === 1 &&
+          prev.cardIds[0] === cardId
+        ) {
           return null
         }
         if (source.type === 'tableau' && prev.source.type === 'tableau' && prev.source.column === source.column) {
@@ -210,13 +215,13 @@ export function GameScreen() {
 
   return (
     <div
-      className="mobile-game relative mx-auto w-full max-w-screen-sm px-3 pb-24 pt-3"
+      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm flex-col px-3 pb-[env(safe-area-inset-bottom,0px)]"
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-b from-emerald-800/35 to-emerald-950/35 blur-[0.2px]" />
 
-      <header className="mb-3 flex items-center justify-between">
+      <header className="mb-3 flex shrink-0 items-center justify-between pt-3">
         <Link
           to="/"
           data-ui-control="true"
@@ -245,8 +250,11 @@ export function GameScreen() {
         </button>
       </header>
 
+      {/* Flex spacer to push game content to bottom */}
+      <div className="min-h-0 flex-1" />
+
       <LayoutGroup>
-        <div className="space-y-3">
+        <div className="mb-3 shrink-0 space-y-3">
           <SlotsRow
             level={level}
             selected={selected}
