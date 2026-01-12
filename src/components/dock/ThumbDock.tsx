@@ -37,7 +37,7 @@ export function ThumbDock({
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40">
-      <div className="mx-auto w-full max-w-screen-sm px-3 pb-[calc(env(safe-area-inset-bottom,0px)+12px)]">
+      <div className="mx-auto w-full max-w-screen-sm px-3 pb-[calc(env(safe-area-inset-bottom,0px)+16px)]">
         <div className="relative">
           <AnimatePresence>
             {toast ? (

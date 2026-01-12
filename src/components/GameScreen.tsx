@@ -169,7 +169,12 @@ export function GameScreen() {
     setSelected((prev) => {
       // Toggle off if same exact selection is clicked again.
       if (prev?.source.type === source.type) {
-        if (source.type === 'waste' && prev.source.type === 'waste' && prev.cardIds.length === 1 && prev.cardIds[0] === cardId) {
+        if (
+          source.type === 'waste' &&
+          prev.source.type === 'waste' &&
+          prev.cardIds.length === 1 &&
+          prev.cardIds[0] === cardId
+        ) {
           return null
         }
         if (source.type === 'tableau' && prev.source.type === 'tableau' && prev.source.column === source.column) {
@@ -210,7 +215,7 @@ export function GameScreen() {
 
   return (
     <div
-      className="mobile-game relative mx-auto w-full max-w-screen-sm px-3 pb-24 pt-3"
+      className="mobile-game relative mx-auto w-full max-w-screen-sm px-3 pb-4 pt-3"
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}

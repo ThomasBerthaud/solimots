@@ -286,7 +286,11 @@ export const useGameStore = create<GameStore>()(
             if (!canPlaceOnTableau(next, bottomId, dest.at(-1) ?? null)) {
               pushBackMany(next, cardIds, from)
               ok = false
-              return { ...state, lastError: { message: 'Déplacement invalide', cardId: bottomId, at: now }, lastAction: null }
+              return {
+                ...state,
+                lastError: { message: 'Déplacement invalide', cardId: bottomId, at: now },
+                lastAction: null,
+              }
             }
             dest.push(...cardIds)
             for (const id of cardIds) {
@@ -312,7 +316,11 @@ export const useGameStore = create<GameStore>()(
               if (!card || card.kind !== 'category') {
                 pushBackMany(next, cardIds, from)
                 ok = false
-                return { ...state, lastError: { message: 'Déplacement invalide', cardId: cardIds[0], at: now }, lastAction: null }
+                return {
+                  ...state,
+                  lastError: { message: 'Déplacement invalide', cardId: cardIds[0], at: now },
+                  lastAction: null,
+                }
               }
               slot.categoryCardId = cardIds[0]
               slot.pile = []
@@ -350,7 +358,11 @@ export const useGameStore = create<GameStore>()(
                 if (!c || c.kind !== 'word' || c.categoryId !== categoryCard.categoryId) {
                   pushBackMany(next, cardIds, from)
                   ok = false
-                  return { ...state, lastError: { message: 'Déplacement invalide', cardId: id, at: now }, lastAction: null }
+                  return {
+                    ...state,
+                    lastError: { message: 'Déplacement invalide', cardId: id, at: now },
+                    lastAction: null,
+                  }
                 }
               }
               slot.pile.push(...cardIds)
@@ -360,7 +372,12 @@ export const useGameStore = create<GameStore>()(
               }
               if (slot.pile.length >= required) {
                 slot.isCompleting = true
-                action = { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: categoryCard.categoryId, at: now }
+                action = {
+                  type: 'slotCompleted',
+                  slotIndex: to.slotIndex,
+                  categoryId: categoryCard.categoryId,
+                  at: now,
+                }
                 completedSlotIndex = to.slotIndex
                 completedAt = now
               }
