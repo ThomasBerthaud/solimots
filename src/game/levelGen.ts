@@ -58,8 +58,6 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const seed = options.seed ?? Date.now()
   const rnd = mulberry32(seed)
 
-  const requiredWordsMin = options.requiredWordsMin ?? 3
-  const requiredWordsMax = options.requiredWordsMax ?? 8
   const tableauColumns = options.tableauColumns ?? 4
   const tableauDealPattern = options.tableauDealPattern ?? [2, 3, 4, 5]
 
@@ -94,43 +92,28 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // New distribution logic: Majority of categories should have 3-4 words.
   // Between 0-3 categories can have 5 words (randomized for variety).
-  // If custom min/max are provided, we fall back to random distribution for compatibility.
-  const useNewDistribution =
-    options.requiredWordsMin === undefined && options.requiredWordsMax === undefined
-
-  // Determine how many categories will have 5 words (large categories)
-  // Maximum 3, but allow randomness for variety
   const maxLargeCategories = 3
-  const largeCategoriesToCreate = useNewDistribution
-    ? Math.min(maxLargeCategories, Math.floor(rnd() * (maxLargeCategories + 1)))
-    : 0
-  
+  const largeCategoriesToCreate = Math.min(
+    maxLargeCategories,
+    Math.floor(rnd() * (maxLargeCategories + 1)),
+  )
+
   // Create an array of word counts for each category
   const wordCounts: number[] = []
-  
-  if (useNewDistribution) {
-    // Add large categories (5 words each)
-    for (let i = 0; i < largeCategoriesToCreate; i++) {
-      wordCounts.push(5)
-    }
-    
-    // Add remaining small categories (3-4 words each)
-    for (let i = largeCategoriesToCreate; i < categoryCount; i++) {
-      // Randomly choose between 3 or 4 words
-      wordCounts.push(rnd() < 0.5 ? 3 : 4)
-    }
-    
-    // Shuffle the word counts to distribute them randomly among categories
-    shuffle(wordCounts, rnd)
-  } else {
-    // Fallback to old behavior for backward compatibility
-    const clampMin = Math.min(8, Math.max(3, Math.floor(requiredWordsMin)))
-    const clampMax = Math.min(8, Math.max(clampMin, Math.floor(requiredWordsMax)))
-    
-    for (let i = 0; i < categoryCount; i++) {
-      wordCounts.push(clampMin + Math.floor(rnd() * (clampMax - clampMin + 1)))
-    }
+
+  // Add large categories (5 words each)
+  for (let i = 0; i < largeCategoriesToCreate; i++) {
+    wordCounts.push(5)
   }
+
+  // Add remaining small categories (3-4 words each)
+  for (let i = largeCategoriesToCreate; i < categoryCount; i++) {
+    // Randomly choose between 3 or 4 words
+    wordCounts.push(rnd() < 0.5 ? 3 : 4)
+  }
+
+  // Shuffle the word counts to distribute them randomly among categories
+  shuffle(wordCounts, rnd)
 
   const dealPattern =
     tableauColumns === 4 && tableauDealPattern.length === 4
