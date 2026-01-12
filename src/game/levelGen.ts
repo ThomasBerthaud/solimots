@@ -92,18 +92,55 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const cards: Card[] = []
   const requiredWordsByCategoryId: LevelState['requiredWordsByCategoryId'] = {}
 
-  // Keep gameplay rules consistent: always require between 3 and 8 words per category.
-  const clampMin = Math.min(8, Math.max(3, Math.floor(requiredWordsMin)))
-  const clampMax = Math.min(8, Math.max(clampMin, Math.floor(requiredWordsMax)))
+  // New distribution logic: Majority of categories should have 3-4 words.
+  // Up to 3 categories can have 5 words, but this is not a strict limit.
+  // If custom min/max are provided, we fall back to random distribution for compatibility.
+  const useNewDistribution = 
+    options.requiredWordsMin === undefined && options.requiredWordsMax === undefined
+
+  // Determine how many categories will have 5 words (large categories)
+  // Maximum 3, but allow randomness for variety
+  const maxLargeCategories = 3
+  const largeCategoriesToCreate = useNewDistribution
+    ? Math.min(maxLargeCategories, Math.floor(rnd() * (maxLargeCategories + 1)))
+    : 0
+  
+  // Create an array of word counts for each category
+  const wordCounts: number[] = []
+  
+  if (useNewDistribution) {
+    // Add large categories (5 words each)
+    for (let i = 0; i < largeCategoriesToCreate; i++) {
+      wordCounts.push(5)
+    }
+    
+    // Add remaining small categories (3-4 words each)
+    for (let i = largeCategoriesToCreate; i < categoryCount; i++) {
+      // Randomly choose between 3 or 4 words
+      wordCounts.push(rnd() < 0.5 ? 3 : 4)
+    }
+    
+    // Shuffle the word counts to distribute them randomly among categories
+    shuffle(wordCounts, rnd)
+  } else {
+    // Fallback to old behavior for backward compatibility
+    const clampMin = Math.min(8, Math.max(3, Math.floor(requiredWordsMin)))
+    const clampMax = Math.min(8, Math.max(clampMin, Math.floor(requiredWordsMax)))
+    
+    for (let i = 0; i < categoryCount; i++) {
+      wordCounts.push(clampMin + Math.floor(rnd() * (clampMax - clampMin + 1)))
+    }
+  }
 
   const dealPattern =
     tableauColumns === 4 && tableauDealPattern.length === 4
       ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n)))
       : null
 
-  for (const cat of selectedCategories) {
+  for (let idx = 0; idx < selectedCategories.length; idx++) {
+    const cat = selectedCategories[idx]
     const availableWords = uniqueWords(cat.words)
-    const requiredRaw = clampMin + Math.floor(rnd() * (clampMax - clampMin + 1))
+    const requiredRaw = wordCounts[idx]
     // Clamp required to not exceed the available unique words for that category.
     const required = Math.min(requiredRaw, availableWords.length)
     requiredWordsByCategoryId[cat.id] = required
