@@ -250,6 +250,7 @@ export function GameScreen() {
         </button>
       </header>
 
+      {/* Flex spacer to push game content to bottom */}
       <div className="min-h-0 flex-1" />
 
       <LayoutGroup>
