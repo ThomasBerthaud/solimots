@@ -128,7 +128,7 @@ export function SlotCell({
                   className="absolute inset-0 flex items-center justify-center p-2"
                   initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.85, y: -8 }}
                   animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985 }}
+                  exit={{ opacity: 0 }}
                   transition={reduceMotion ? { duration: 0.2 } : { duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                 >
                   <Card
