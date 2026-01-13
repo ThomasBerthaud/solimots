@@ -126,10 +126,10 @@ export function SlotCell({
                 <motion.div
                   key={topWordCard.id}
                   className="absolute inset-0 flex items-center justify-center p-2"
-                  initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
-                  animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                  initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.85, y: -8 }}
+                  animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                 >
                   <Card
                     card={topWordCard}
@@ -141,8 +141,8 @@ export function SlotCell({
               ) : null}
             </AnimatePresence>
 
-            {/* Progress badge */}
-            <div className="pointer-events-none absolute left-2 top-2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/85">
+            {/* Progress badge - centered at bottom */}
+            <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/85">
               {progress}
             </div>
 
