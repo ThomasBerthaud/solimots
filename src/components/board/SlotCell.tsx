@@ -129,7 +129,7 @@ export function SlotCell({
                   initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.85, y: -8 }}
                   animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985 }}
-                  transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                  transition={reduceMotion ? { duration: 0.2 } : { duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
                 >
                   <Card
                     card={topWordCard}
