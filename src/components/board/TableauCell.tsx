@@ -14,7 +14,7 @@ export type TableauCellProps = {
   selectedCard: GameCard | null
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   tryMoveTo: (target: MoveTarget) => void
-  onDropCard: (from: MoveSource, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
+  onDropCard: (from: MoveSource, draggedCardId: CardId, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
   errorCardId?: string
   errorAt?: number
 }
@@ -74,7 +74,7 @@ export function TableauCell({
                     onDrop={
                       isDraggable
                         ? (point, draggedEl) =>
-                            onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
+                            onDropCard({ type: 'tableau', column: columnIndex }, id, { x: point.x, y: point.y }, draggedEl)
                         : undefined
                     }
                     onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, id)}
