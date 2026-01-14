@@ -45,7 +45,7 @@ export function StockWaste({
               key={wasteId}
               initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 18, y: -6, rotate: 0.8, scale: 0.98 }}
               animate={reduceMotion ? { opacity: 1 } : { opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 }}
-              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -10, y: 8, scale: 0.98 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
             >
               <Card

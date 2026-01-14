@@ -37,6 +37,14 @@ export function TableauCell({
   const topId = ids.at(-1)
   const hint = Boolean(selectedCard)
 
+  // Helper to check if a card can be dragged (all cards from this one to the end must be face-up)
+  const canDragCard = (cardId: CardId): boolean => {
+    const colIdx = ids.indexOf(cardId)
+    if (colIdx < 0) return false
+    const segment = ids.slice(colIdx)
+    return segment.every((id) => level.cardsById[id]?.faceUp)
+  }
+
   return (
     <div
       data-drop-target="tableau"
@@ -54,17 +62,17 @@ export function TableauCell({
       <div className="relative">
         {visible.length ? (
           visible.map((id, idx) => {
-            const isTop = id === topId
             const card = level.cardsById[id]
             const top = `calc(var(--stackStep) * ${idx})`
+            const isDraggable = card?.faceUp && canDragCard(id)
             return (
-              <div key={id} className="absolute left-0 right-0" style={{ top }}>
+              <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx + 1 }}>
                 {card?.faceUp ? (
                   <Card
                     card={card}
-                    draggable={isTop}
+                    draggable={isDraggable}
                     onDrop={
-                      isTop
+                      isDraggable
                         ? (point, draggedEl) =>
                             onDropCard({ type: 'tableau', column: columnIndex }, { x: point.x, y: point.y }, draggedEl)
                         : undefined
