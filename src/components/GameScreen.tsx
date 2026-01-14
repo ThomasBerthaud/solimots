@@ -29,6 +29,15 @@ function computeContiguousSelection(level: LevelState, source: MoveSource, click
   return firstHidden >= 0 ? segment.slice(0, firstHidden) : segment
 }
 
+function getCardsToMove(from: MoveSource, draggedCardId: CardId, level: LevelState): CardId[] {
+  // For tableau, this includes all cards from the dragged card to the end of the column.
+  // For waste, it's always just the single card.
+  if (from.type === 'tableau') {
+    return computeContiguousSelection(level, from, draggedCardId)
+  }
+  return [draggedCardId]
+}
+
 function explainInvalidMove(level: LevelState, cardId: CardId, to: MoveTarget): string | null {
   if (to.type === 'tableau') return null
 
@@ -135,16 +144,7 @@ export function GameScreen() {
     // Dropping onto the same source is a no-op; treat it as invalid so the UI snaps back.
     if (from.type === 'tableau' && to.type === 'tableau' && from.column === to.column) return false
 
-    // Compute the stack of cards to move based on the dragged card.
-    // For tableau, this includes all cards from the dragged card to the end of the column.
-    // For waste, it's always just the single card.
-    let cardIdsToMove: CardId[]
-    if (from.type === 'tableau') {
-      cardIdsToMove = computeContiguousSelection(level!, from, draggedCardId)
-    } else {
-      cardIdsToMove = [draggedCardId]
-    }
-
+    const cardIdsToMove = getCardsToMove(from, draggedCardId, level!)
     const bottomId = cardIdsToMove[0]
     lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, bottomId, to) }
     const ok = cardIdsToMove.length === 1 ? moveCard(from, to) : moveCards(from, to, cardIdsToMove)
