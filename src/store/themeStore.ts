@@ -68,13 +68,13 @@ export const themes: Record<string, Theme> = {
       category: {
         gradient: 'linear-gradient(135deg, rgba(186, 230, 253, 0.92), rgba(56, 189, 248, 0.85))',
         border: 'rgb(186 230 253 / 0.6)',
-        text: 'rgb(7 89 133)',
+        text: 'rgb(3 60 90)', // Darker blue for better contrast (was rgb(7 89 133))
         ring: 'rgb(186 230 253 / 0.9)',
       },
       word: {
         background: 'rgb(240 249 255)',
         border: 'rgb(14 165 233 / 0.15)',
-        text: 'rgb(7 89 133)',
+        text: 'rgb(3 60 90)', // Darker blue for better contrast (was rgb(7 89 133))
         ring: 'rgb(186 230 253 / 0.8)',
       },
       back: {
@@ -97,13 +97,13 @@ export const themes: Record<string, Theme> = {
       category: {
         gradient: 'linear-gradient(135deg, rgba(254, 205, 211, 0.92), rgba(251, 113, 133, 0.85))',
         border: 'rgb(254 205 211 / 0.6)',
-        text: 'rgb(136 19 55)',
+        text: 'rgb(100 15 40)', // Darker red for better contrast (was rgb(136 19 55))
         ring: 'rgb(254 205 211 / 0.9)',
       },
       word: {
         background: 'rgb(255 241 242)',
         border: 'rgb(244 114 182 / 0.15)',
-        text: 'rgb(136 19 55)',
+        text: 'rgb(100 15 40)', // Darker red for better contrast (was rgb(136 19 55))
         ring: 'rgb(254 205 211 / 0.8)',
       },
       back: {
@@ -126,13 +126,13 @@ export const themes: Record<string, Theme> = {
       category: {
         gradient: 'linear-gradient(135deg, rgba(187, 247, 208, 0.92), rgba(74, 222, 128, 0.85))',
         border: 'rgb(187 247 208 / 0.6)',
-        text: 'rgb(20 83 45)',
+        text: 'rgb(15 60 30)', // Darker green for better contrast (was rgb(20 83 45))
         ring: 'rgb(187 247 208 / 0.9)',
       },
       word: {
         background: 'rgb(240 253 244)',
         border: 'rgb(34 197 94 / 0.15)',
-        text: 'rgb(20 83 45)',
+        text: 'rgb(15 60 30)', // Darker green for better contrast (was rgb(20 83 45))
         ring: 'rgb(187 247 208 / 0.8)',
       },
       back: {
@@ -155,13 +155,13 @@ export const themes: Record<string, Theme> = {
       category: {
         gradient: 'linear-gradient(135deg, rgba(221, 214, 254, 0.92), rgba(167, 139, 250, 0.85))',
         border: 'rgb(221 214 254 / 0.6)',
-        text: 'rgb(76 29 149)',
+        text: 'rgb(55 20 110)', // Darker purple for better contrast (was rgb(76 29 149))
         ring: 'rgb(221 214 254 / 0.9)',
       },
       word: {
         background: 'rgb(250 245 255)',
         border: 'rgb(167 139 250 / 0.15)',
-        text: 'rgb(76 29 149)',
+        text: 'rgb(55 20 110)', // Darker purple for better contrast (was rgb(76 29 149))
         ring: 'rgb(221 214 254 / 0.8)',
       },
       back: {
@@ -184,13 +184,13 @@ export const themes: Record<string, Theme> = {
       category: {
         gradient: 'linear-gradient(135deg, rgba(254, 215, 170, 0.92), rgba(251, 146, 60, 0.85))',
         border: 'rgb(254 215 170 / 0.6)',
-        text: 'rgb(124 45 18)',
+        text: 'rgb(90 35 10)', // Darker brown for better contrast (was rgb(124 45 18))
         ring: 'rgb(254 215 170 / 0.9)',
       },
       word: {
         background: 'rgb(255 247 237)',
         border: 'rgb(251 146 60 / 0.15)',
-        text: 'rgb(124 45 18)',
+        text: 'rgb(90 35 10)', // Darker brown for better contrast (was rgb(124 45 18))
         ring: 'rgb(254 215 170 / 0.8)',
       },
       back: {
