@@ -144,14 +144,6 @@ export function Card({
         }
         transition={feedback || selected ? { duration: 0.28, ease: 'easeOut' } : undefined}
       >
-        {/* Subtle “foil” sheen for category cards */}
-        {isCategory ? (
-          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[18px]">
-            <div className="absolute -left-12 -top-14 h-24 w-44 rotate-12 bg-white/30 blur-[0.5px]" />
-            <div className="absolute -right-20 top-10 h-40 w-40 rounded-full bg-white/18 blur-2xl" />
-          </div>
-        ) : null}
-
         <div className="relative flex h-full w-full flex-col justify-between p-3">
           <div className="flex min-h-0 flex-1 items-center justify-center">
             <span

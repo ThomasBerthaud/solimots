@@ -23,8 +23,6 @@ export function Home() {
 
   return (
     <div className="space-y-6">
-      <ThemeSelector />
-
       <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
         <p className="text-sm uppercase tracking-wider text-white/70">Solitaire d'associations</p>
         <h1 className="mt-2 text-2xl font-semibold leading-tight md:text-3xl">
@@ -71,6 +69,8 @@ export function Home() {
           </Link>
         </div>
       </section>
+
+      <ThemeSelector />
 
       <section className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
