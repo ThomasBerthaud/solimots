@@ -95,7 +95,7 @@ function DraggableCardStack({ children, isDraggable, onDrop, reduceMotion }: Dra
           shakeBack()
         }
       }}
-      style={{ x, y, zIndex: isDragging ? 9999 : undefined, cursor: isDraggable ? 'grab' : undefined }}
+      style={{ x, y, zIndex: isDragging ? 9999 : undefined, cursor: 'grab', touchAction: 'none' }}
     >
       {children}
     </motion.div>
