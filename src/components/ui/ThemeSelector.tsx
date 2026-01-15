@@ -64,7 +64,7 @@ export function ThemeSelector() {
               {theme.watermark ? (
                 <div
                   className="pointer-events-none absolute inset-0 flex items-center justify-center text-4xl"
-                  style={{ opacity: theme.watermark.opacity * 2 }}
+                  style={{ opacity: theme.watermark.opacity * 2 }} // Double opacity for better visibility in small preview
                   aria-hidden="true"
                 >
                   {theme.watermark.pattern}

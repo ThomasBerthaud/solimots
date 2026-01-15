@@ -217,6 +217,8 @@ export const useThemeStore = create<ThemeStore>()(
       setTheme: (themeId: string) => {
         if (themes[themeId]) {
           set({ currentTheme: themeId })
+        } else {
+          console.warn(`Invalid theme ID: "${themeId}". Available themes:`, Object.keys(themes))
         }
       },
       getTheme: () => themes[get().currentTheme] ?? themes.default,
