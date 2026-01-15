@@ -202,7 +202,8 @@ export function GameScreen() {
 
   return (
     <div
-      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm flex-col px-3 pb-[env(safe-area-inset-bottom,0px)]"
+      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm flex-col px-3 pb-3"
+      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
