@@ -307,13 +307,8 @@ export const useGameStore = create<GameStore>()(
 
             // Case A: placing a category onto an empty slot.
             if (slot.categoryCardId == null) {
-              if (cardIds.length !== 1) {
-                pushBackMany(next, cardIds, from)
-                ok = false
-                return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
-              }
-              const card = next.cardsById[cardIds[0]]
-              if (!card || card.kind !== 'category') {
+              const categoryCard = next.cardsById[cardIds[0]]
+              if (!categoryCard || categoryCard.kind !== 'category') {
                 pushBackMany(next, cardIds, from)
                 ok = false
                 return {
@@ -322,13 +317,48 @@ export const useGameStore = create<GameStore>()(
                   lastAction: null,
                 }
               }
+
+              // If dragging multiple cards, validate that all subsequent cards are matching words
+              const required = next.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
+              const wordCards = cardIds.slice(1)
+
+              if (wordCards.length > 0) {
+                // Check that all subsequent cards are valid words for this category
+                if (wordCards.length > required) {
+                  pushBackMany(next, cardIds, from)
+                  ok = false
+                  return { ...state, lastError: { message: 'Trop de mots pour cette catégorie', at: now }, lastAction: null }
+                }
+
+                for (const id of wordCards) {
+                  const wordCard = next.cardsById[id]
+                  if (!wordCard || wordCard.kind !== 'word' || wordCard.categoryId !== categoryCard.categoryId) {
+                    pushBackMany(next, cardIds, from)
+                    ok = false
+                    return {
+                      ...state,
+                      lastError: { message: 'Ces mots ne correspondent pas à la catégorie', cardId: id, at: now },
+                      lastAction: null,
+                    }
+                  }
+                }
+              }
+
+              // Place the category card
               slot.categoryCardId = cardIds[0]
-              slot.pile = []
-              card.faceUp = true
-              const required = next.requiredWordsByCategoryId[card.categoryId] ?? 0
-              if (required <= 0) {
+              categoryCard.faceUp = true
+
+              // Place all matching word cards
+              slot.pile = [...wordCards]
+              for (const id of wordCards) {
+                const c = next.cardsById[id]
+                if (c) c.faceUp = true
+              }
+
+              // Check if the slot is now complete
+              if (required > 0 && slot.pile.length >= required) {
                 slot.isCompleting = true
-                action = { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: card.categoryId, at: now }
+                action = { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: categoryCard.categoryId, at: now }
                 completedSlotIndex = to.slotIndex
                 completedAt = now
               } else {
