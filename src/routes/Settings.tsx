@@ -32,7 +32,7 @@ export function Settings() {
           >
             <div>
               <p className="font-semibold">Droitier</p>
-              <p className="text-sm text-white/60">Pioche à droite</p>
+              <p className="text-sm text-white/60">Pioche à gauche</p>
             </div>
             {handedness === 'right' ? (
               <div className="text-lg" aria-hidden="true">
@@ -55,7 +55,7 @@ export function Settings() {
           >
             <div>
               <p className="font-semibold">Gaucher</p>
-              <p className="text-sm text-white/60">Pioche à gauche</p>
+              <p className="text-sm text-white/60">Pioche à droite</p>
             </div>
             {handedness === 'left' ? (
               <div className="text-lg" aria-hidden="true">
