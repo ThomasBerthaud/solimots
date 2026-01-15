@@ -10,7 +10,12 @@ export type TableauRowProps = {
   selectedCard: Card | null
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   tryMoveTo: (target: MoveTarget) => void
-  onDropCard: (from: MoveSource, draggedCardId: CardId, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
+  onDropCard: (
+    from: MoveSource,
+    draggedCardId: CardId,
+    point: { x: number; y: number },
+    draggedEl?: HTMLElement | null,
+  ) => boolean
   errorCardId?: string
   errorAt?: number
 }

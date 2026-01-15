@@ -140,7 +140,12 @@ export function GameScreen() {
     }
   }, [])
 
-  const onDropCard = (from: MoveSource, draggedCardId: CardId, point: { x: number; y: number }, draggedEl?: HTMLElement | null): boolean => {
+  const onDropCard = (
+    from: MoveSource,
+    draggedCardId: CardId,
+    point: { x: number; y: number },
+    draggedEl?: HTMLElement | null,
+  ): boolean => {
     const to = resolveDropTarget(point, draggedEl)
     if (!to) return false
     // Dropping onto the same source is a no-op; treat it as invalid so the UI snaps back.
@@ -209,7 +214,7 @@ export function GameScreen() {
     >
       {/* Felt background panel */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] bg-[var(--theme-felt-gradient)] blur-[0.2px]" />
-      
+
       {/* Theme watermark */}
       {theme.watermark ? (
         <div

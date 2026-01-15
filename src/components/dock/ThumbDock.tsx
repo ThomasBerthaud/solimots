@@ -13,7 +13,12 @@ export type ThumbDockProps = {
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   onDraw: () => void
   onUndo: () => void
-  onDropCard: (from: MoveSource, draggedCardId: CardId, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
+  onDropCard: (
+    from: MoveSource,
+    draggedCardId: CardId,
+    point: { x: number; y: number },
+    draggedEl?: HTMLElement | null,
+  ) => boolean
   errorCardId?: string
   errorAt?: number
   undoIcon: ReactNode

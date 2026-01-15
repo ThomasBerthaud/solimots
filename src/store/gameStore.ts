@@ -327,7 +327,11 @@ export const useGameStore = create<GameStore>()(
                 if (wordCards.length > required) {
                   pushBackMany(next, cardIds, from)
                   ok = false
-                  return { ...state, lastError: { message: 'Trop de mots pour cette catégorie', at: now }, lastAction: null }
+                  return {
+                    ...state,
+                    lastError: { message: 'Trop de mots pour cette catégorie', at: now },
+                    lastAction: null,
+                  }
                 }
 
                 for (const id of wordCards) {
@@ -358,7 +362,12 @@ export const useGameStore = create<GameStore>()(
               // Check if the slot is now complete
               if (required > 0 && slot.pile.length >= required) {
                 slot.isCompleting = true
-                action = { type: 'slotCompleted', slotIndex: to.slotIndex, categoryId: categoryCard.categoryId, at: now }
+                action = {
+                  type: 'slotCompleted',
+                  slotIndex: to.slotIndex,
+                  categoryId: categoryCard.categoryId,
+                  at: now,
+                }
                 completedSlotIndex = to.slotIndex
                 completedAt = now
               } else {

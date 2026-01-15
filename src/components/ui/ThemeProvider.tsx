@@ -6,7 +6,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement
-    
+
     // Apply theme CSS variables
     root.style.setProperty('--theme-bg-gradient', theme.background.gradient)
     root.style.setProperty('--theme-felt-gradient', theme.background.feltGradient)
@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--theme-card-word-text', theme.cards.word.text)
     root.style.setProperty('--theme-card-word-ring', theme.cards.word.ring)
     root.style.setProperty('--theme-card-back-gradient', theme.cards.back.gradient)
-    
+
     // Update body background immediately
     document.body.style.background = theme.background.gradient
   }, [theme])

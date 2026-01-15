@@ -114,7 +114,11 @@ export function Card({
         isCategory
           ? 'border-[var(--theme-card-category-border)] bg-[var(--theme-card-category-gradient)] text-[var(--theme-card-category-text)]'
           : 'border-[var(--theme-card-word-border)] bg-[var(--theme-card-word-bg)] text-[var(--theme-card-word-text)]',
-        selected ? (isCategory ? 'ring-2 ring-[var(--theme-card-category-ring)]' : 'ring-2 ring-[var(--theme-card-word-ring)]') : '',
+        selected
+          ? isCategory
+            ? 'ring-2 ring-[var(--theme-card-category-ring)]'
+            : 'ring-2 ring-[var(--theme-card-word-ring)]'
+          : '',
         draggable ? 'cursor-grab active:cursor-grabbing' : '',
         className ?? '',
       ].join(' ')}
