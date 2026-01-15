@@ -1,6 +1,7 @@
 import { Dices, GraduationCap, Play, RotateCcw, ScrollText, Smartphone } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
+import { ThemeSelector } from '../components/ui/ThemeSelector'
 import { useGameStore } from '../store/gameStore'
 
 export function Home() {
@@ -22,6 +23,8 @@ export function Home() {
 
   return (
     <div className="space-y-6">
+      <ThemeSelector />
+
       <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
         <p className="text-sm uppercase tracking-wider text-white/70">Solitaire d'associations</p>
         <h1 className="mt-2 text-2xl font-semibold leading-tight md:text-3xl">

@@ -112,9 +112,9 @@ export function Card({
       className={[
         'relative select-none rounded-[18px] border shadow-[0_14px_34px_rgba(0,0,0,0.22)]',
         isCategory
-          ? 'border-amber-200/60 bg-[linear-gradient(135deg,rgba(253,230,138,0.92),rgba(251,191,36,0.80))] text-amber-950'
-          : 'border-black/5 bg-white text-slate-900',
-        selected ? (isCategory ? 'ring-2 ring-amber-200/90' : 'ring-2 ring-white/80') : '',
+          ? 'border-[var(--theme-card-category-border)] bg-[var(--theme-card-category-gradient)] text-[var(--theme-card-category-text)]'
+          : 'border-[var(--theme-card-word-border)] bg-[var(--theme-card-word-bg)] text-[var(--theme-card-word-text)]',
+        selected ? (isCategory ? 'ring-2 ring-[var(--theme-card-category-ring)]' : 'ring-2 ring-[var(--theme-card-word-ring)]') : '',
         draggable ? 'cursor-grab active:cursor-grabbing' : '',
         className ?? '',
       ].join(' ')}

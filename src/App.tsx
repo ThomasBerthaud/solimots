@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { GraduationCap, Play, ScrollText } from 'lucide-react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { IconLabel } from './components/ui/IconLabel'
+import { ThemeProvider } from './components/ui/ThemeProvider'
 import { useGameStore } from './store/gameStore'
 
 function App() {
@@ -16,7 +17,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-dvh">
+    <ThemeProvider>
+      <div className="min-h-dvh">
       {isGame ? null : (
         <header className="sticky top-0 z-20 border-b border-white/10 bg-black/20 backdrop-blur">
           <div className="mx-auto flex max-w-screen-md items-center justify-between px-4 py-3 md:max-w-4xl">
@@ -72,6 +74,7 @@ function App() {
         </motion.div>
       </main>
     </div>
+    </ThemeProvider>
   )
 }
 

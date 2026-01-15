@@ -11,6 +11,19 @@
   --card-ink: 222 22% 12%;
   --muted-ink: 215 16% 35%;
   --gold: 43 84% 55%;
+
+  /* Theme colors - will be overridden dynamically */
+  --theme-bg-gradient: radial-gradient(1200px 600px at 30% 0%, hsl(var(--felt-700)), hsl(var(--felt-900)));
+  --theme-felt-gradient: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 78, 59, 0.35));
+  --theme-card-category-gradient: linear-gradient(135deg, rgba(253, 230, 138, 0.92), rgba(251, 191, 36, 0.80));
+  --theme-card-category-border: rgb(254 240 138 / 0.6);
+  --theme-card-category-text: rgb(69 26 3);
+  --theme-card-category-ring: rgb(254 240 138 / 0.9);
+  --theme-card-word-bg: rgb(255 255 255);
+  --theme-card-word-border: rgb(0 0 0 / 0.05);
+  --theme-card-word-text: rgb(15 23 42);
+  --theme-card-word-ring: rgb(255 255 255 / 0.8);
+  --theme-card-back-gradient: linear-gradient(135deg, rgb(2, 132, 199), rgb(79, 70, 229), rgb(5, 150, 105));
 }
 
 html,
@@ -20,7 +33,7 @@ body {
 
 body {
   margin: 0;
-  background: radial-gradient(1200px 600px at 30% 0%, hsl(var(--felt-700)), hsl(var(--felt-900)));
+  background: var(--theme-bg-gradient);
   color: hsl(var(--card));
   font-family:
     ui-sans-serif,

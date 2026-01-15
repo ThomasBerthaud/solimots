@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { CardId, LevelState } from '../game/types'
 import { useGameStore, type MoveSource, type MoveTarget } from '../store/gameStore'
+import { useThemeStore } from '../store/themeStore'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
 import { ThumbDock } from './dock/ThumbDock'
@@ -78,6 +79,7 @@ export function GameScreen() {
   const undo = useGameStore((s) => s.undo)
   const moveCard = useGameStore((s) => s.moveCard)
   const moveCards = useGameStore((s) => s.moveCards)
+  const theme = useThemeStore((s) => s.getTheme())
 
   const [selected, setSelected] = useState<Selected>(null)
   const [helpOpen, setHelpOpen] = useState(false)
@@ -206,7 +208,18 @@ export function GameScreen() {
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
-      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-b from-emerald-800/35 to-emerald-950/35 blur-[0.2px]" />
+      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] bg-[var(--theme-felt-gradient)] blur-[0.2px]" />
+      
+      {/* Theme watermark */}
+      {theme.watermark ? (
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center text-[180px] leading-none"
+          style={{ opacity: theme.watermark.opacity }}
+          aria-hidden="true"
+        >
+          {theme.watermark.pattern}
+        </div>
+      ) : null}
 
       <header className="mb-3 flex shrink-0 items-center justify-between pt-3">
         <Link
