@@ -38,12 +38,11 @@ export type TableauCellProps = {
 // DraggableCardStack: A wrapper that makes a stack of cards draggable as a unit
 type DraggableCardStackProps = {
   children: React.ReactNode
-  isDraggable: boolean
   onDrop: (point: Point, draggedEl: HTMLElement | null) => boolean
   reduceMotion: boolean
 }
 
-function DraggableCardStack({ children, isDraggable, onDrop, reduceMotion }: DraggableCardStackProps) {
+function DraggableCardStack({ children, onDrop, reduceMotion }: DraggableCardStackProps) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const x = useMotionValue(0)
@@ -69,10 +68,6 @@ function DraggableCardStack({ children, isDraggable, onDrop, reduceMotion }: Dra
       animate(x, 0, { type: 'spring', stiffness: 240, damping: 30 })
       animate(y, 0, { type: 'spring', stiffness: 240, damping: 30 })
     })
-  }
-
-  if (!isDraggable) {
-    return <div className="relative">{children}</div>
   }
 
   return (
@@ -165,7 +160,6 @@ export function TableauCell({
                 return (
                   <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx + 1 }}>
                     <DraggableCardStack
-                      isDraggable={true}
                       onDrop={(point, draggedEl) =>
                         onDropCard({ type: 'tableau', column: columnIndex }, id, { x: point.x, y: point.y }, draggedEl)
                       }
@@ -185,7 +179,7 @@ export function TableauCell({
                               <Card
                                 card={stackCard}
                                 draggable={false}
-                                onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, id)}
+                                onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, stackId)}
                                 selected={selected?.cardIds.includes(stackId) ?? false}
                                 feedback={errorCardId === stackId ? 'error' : undefined}
                                 feedbackKey={errorCardId === stackId ? errorAt : undefined}
