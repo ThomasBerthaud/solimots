@@ -101,13 +101,13 @@ export function ThumbDock({
           >
             {handedness === 'left' ? (
               <>
-                {undoElement}
                 {stockWasteElement}
+                {undoElement}
               </>
             ) : (
               <>
-                {stockWasteElement}
                 {undoElement}
+                {stockWasteElement}
               </>
             )}
           </motion.div>

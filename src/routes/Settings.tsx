@@ -1,3 +1,5 @@
+import { ArrowLeft } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useSettingsStore } from '../store/settingsStore'
 
 export function Settings() {
@@ -7,6 +9,15 @@ export function Settings() {
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-white/75 hover:text-white mb-4"
+          aria-label="Retour"
+          title="Retour"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          <span>Retour</span>
+        </Link>
         <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Configuration</h1>
         <p className="mt-2 text-white/75">Personnalise ton expérience de jeu.</p>
       </section>
@@ -32,7 +43,7 @@ export function Settings() {
           >
             <div>
               <p className="font-semibold">Droitier</p>
-              <p className="text-sm text-white/60">Pioche à gauche</p>
+              <p className="text-sm text-white/60">Pioche à droite</p>
             </div>
             {handedness === 'right' ? (
               <div className="text-lg" aria-hidden="true">
@@ -55,7 +66,7 @@ export function Settings() {
           >
             <div>
               <p className="font-semibold">Gaucher</p>
-              <p className="text-sm text-white/60">Pioche à droite</p>
+              <p className="text-sm text-white/60">Pioche à gauche</p>
             </div>
             {handedness === 'left' ? (
               <div className="text-lg" aria-hidden="true">
