@@ -45,7 +45,7 @@ export type GenerateLevelOptions = {
   tableauColumns?: number
   /**
    * Tableau deal pattern from left to right (top is last).
-   * Default: [2, 3, 4, 5].
+   * Default: [4, 5, 6, 7].
    */
   tableauDealPattern?: number[]
 }
@@ -55,7 +55,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const rnd = mulberry32(seed)
 
   const tableauColumns = options.tableauColumns ?? 4
-  const tableauDealPattern = options.tableauDealPattern ?? [2, 3, 4, 5]
+  const tableauDealPattern = options.tableauDealPattern ?? [4, 5, 6, 7]
 
   validateWordBank(WORD_BANK)
 

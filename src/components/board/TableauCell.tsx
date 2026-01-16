@@ -110,7 +110,7 @@ export function TableauCell({
   errorAt,
 }: TableauCellProps) {
   const reduceMotion = useReducedMotion()
-  const visible = ids.slice(Math.max(0, ids.length - 7))
+  const visible = ids.slice(Math.max(0, ids.length - 10))
   const topId = ids.at(-1)
   const hint = Boolean(selectedCard)
 
@@ -128,7 +128,7 @@ export function TableauCell({
       data-column-index={columnIndex}
       data-tap-target="true"
       className={[
-        'relative h-[calc(var(--cardH)+var(--stackStep)*6)] w-[var(--cardW)]',
+        'relative h-[calc(var(--cardH)+var(--stackStep)*9)] w-[var(--cardW)]',
         hint ? 'rounded-[18px] ring-1 ring-white/15' : '',
       ].join(' ')}
       onClick={() => {
