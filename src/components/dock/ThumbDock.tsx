@@ -1,7 +1,9 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import type { ReactNode } from 'react'
+import { useMemo } from 'react'
 import type { CardId, LevelState } from '../../game/types'
 import type { MoveSource } from '../../store/gameStore'
+import { useSettingsStore } from '../../store/settingsStore'
 import { StockWaste } from './StockWaste'
 
 type Selected = { source: MoveSource; cardIds: CardId[] } | null
@@ -34,6 +36,39 @@ export function ThumbDock({
   toast,
 }: ThumbDockProps) {
   const reduceMotion = useReducedMotion() ?? false
+  const handedness = useSettingsStore((s) => s.handedness)
+
+  const stockWasteElement = useMemo(
+    () => (
+      <StockWaste
+        level={level}
+        selected={selected}
+        onSelectSource={onSelectSource}
+        onDraw={onDraw}
+        onDropCard={onDropCard}
+        errorCardId={errorCardId}
+        errorAt={errorAt}
+      />
+    ),
+    [level, selected, onSelectSource, onDraw, onDropCard, errorCardId, errorAt],
+  )
+
+  const undoElement = useMemo(
+    () => (
+      <button
+        type="button"
+        data-ui-control="true"
+        onClick={onUndo}
+        className="relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-white/85 active:bg-white/10"
+        aria-label="Annuler"
+        title="Annuler"
+      >
+        {undoIcon}
+        <span className="sr-only">Annuler</span>
+      </button>
+    ),
+    [onUndo, undoIcon],
+  )
 
   return (
     <div className="pointer-events-none relative z-40">
@@ -64,27 +99,17 @@ export function ThumbDock({
             transition={reduceMotion ? undefined : { duration: 0.2, ease: 'easeOut' }}
             data-ui-control="true"
           >
-            <StockWaste
-              level={level}
-              selected={selected}
-              onSelectSource={onSelectSource}
-              onDraw={onDraw}
-              onDropCard={onDropCard}
-              errorCardId={errorCardId}
-              errorAt={errorAt}
-            />
-
-            <button
-              type="button"
-              data-ui-control="true"
-              onClick={onUndo}
-              className="relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-white/85 active:bg-white/10"
-              aria-label="Annuler"
-              title="Annuler"
-            >
-              {undoIcon}
-              <span className="sr-only">Annuler</span>
-            </button>
+            {handedness === 'left' ? (
+              <>
+                {stockWasteElement}
+                {undoElement}
+              </>
+            ) : (
+              <>
+                {undoElement}
+                {stockWasteElement}
+              </>
+            )}
           </motion.div>
         </div>
       </div>

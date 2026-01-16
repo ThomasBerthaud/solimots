@@ -1,4 +1,4 @@
-import { Dices, GraduationCap, Play, RotateCcw, ScrollText, Smartphone } from 'lucide-react'
+import { Dices, GraduationCap, Play, RotateCcw, ScrollText, Settings, Smartphone } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
 import { useGameStore } from '../store/gameStore'
@@ -65,6 +65,14 @@ export function Home() {
             title="Voir les règles"
           >
             <IconLabel icon={ScrollText} label="Voir les règles" hideLabelOnMobile={false} />
+          </Link>
+          <Link
+            to="/settings"
+            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
+            aria-label="Configuration"
+            title="Configuration"
+          >
+            <IconLabel icon={Settings} label="Configuration" hideLabelOnMobile={false} />
           </Link>
         </div>
       </section>

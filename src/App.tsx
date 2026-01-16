@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { GraduationCap, Play, ScrollText } from 'lucide-react'
+import { GraduationCap, Play, ScrollText, Settings } from 'lucide-react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { IconLabel } from './components/ui/IconLabel'
 import { useGameStore } from './store/gameStore'
@@ -48,6 +48,14 @@ function App() {
                 title="Règles"
               >
                 <IconLabel icon={ScrollText} label="Règles" />
+              </Link>
+              <Link
+                className="inline-flex items-center hover:text-white"
+                to="/settings"
+                aria-label="Configuration"
+                title="Configuration"
+              >
+                <IconLabel icon={Settings} label="Config" />
               </Link>
             </nav>
           </div>
