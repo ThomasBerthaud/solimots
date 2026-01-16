@@ -42,15 +42,15 @@ export const themes: Record<string, Theme> = {
     cards: {
       category: {
         gradient: 'linear-gradient(135deg, rgb(253, 230, 138), rgb(251, 191, 36))',
-        border: 'rgb(254 240 138 / 0.6)',
+        border: 'rgb(254 240 138)',
         text: 'rgb(69 26 3)',
-        ring: 'rgb(254 240 138 / 0.9)',
+        ring: 'rgb(254 240 138)',
       },
       word: {
         background: 'rgb(255 255 255)',
-        border: 'rgb(0 0 0 / 0.05)',
+        border: 'rgb(229 229 229)',
         text: 'rgb(15 23 42)',
-        ring: 'rgb(255 255 255 / 0.8)',
+        ring: 'rgb(255 255 255)',
       },
       back: {
         gradient: 'linear-gradient(135deg, rgb(2, 132, 199), rgb(79, 70, 229), rgb(5, 150, 105))',
@@ -67,15 +67,15 @@ export const themes: Record<string, Theme> = {
     cards: {
       category: {
         gradient: 'linear-gradient(135deg, rgb(186, 230, 253), rgb(56, 189, 248))',
-        border: 'rgb(186 230 253 / 0.6)',
+        border: 'rgb(186 230 253)',
         text: 'rgb(3 60 90)', // Darker blue for better contrast (was rgb(7 89 133))
-        ring: 'rgb(186 230 253 / 0.9)',
+        ring: 'rgb(186 230 253)',
       },
       word: {
         background: 'rgb(240 249 255)',
-        border: 'rgb(14 165 233 / 0.15)',
+        border: 'rgb(186 230 253)',
         text: 'rgb(3 60 90)', // Darker blue for better contrast (was rgb(7 89 133))
-        ring: 'rgb(186 230 253 / 0.8)',
+        ring: 'rgb(186 230 253)',
       },
       back: {
         gradient: 'linear-gradient(135deg, rgb(14, 165, 233), rgb(59, 130, 246), rgb(6, 182, 212))',
@@ -96,15 +96,15 @@ export const themes: Record<string, Theme> = {
     cards: {
       category: {
         gradient: 'linear-gradient(135deg, rgb(254, 205, 211), rgb(251, 113, 133))',
-        border: 'rgb(254 205 211 / 0.6)',
+        border: 'rgb(254 205 211)',
         text: 'rgb(100 15 40)', // Darker red for better contrast (was rgb(136 19 55))
-        ring: 'rgb(254 205 211 / 0.9)',
+        ring: 'rgb(254 205 211)',
       },
       word: {
         background: 'rgb(255 241 242)',
-        border: 'rgb(244 114 182 / 0.15)',
+        border: 'rgb(254 205 211)',
         text: 'rgb(100 15 40)', // Darker red for better contrast (was rgb(136 19 55))
-        ring: 'rgb(254 205 211 / 0.8)',
+        ring: 'rgb(254 205 211)',
       },
       back: {
         gradient: 'linear-gradient(135deg, rgb(244, 114, 182), rgb(168, 85, 247), rgb(251, 113, 133))',
@@ -125,15 +125,15 @@ export const themes: Record<string, Theme> = {
     cards: {
       category: {
         gradient: 'linear-gradient(135deg, rgb(187, 247, 208), rgb(74, 222, 128))',
-        border: 'rgb(187 247 208 / 0.6)',
+        border: 'rgb(187 247 208)',
         text: 'rgb(15 60 30)', // Darker green for better contrast (was rgb(20 83 45))
-        ring: 'rgb(187 247 208 / 0.9)',
+        ring: 'rgb(187 247 208)',
       },
       word: {
         background: 'rgb(240 253 244)',
-        border: 'rgb(34 197 94 / 0.15)',
+        border: 'rgb(187 247 208)',
         text: 'rgb(15 60 30)', // Darker green for better contrast (was rgb(20 83 45))
-        ring: 'rgb(187 247 208 / 0.8)',
+        ring: 'rgb(187 247 208)',
       },
       back: {
         gradient: 'linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74), rgb(21, 128, 61))',
@@ -154,15 +154,15 @@ export const themes: Record<string, Theme> = {
     cards: {
       category: {
         gradient: 'linear-gradient(135deg, rgb(221, 214, 254), rgb(167, 139, 250))',
-        border: 'rgb(221 214 254 / 0.6)',
+        border: 'rgb(221 214 254)',
         text: 'rgb(55 20 110)', // Darker purple for better contrast (was rgb(76 29 149))
-        ring: 'rgb(221 214 254 / 0.9)',
+        ring: 'rgb(221 214 254)',
       },
       word: {
         background: 'rgb(250 245 255)',
-        border: 'rgb(167 139 250 / 0.15)',
+        border: 'rgb(221 214 254)',
         text: 'rgb(55 20 110)', // Darker purple for better contrast (was rgb(76 29 149))
-        ring: 'rgb(221 214 254 / 0.8)',
+        ring: 'rgb(221 214 254)',
       },
       back: {
         gradient: 'linear-gradient(135deg, rgb(167, 139, 250), rgb(139, 92, 246), rgb(109, 40, 217))',
@@ -183,15 +183,15 @@ export const themes: Record<string, Theme> = {
     cards: {
       category: {
         gradient: 'linear-gradient(135deg, rgb(254, 215, 170), rgb(251, 146, 60))',
-        border: 'rgb(254 215 170 / 0.6)',
+        border: 'rgb(254 215 170)',
         text: 'rgb(90 35 10)', // Darker brown for better contrast (was rgb(124 45 18))
-        ring: 'rgb(254 215 170 / 0.9)',
+        ring: 'rgb(254 215 170)',
       },
       word: {
         background: 'rgb(255 247 237)',
-        border: 'rgb(251 146 60 / 0.15)',
+        border: 'rgb(254 215 170)',
         text: 'rgb(90 35 10)', // Darker brown for better contrast (was rgb(124 45 18))
-        ring: 'rgb(254 215 170 / 0.8)',
+        ring: 'rgb(254 215 170)',
       },
       back: {
         gradient: 'linear-gradient(135deg, rgb(251, 146, 60), rgb(234, 88, 12), rgb(194, 65, 12))',
