@@ -40,7 +40,8 @@ class SoundManager {
     const clone = audio.cloneNode() as HTMLAudioElement
     clone.volume = volume
     clone.play().catch(() => {
-      // Silently fail if audio can't play (e.g., no user interaction yet)
+      // Silently fail if audio can't play due to browser autoplay policies.
+      // Modern browsers require user interaction before playing audio.
     })
   }
 
@@ -55,7 +56,8 @@ class SoundManager {
     audio.volume = volume
     audio.currentTime = 0
     audio.play().catch(() => {
-      // Silently fail if audio can't play
+      // Silently fail if audio can't play due to browser autoplay policies.
+      // Modern browsers require user interaction before playing audio.
     })
   }
 

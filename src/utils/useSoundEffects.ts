@@ -27,7 +27,12 @@ export function useSoundEffects() {
   return { playSound, playMusic, stopMusic, fadeOutMusic, soundEnabled, musicEnabled }
 }
 
-// Hook for startup music
+/**
+ * Hook that automatically plays startup music when the component mounts.
+ * The music will only play if musicEnabled is true in settings.
+ * Note: Due to browser autoplay policies, the music may not play until
+ * the user has interacted with the page (click, tap, etc).
+ */
 export function useStartupMusic() {
   const { playMusic, stopMusic, musicEnabled } = useSoundEffects()
   const hasPlayedRef = useRef(false)
