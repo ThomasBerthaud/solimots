@@ -11,6 +11,14 @@
   --card-ink: 222 22% 12%;
   --muted-ink: 215 16% 35%;
   --gold: 43 84% 55%;
+
+  /* Theme variables - defaults to classic theme */
+  --theme-bg-from: hsl(150 38% 16%);
+  --theme-bg-via: hsl(150 38% 16%);
+  --theme-bg-to: hsl(150 45% 9%);
+  --theme-felt-from: rgba(16, 185, 129, 0.35);
+  --theme-felt-to: rgba(6, 78, 59, 0.35);
+  --theme-card-back-gradient: from-sky-600 via-indigo-600 to-emerald-600;
 }
 
 html,
@@ -20,7 +28,7 @@ body {
 
 body {
   margin: 0;
-  background: radial-gradient(1200px 600px at 30% 0%, hsl(var(--felt-700)), hsl(var(--felt-900)));
+  background: radial-gradient(1200px 600px at 30% 0%, var(--theme-bg-from), var(--theme-bg-to));
   color: hsl(var(--card));
   font-family:
     ui-sans-serif,
