@@ -25,10 +25,12 @@ export function SlotsRow({
   completedSlotIndex,
   actionAt,
 }: SlotsRowProps) {
+  const columnCount = level.slots.length
+  
   return (
     <section className="rounded-[24px] bg-black/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
       <LayoutGroup>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
           {level.slots.map((slot, idx) => (
             <SlotCell
               key={idx}

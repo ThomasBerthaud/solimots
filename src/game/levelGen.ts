@@ -41,11 +41,11 @@ export type GenerateLevelOptions = {
   seed?: number
   /** How many categories are included in the level (must be > 4 for slot gameplay). */
   categoryCount?: number
-  /** Fixed MVP: 5 columns. */
+  /** Number of columns (3-5, randomly chosen if not specified). */
   tableauColumns?: number
   /**
    * Tableau deal pattern from left to right (top is last).
-   * Default: [4, 5, 6, 7, 8].
+   * Auto-generated based on column count if not specified.
    */
   tableauDealPattern?: number[]
 }
@@ -54,8 +54,12 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const seed = options.seed ?? Date.now()
   const rnd = mulberry32(seed)
 
-  const tableauColumns = options.tableauColumns ?? 5
-  const tableauDealPattern = options.tableauDealPattern ?? [4, 5, 6, 7, 8]
+  // Randomly choose between 3, 4, or 5 columns if not specified
+  const tableauColumns = options.tableauColumns ?? randomIntInclusive(3, 5, rnd)
+  
+  // Generate deal pattern based on column count: [4, 5, 6, ...] up to the number of columns
+  const tableauDealPattern = options.tableauDealPattern ?? 
+    Array.from({ length: tableauColumns }, (_, i) => 4 + i)
 
   validateWordBank(WORD_BANK)
 
@@ -112,7 +116,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   shuffle(wordCounts, rnd)
 
   const dealPattern =
-    tableauColumns === 5 && tableauDealPattern.length === 5
+    tableauColumns === tableauDealPattern.length
       ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n)))
       : null
 

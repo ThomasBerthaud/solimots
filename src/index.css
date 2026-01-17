@@ -68,6 +68,7 @@ body {
 /* Mobile game sizing variables */
 .mobile-game {
   --gap: clamp(6px, 1.4vw, 10px);
+  /* Card width calculated for max 5 columns - will have more space with fewer columns */
   --cardW: clamp(56px, calc((100vw - 24px - (var(--gap) * 4)) / 5), 88px);
   --cardH: calc(var(--cardW) * 1.38);
   --stackStep: clamp(18px, 4vw, 28px);
