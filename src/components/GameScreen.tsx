@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { CardId, LevelState } from '../game/types'
 import { useGameStore, type MoveSource, type MoveTarget } from '../store/gameStore'
+import { useSoundEffects } from '../utils/useSoundEffects'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
 import { ThumbDock } from './dock/ThumbDock'
@@ -79,6 +80,8 @@ export function GameScreen() {
   const moveCard = useGameStore((s) => s.moveCard)
   const moveCards = useGameStore((s) => s.moveCards)
 
+  const { playSound, playMusic } = useSoundEffects()
+
   const [selected, setSelected] = useState<Selected>(null)
   const [helpOpen, setHelpOpen] = useState(false)
   const [toast, setToast] = useState<Toast>(null)
@@ -103,9 +106,28 @@ export function GameScreen() {
     const attempt = lastAttemptRef.current
     const message = attempt && now - attempt.at < 600 && attempt.message ? attempt.message : lastError.message
     setToast({ key: lastError.at, message })
+    playSound('error', 0.4)
     const t = window.setTimeout(() => setToast(null), 1800)
     return () => window.clearTimeout(t)
-  }, [lastError])
+  }, [lastError, playSound])
+
+  useEffect(() => {
+    if (!lastAction) return
+    if (lastAction.type === 'slotPlaced') {
+      playSound('place', 0.5)
+    } else if (lastAction.type === 'slotCompleted') {
+      playSound('complete', 0.6)
+    }
+  }, [lastAction, playSound])
+
+  useEffect(() => {
+    if (status === 'won') {
+      playSound('win', 0.6)
+      playMusic('end', 0.25)
+    } else if (status === 'lost') {
+      playSound('lose', 0.5)
+    }
+  }, [status, playSound, playMusic])
 
   const resolveDropTarget = useMemo(() => {
     return (point: { x: number; y: number }, ignoreEl?: HTMLElement | null): MoveTarget | null => {
@@ -153,7 +175,10 @@ export function GameScreen() {
     const bottomId = cardIdsToMove[0]
     lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, bottomId, to) }
     const ok = cardIdsToMove.length === 1 ? moveCard(from, to) : moveCards(from, to, cardIdsToMove)
-    if (ok) setSelected(null)
+    if (ok) {
+      setSelected(null)
+      playSound('move', 0.4)
+    }
     return ok
   }
 
@@ -187,7 +212,20 @@ export function GameScreen() {
     const bottomId = sel.cardIds[0]
     lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, bottomId, target) }
     const ok = sel.cardIds.length === 1 ? moveCard(sel.source, target) : moveCards(sel.source, target, sel.cardIds)
-    if (ok) setSelected(null)
+    if (ok) {
+      setSelected(null)
+      playSound('move', 0.4)
+    }
+  }
+
+  const handleDraw = () => {
+    draw()
+    playSound('draw', 0.4)
+  }
+
+  const handleUndo = () => {
+    undo()
+    playSound('undo', 0.4)
   }
 
   const onPointerDownCapture = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -274,8 +312,8 @@ export function GameScreen() {
           level={level}
           selected={selected}
           onSelectSource={onSelectSource}
-          onDraw={draw}
-          onUndo={undo}
+          onDraw={handleDraw}
+          onUndo={handleUndo}
           onDropCard={onDropCard}
           errorCardId={lastError?.cardId}
           errorAt={lastError?.at}

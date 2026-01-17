@@ -3,12 +3,15 @@ import { GraduationCap, Play, ScrollText, Settings } from 'lucide-react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { IconLabel } from './components/ui/IconLabel'
 import { useGameStore } from './store/gameStore'
+import { useStartupMusic } from './utils/useSoundEffects'
 
 function App() {
   const location = useLocation()
   const navigate = useNavigate()
   const newGame = useGameStore((s) => s.newGame)
   const isGame = location.pathname.startsWith('/game')
+
+  useStartupMusic()
 
   const handlePlay = () => {
     newGame()
