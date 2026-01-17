@@ -4,6 +4,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { IconLabel } from './components/ui/IconLabel'
 import { useGameStore } from './store/gameStore'
 import { useStartupMusic } from './utils/useSoundEffects'
+import { useTheme } from './utils/useTheme'
 
 function App() {
   const location = useLocation()
@@ -12,6 +13,7 @@ function App() {
   const isGame = location.pathname.startsWith('/game')
 
   useStartupMusic()
+  useTheme()
 
   const handlePlay = () => {
     newGame()

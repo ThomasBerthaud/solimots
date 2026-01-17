@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useSettingsStore, themes } from '../../store/settingsStore'
 
 export type CardBackProps = {
   className?: string
@@ -7,10 +8,14 @@ export type CardBackProps = {
 
 // English comments per project rule.
 export function CardBack({ className, style }: CardBackProps) {
+  const themeId = useSettingsStore((s) => s.theme)
+  const theme = themes[themeId]
+
   return (
     <motion.div
       className={[
-        'rounded-[18px] border border-white/10 bg-gradient-to-br from-sky-600 via-indigo-600 to-emerald-600 shadow-[0_12px_30px_rgba(0,0,0,0.25)]',
+        'rounded-[18px] border border-white/10 bg-gradient-to-br shadow-[0_12px_30px_rgba(0,0,0,0.25)]',
+        theme.cardBack.gradient,
         className ?? '',
       ].join(' ')}
       style={style}

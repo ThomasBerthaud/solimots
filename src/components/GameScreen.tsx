@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import type { CardId, LevelState } from '../game/types'
 import { useGameStore, type MoveSource, type MoveTarget } from '../store/gameStore'
 import { useSoundEffects } from '../utils/useSoundEffects'
+import { useTheme } from '../utils/useTheme'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
 import { ThumbDock } from './dock/ThumbDock'
@@ -81,6 +82,7 @@ export function GameScreen() {
   const moveCards = useGameStore((s) => s.moveCards)
 
   const { playSound, playMusic } = useSoundEffects()
+  const theme = useTheme()
 
   const [selected, setSelected] = useState<Selected>(null)
   const [helpOpen, setHelpOpen] = useState(false)
@@ -243,6 +245,10 @@ export function GameScreen() {
   if (!level) return null
   const selectedCard = selected ? level.cardsById[selected.cardIds[0]] : null
 
+  const feltBackgroundStyle = {
+    background: `linear-gradient(to bottom, ${theme.feltBackground.from}, ${theme.feltBackground.to})`,
+  }
+
   return (
     <div
       className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm flex-col px-3 pb-3"
@@ -250,7 +256,7 @@ export function GameScreen() {
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
-      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] bg-gradient-to-b from-emerald-800/35 to-emerald-950/35 blur-[0.2px]" />
+      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] blur-[0.2px]" style={feltBackgroundStyle} />
 
       <header className="mb-3 flex shrink-0 items-center justify-between pt-3">
         <Link
