@@ -18,9 +18,6 @@ export function useTheme() {
     // Apply theme for felt background
     root.style.setProperty('--theme-felt-from', theme.feltBackground.from)
     root.style.setProperty('--theme-felt-to', theme.feltBackground.to)
-
-    // Apply theme for card back
-    root.style.setProperty('--theme-card-back-gradient', theme.cardBack.gradient)
   }, [theme])
 
   return theme

@@ -18,7 +18,6 @@
   --theme-bg-to: hsl(150 45% 9%);
   --theme-felt-from: rgba(16, 185, 129, 0.35);
   --theme-felt-to: rgba(6, 78, 59, 0.35);
-  --theme-card-back-gradient: from-sky-600 via-indigo-600 to-emerald-600;
 }
 
 html,
