@@ -28,7 +28,7 @@ export function SlotsRow({
   return (
     <section className="rounded-[24px] bg-black/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
       <LayoutGroup>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-5 gap-2">
           {level.slots.map((slot, idx) => (
             <SlotCell
               key={idx}
