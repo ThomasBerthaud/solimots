@@ -138,7 +138,12 @@ export function GameScreen() {
     }
   }, [])
 
-  const onDropCard = (from: MoveSource, draggedCardId: CardId, point: { x: number; y: number }, draggedEl?: HTMLElement | null): boolean => {
+  const onDropCard = (
+    from: MoveSource,
+    draggedCardId: CardId,
+    point: { x: number; y: number },
+    draggedEl?: HTMLElement | null,
+  ): boolean => {
     const to = resolveDropTarget(point, draggedEl)
     if (!to) return false
     // Dropping onto the same source is a no-op; treat it as invalid so the UI snaps back.
@@ -338,16 +343,28 @@ function WinOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onRepla
           <div className="mx-auto h-1.5 w-28 rounded-full bg-gradient-to-r from-amber-300/30 via-amber-300/90 to-amber-300/30" />
         </motion.div>
 
-        <button
-          type="button"
-          data-ui-control="true"
-          onClick={onReplay}
-          className="mt-4 w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-bold text-black shadow active:bg-amber-500"
-          aria-label="Rejouer"
-          title="Rejouer"
-        >
-          Rejouer
-        </button>
+        <div className="mt-4 grid gap-2">
+          <button
+            type="button"
+            data-ui-control="true"
+            onClick={onReplay}
+            className="w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-bold text-black shadow active:bg-amber-500"
+            aria-label="Rejouer"
+            title="Rejouer"
+          >
+            Rejouer
+          </button>
+
+          <Link
+            to="/"
+            data-ui-control="true"
+            className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-sm font-bold text-white/90 shadow active:bg-black/45"
+            aria-label="Retour à l'accueil"
+            title="Retour à l'accueil"
+          >
+            Accueil
+          </Link>
+        </div>
       </motion.div>
     </motion.div>
   )
@@ -389,7 +406,7 @@ function LostOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onRepl
             data-ui-control="true"
             className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-sm font-bold text-white/90 shadow active:bg-black/45"
             aria-label="Retour à l’accueil"
-            title="Accueil"
+            title="Retour à l'accueil"
           >
             Accueil
           </Link>
