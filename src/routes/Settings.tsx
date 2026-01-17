@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useSettingsStore, themes, type ThemeId } from '../store/settingsStore'
+import { useSettingsStore, themes } from '../store/settingsStore'
 
 export function Settings() {
   const handedness = useSettingsStore((s) => s.handedness)
@@ -92,7 +92,7 @@ export function Settings() {
             <button
               key={theme.id}
               type="button"
-              onClick={() => setTheme(theme.id as ThemeId)}
+              onClick={() => setTheme(theme.id)}
               className={[
                 'flex flex-col items-start rounded-xl border p-3 text-left transition-colors',
                 currentTheme === theme.id
