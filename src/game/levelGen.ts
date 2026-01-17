@@ -180,7 +180,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     if (top) top.faceUp = true
   }
 
-  const slots: LevelState['slots'] = Array.from({ length: 5 }, () => ({
+  const slots: LevelState['slots'] = Array.from({ length: tableauColumns }, () => ({
     categoryCardId: null,
     pile: [],
   }))
