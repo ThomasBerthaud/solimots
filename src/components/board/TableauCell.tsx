@@ -28,7 +28,12 @@ export type TableauCellProps = {
   selectedCard: GameCard | null
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   tryMoveTo: (target: MoveTarget) => void
-  onDropCard: (from: MoveSource, draggedCardId: CardId, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
+  onDropCard: (
+    from: MoveSource,
+    draggedCardId: CardId,
+    point: { x: number; y: number },
+    draggedEl?: HTMLElement | null,
+  ) => boolean
   errorCardId?: string
   errorAt?: number
 }
@@ -147,15 +152,15 @@ export function TableauCell({
               const card = level.cardsById[id]
               const top = `calc(var(--stackStep) * ${idx})`
               const isDraggable = card?.faceUp && canDragCard(id)
-              
+
               // For draggable cards, render as a stack with all cards above
               // For non-draggable cards (face-down), render individually
               if (isDraggable) {
                 // Get all cards from this position to the end that should move together
                 const cardsAbove = visible.slice(idx)
-                
+
                 // Mark all cards in this stack as rendered
-                cardsAbove.forEach(stackId => rendered.add(stackId))
+                cardsAbove.forEach((stackId) => rendered.add(stackId))
 
                 return (
                   <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx + 1 }}>
@@ -168,13 +173,9 @@ export function TableauCell({
                       {cardsAbove.map((stackId, stackIdx) => {
                         const stackCard = level.cardsById[stackId]
                         const stackTop = `calc(var(--stackStep) * ${stackIdx})`
-                        
+
                         return (
-                          <div
-                            key={stackId}
-                            className="absolute left-0 right-0"
-                            style={{ top: stackTop }}
-                          >
+                          <div key={stackId} className="absolute left-0 right-0" style={{ top: stackTop }}>
                             {stackCard?.faceUp ? (
                               <Card
                                 card={stackCard}

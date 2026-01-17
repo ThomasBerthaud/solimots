@@ -11,7 +11,12 @@ export type StockWasteProps = {
   selected: Selected
   onSelectSource: (source: MoveSource, cardId: CardId) => void
   onDraw: () => void
-  onDropCard: (from: MoveSource, draggedCardId: CardId, point: { x: number; y: number }, draggedEl?: HTMLElement | null) => boolean
+  onDropCard: (
+    from: MoveSource,
+    draggedCardId: CardId,
+    point: { x: number; y: number },
+    draggedEl?: HTMLElement | null,
+  ) => boolean
   errorCardId?: string
   errorAt?: number
 }
@@ -51,7 +56,9 @@ export function StockWaste({
               <Card
                 card={topWasteCard}
                 draggable
-                onDrop={(point, draggedEl) => onDropCard({ type: 'waste' }, topWasteCard.id, { x: point.x, y: point.y }, draggedEl)}
+                onDrop={(point, draggedEl) =>
+                  onDropCard({ type: 'waste' }, topWasteCard.id, { x: point.x, y: point.y }, draggedEl)
+                }
                 onClick={() => onSelectSource({ type: 'waste' }, topWasteCard.id)}
                 selected={selected?.cardIds.length === 1 && selected.cardIds[0] === topWasteCard.id}
                 feedback={errorCardId === topWasteCard.id ? 'error' : undefined}

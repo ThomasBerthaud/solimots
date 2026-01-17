@@ -93,10 +93,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // New distribution logic: Majority of categories should have 3-4 words.
   // Between 0-3 categories can have 5 words (randomized for variety).
   const maxLargeCategories = 3
-  const largeCategoriesToCreate = Math.min(
-    maxLargeCategories,
-    Math.floor(rnd() * (maxLargeCategories + 1)),
-  )
+  const largeCategoriesToCreate = Math.min(maxLargeCategories, Math.floor(rnd() * (maxLargeCategories + 1)))
 
   // Create an array of word counts for each category
   const wordCounts: number[] = []
