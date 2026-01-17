@@ -1,14 +1,6 @@
 // Simple sound manager for game audio effects
 
-export type SoundEffect =
-  | 'draw'
-  | 'move'
-  | 'undo'
-  | 'place'
-  | 'complete'
-  | 'error'
-  | 'win'
-  | 'lose'
+export type SoundEffect = 'draw' | 'move' | 'undo' | 'place' | 'complete' | 'error' | 'win' | 'lose'
 
 export type MusicTrack = 'startup' | 'end'
 

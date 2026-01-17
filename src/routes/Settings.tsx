@@ -28,9 +28,7 @@ export function Settings() {
 
       <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
         <h2 className="text-lg font-semibold">Mode de jeu</h2>
-        <p className="mt-1 text-sm text-white/75">
-          Choisis la position de la pioche selon ta main préférée.
-        </p>
+        <p className="mt-1 text-sm text-white/75">Choisis la position de la pioche selon ta main préférée.</p>
 
         <div className="mt-4 space-y-3">
           <button
@@ -83,9 +81,7 @@ export function Settings() {
 
       <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
         <h2 className="text-lg font-semibold">Audio</h2>
-        <p className="mt-1 text-sm text-white/75">
-          Active ou désactive les sons et la musique.
-        </p>
+        <p className="mt-1 text-sm text-white/75">Active ou désactive les sons et la musique.</p>
 
         <div className="mt-4 space-y-3">
           <button
