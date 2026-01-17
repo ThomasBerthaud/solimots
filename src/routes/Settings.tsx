@@ -102,7 +102,7 @@ export function Settings() {
               aria-label={`Thème ${theme.name}`}
               title={`Thème ${theme.name}`}
             >
-              <div className="mb-2 h-8 w-full rounded-lg bg-gradient-to-br shadow-sm" style={{
+              <div className="mb-2 h-8 w-full rounded-lg shadow-sm" style={{
                 background: `linear-gradient(to bottom right, ${theme.feltBackground.from}, ${theme.feltBackground.to})`
               }} />
               <div className="w-full">
