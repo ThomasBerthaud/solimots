@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useSettingsStore } from '../store/settingsStore'
+import { useSettingsStore, themes } from '../store/settingsStore'
 
 export function Settings() {
   const handedness = useSettingsStore((s) => s.handedness)
@@ -9,6 +9,10 @@ export function Settings() {
   const setSoundEnabled = useSettingsStore((s) => s.setSoundEnabled)
   const musicEnabled = useSettingsStore((s) => s.musicEnabled)
   const setMusicEnabled = useSettingsStore((s) => s.setMusicEnabled)
+  const currentTheme = useSettingsStore((s) => s.theme)
+  const setTheme = useSettingsStore((s) => s.setTheme)
+
+  const themeOptions = Object.values(themes)
 
   return (
     <div className="space-y-6">
@@ -76,6 +80,42 @@ export function Settings() {
               </div>
             ) : null}
           </button>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
+        <h2 className="text-lg font-semibold">Thème visuel</h2>
+        <p className="mt-1 text-sm text-white/75">Personnalise l'apparence du jeu.</p>
+
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {themeOptions.map((theme) => (
+            <button
+              key={theme.id}
+              type="button"
+              onClick={() => setTheme(theme.id)}
+              className={[
+                'flex flex-col items-start rounded-xl border p-3 text-left transition-colors',
+                currentTheme === theme.id
+                  ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
+                  : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
+              ].join(' ')}
+              aria-label={`Thème ${theme.name}`}
+              title={`Thème ${theme.name}`}
+            >
+              <div className="mb-2 h-8 w-full rounded-lg shadow-sm" style={{
+                background: `linear-gradient(to bottom right, ${theme.feltBackground.from}, ${theme.feltBackground.to})`
+              }} />
+              <div className="w-full">
+                <p className="font-semibold">{theme.name}</p>
+                <p className="text-xs text-white/60">{theme.description}</p>
+              </div>
+              {currentTheme === theme.id ? (
+                <div className="ml-auto mt-1 text-lg" aria-hidden="true">
+                  ✓
+                </div>
+              ) : null}
+            </button>
+          ))}
         </div>
       </section>
 
