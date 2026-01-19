@@ -32,7 +32,7 @@ export function TableauRow({
   errorAt,
 }: TableauRowProps) {
   const columnCount = level.tableau.length
-  
+
   return (
     <section className="rounded-[24px] bg-black/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
       <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>

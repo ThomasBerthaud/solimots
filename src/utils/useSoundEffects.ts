@@ -6,15 +6,21 @@ export function useSoundEffects() {
   const soundEnabled = useSettingsStore((s) => s.soundEnabled)
   const musicEnabled = useSettingsStore((s) => s.musicEnabled)
 
-  const playSound = useCallback((effect: SoundEffect, volume = 0.5) => {
-    if (!soundEnabled) return
-    soundManager.playSound(effect, volume)
-  }, [soundEnabled])
+  const playSound = useCallback(
+    (effect: SoundEffect, volume = 0.5) => {
+      if (!soundEnabled) return
+      soundManager.playSound(effect, volume)
+    },
+    [soundEnabled],
+  )
 
-  const playMusic = useCallback((track: MusicTrack, volume = 0.3) => {
-    if (!musicEnabled) return
-    soundManager.playMusic(track, volume)
-  }, [musicEnabled])
+  const playMusic = useCallback(
+    (track: MusicTrack, volume = 0.3) => {
+      if (!musicEnabled) return
+      soundManager.playMusic(track, volume)
+    },
+    [musicEnabled],
+  )
 
   const stopMusic = useCallback(() => {
     soundManager.stopMusic()

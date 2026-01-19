@@ -56,10 +56,9 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // Randomly choose between 3, 4, or 5 columns if not specified
   const tableauColumns = options.tableauColumns ?? randomIntInclusive(3, 5, rnd)
-  
+
   // Generate deal pattern based on column count: [4, 5, 6, ...] up to the number of columns
-  const tableauDealPattern = options.tableauDealPattern ?? 
-    Array.from({ length: tableauColumns }, (_, i) => 4 + i)
+  const tableauDealPattern = options.tableauDealPattern ?? Array.from({ length: tableauColumns }, (_, i) => 4 + i)
 
   validateWordBank(WORD_BANK)
 
@@ -75,9 +74,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   if (options.categoryCount != null) {
     categoryCount = Math.floor(options.categoryCount)
     if (categoryCount < MIN_CATEGORIES_PER_LEVEL || categoryCount > maxPick) {
-      throw new Error(
-        `Invalid categoryCount "${options.categoryCount}". Must be between ${MIN_CATEGORIES_PER_LEVEL} and ${maxPick}.`,
-      )
+      categoryCount = Math.max(MIN_CATEGORIES_PER_LEVEL, Math.min(categoryCount, maxPick))
     }
   } else {
     categoryCount = randomIntInclusive(MIN_CATEGORIES_PER_LEVEL, maxPick, rnd)
@@ -113,9 +110,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   shuffle(wordCounts, rnd)
 
   const dealPattern =
-    tableauColumns === tableauDealPattern.length
-      ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n)))
-      : null
+    tableauColumns === tableauDealPattern.length ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n))) : null
 
   for (let idx = 0; idx < selectedCategories.length; idx++) {
     const cat = selectedCategories[idx]
@@ -150,7 +145,14 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const cardsById: Record<CardId, Card> = Object.fromEntries(cardsShuffled.map((c) => [c.id, c]))
 
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
-  const tableauDealCount = dealPattern ? dealPattern.reduce((acc, n) => acc + n, 0) : tableauColumns * 3
+  let tableauDealCount = dealPattern ? dealPattern.reduce((acc, n) => acc + n, 0) : tableauColumns * 3
+
+  // Ensure we have enough cards for both tableau and stock (minimum 1 card in stock)
+  // If not enough cards, reduce the tableau deal count to leave at least 1 card for stock
+  if (cardsShuffled.length < tableauDealCount + 1) {
+    tableauDealCount = Math.max(0, cardsShuffled.length - 1)
+  }
+
   const dealt = cardsShuffled.slice(0, tableauDealCount)
 
   if (dealPattern) {

@@ -26,7 +26,7 @@ export function SlotsRow({
   actionAt,
 }: SlotsRowProps) {
   const columnCount = level.slots.length
-  
+
   return (
     <section className="rounded-[24px] bg-black/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
       <LayoutGroup>
