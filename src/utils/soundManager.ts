@@ -8,6 +8,7 @@ class SoundManager {
   private soundEffects: Map<SoundEffect, HTMLAudioElement> = new Map()
   private musicTracks: Map<MusicTrack, HTMLAudioElement> = new Map()
   private currentMusic: HTMLAudioElement | null = null
+  private lastErrorSound: HTMLAudioElement | null = null
 
   constructor() {
     this.preloadSounds()
@@ -36,9 +37,22 @@ class SoundManager {
     const audio = this.soundEffects.get(effect)
     if (!audio) return
 
+    // Stop previous error sound to prevent overlap
+    if (effect === 'error' && this.lastErrorSound) {
+      this.lastErrorSound.pause()
+      this.lastErrorSound.currentTime = 0
+      this.lastErrorSound = null
+    }
+
     // Clone and play to allow overlapping sounds
     const clone = audio.cloneNode() as HTMLAudioElement
     clone.volume = volume
+    
+    // Track error sounds to prevent infinite playing
+    if (effect === 'error') {
+      this.lastErrorSound = clone
+    }
+    
     clone.play().catch(() => {
       // Silently fail if audio can't play due to browser autoplay policies.
       // Modern browsers require user interaction before playing audio.

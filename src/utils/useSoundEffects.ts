@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useSettingsStore } from '../store/settingsStore'
 import { soundManager, type MusicTrack, type SoundEffect } from './soundManager'
 
@@ -6,23 +6,23 @@ export function useSoundEffects() {
   const soundEnabled = useSettingsStore((s) => s.soundEnabled)
   const musicEnabled = useSettingsStore((s) => s.musicEnabled)
 
-  const playSound = (effect: SoundEffect, volume = 0.5) => {
+  const playSound = useCallback((effect: SoundEffect, volume = 0.5) => {
     if (!soundEnabled) return
     soundManager.playSound(effect, volume)
-  }
+  }, [soundEnabled])
 
-  const playMusic = (track: MusicTrack, volume = 0.3) => {
+  const playMusic = useCallback((track: MusicTrack, volume = 0.3) => {
     if (!musicEnabled) return
     soundManager.playMusic(track, volume)
-  }
+  }, [musicEnabled])
 
-  const stopMusic = () => {
+  const stopMusic = useCallback(() => {
     soundManager.stopMusic()
-  }
+  }, [])
 
-  const fadeOutMusic = (duration = 1000) => {
+  const fadeOutMusic = useCallback((duration = 1000) => {
     soundManager.fadeOutMusic(duration)
-  }
+  }, [])
 
   return { playSound, playMusic, stopMusic, fadeOutMusic, soundEnabled, musicEnabled }
 }
