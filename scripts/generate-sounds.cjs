@@ -103,7 +103,7 @@ function generateDrawSound() {
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate
-    // White noise filtered with quick decay envelope
+    // White noise with quick decay envelope
     const noise = (Math.random() * 2 - 1) * 0.3
     const envelope = Math.exp(-50 * t)
     samples.push(noise * envelope)
@@ -121,11 +121,11 @@ function generateMoveSound() {
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate
-    // Filtered noise sweep with quick decay
+    // Noise mixed with descending sine wave for percussive sweep effect
     const noise = (Math.random() * 2 - 1) * 0.25
     const envelope = Math.exp(-30 * t)
-    const filter = Math.sin(2 * Math.PI * (800 - 600 * t / duration) * t)
-    samples.push(noise * envelope * 0.5 + filter * envelope * 0.5)
+    const tone = Math.sin(2 * Math.PI * (800 - 600 * t / duration) * t)
+    samples.push(noise * envelope * 0.5 + tone * envelope * 0.5)
   }
 
   return samples
@@ -140,11 +140,11 @@ function generateUndoSound() {
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate
-    // Filtered noise with rising frequency
+    // Noise mixed with ascending sine wave for reverse sweep effect
     const noise = (Math.random() * 2 - 1) * 0.25
     const envelope = Math.exp(-25 * t)
-    const filter = Math.sin(2 * Math.PI * (400 + 600 * t / duration) * t)
-    samples.push(noise * envelope * 0.5 + filter * envelope * 0.5)
+    const tone = Math.sin(2 * Math.PI * (400 + 600 * t / duration) * t)
+    samples.push(noise * envelope * 0.5 + tone * envelope * 0.5)
   }
 
   return samples
