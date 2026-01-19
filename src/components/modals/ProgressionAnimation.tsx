@@ -81,7 +81,9 @@ export function ProgressionAnimation({
               <TrendingUp size={24} />
               <span className="text-2xl font-bold">+{pointsEarned} points</span>
             </div>
-            <p className="text-center text-sm text-white/70">{cardCount} cartes rangées</p>
+            <p className="text-center text-sm text-white/70">
+              {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
+            </p>
             <div className="mt-4 text-center">
               <div className="text-3xl font-bold text-white">{displayPoints.toLocaleString()}</div>
               <div className="text-xs text-white/50">Points totaux</div>

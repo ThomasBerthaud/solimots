@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { CardId, LevelState } from '../game/types'
 import { useGameStore, type MoveSource, type MoveTarget } from '../store/gameStore'
-import { getTitleForLevel, useProgressionStore } from '../store/progressionStore'
+import { getTitleForLevel, POINTS_PER_CARD, useProgressionStore } from '../store/progressionStore'
 import { useSoundEffects } from '../utils/useSoundEffects'
 import { useTheme } from '../utils/useTheme'
 import { SlotsRow } from './board/SlotsRow'
@@ -133,7 +133,7 @@ export function GameScreen() {
       const oldPoints = currentPoints
       
       const result = awardPoints(cardCount)
-      const pointsEarned = cardCount * 10 // POINTS_PER_CARD from progressionStore
+      const pointsEarned = cardCount * POINTS_PER_CARD
       
       setProgressionData({
         cardCount,

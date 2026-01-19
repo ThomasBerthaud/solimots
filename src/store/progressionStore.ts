@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 // Points per card completed (can be adjusted for balance)
-const POINTS_PER_CARD = 10
+export const POINTS_PER_CARD = 10
 
 // Points needed for each level (simple linear progression)
 const POINTS_PER_LEVEL = 100
