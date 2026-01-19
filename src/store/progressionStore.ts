@@ -66,7 +66,7 @@ export const useProgressionStore = create<ProgressionStore>()(
         const points = cardCount * POINTS_PER_CARD
         const state = get()
 
-        let newTotalPoints = state.totalPoints + points
+        const newTotalPoints = state.totalPoints + points
         let newPointsInLevel = state.pointsInCurrentLevel + points
         let newLevel = state.currentLevel
         let levelsGained = 0
