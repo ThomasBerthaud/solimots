@@ -56,10 +56,9 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // Randomly choose between 3, 4, or 5 columns if not specified
   const tableauColumns = options.tableauColumns ?? randomIntInclusive(3, 5, rnd)
-  
+
   // Generate deal pattern based on column count: [4, 5, 6, ...] up to the number of columns
-  const tableauDealPattern = options.tableauDealPattern ?? 
-    Array.from({ length: tableauColumns }, (_, i) => 4 + i)
+  const tableauDealPattern = options.tableauDealPattern ?? Array.from({ length: tableauColumns }, (_, i) => 4 + i)
 
   validateWordBank(WORD_BANK)
 
@@ -70,17 +69,36 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     )
   }
 
+  // Calculate how many cards the tableau will need
+  const tableauCardsNeeded = tableauDealPattern.reduce((acc, n) => acc + n, 0)
+
+  // Ensure we have enough cards: tableau + minimum stock (at least 1 card in stock for gameplay)
+  // Worst case: each category has 1 category card + 3 word cards = 4 cards per category
+  const minCardsPerCategory = 4
+  const minStockSize = 1
+  const minTotalCardsNeeded = tableauCardsNeeded + minStockSize
+  const minCategoriesNeeded = Math.ceil(minTotalCardsNeeded / minCardsPerCategory)
+
   const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, playableCategories.length)
+  // Ensure we have at least the minimum categories needed for enough cards
+  const effectiveMinCategories = Math.max(MIN_CATEGORIES_PER_LEVEL, minCategoriesNeeded)
+
+  if (effectiveMinCategories > maxPick) {
+    throw new Error(
+      `Cannot generate a playable level: need at least ${minCategoriesNeeded} categories to fill tableau (${tableauCardsNeeded} cards) and stock, but only ${maxPick} categories available.`,
+    )
+  }
+
   let categoryCount: number
   if (options.categoryCount != null) {
     categoryCount = Math.floor(options.categoryCount)
-    if (categoryCount < MIN_CATEGORIES_PER_LEVEL || categoryCount > maxPick) {
+    if (categoryCount < effectiveMinCategories || categoryCount > maxPick) {
       throw new Error(
-        `Invalid categoryCount "${options.categoryCount}". Must be between ${MIN_CATEGORIES_PER_LEVEL} and ${maxPick}.`,
+        `Invalid categoryCount "${options.categoryCount}". Must be between ${effectiveMinCategories} and ${maxPick} (need ${minCategoriesNeeded} categories minimum for ${tableauCardsNeeded} tableau cards).`,
       )
     }
   } else {
-    categoryCount = randomIntInclusive(MIN_CATEGORIES_PER_LEVEL, maxPick, rnd)
+    categoryCount = randomIntInclusive(effectiveMinCategories, maxPick, rnd)
   }
 
   const selectedCategories = pickN(playableCategories, categoryCount, rnd)
@@ -113,9 +131,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   shuffle(wordCounts, rnd)
 
   const dealPattern =
-    tableauColumns === tableauDealPattern.length
-      ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n)))
-      : null
+    tableauColumns === tableauDealPattern.length ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n))) : null
 
   for (let idx = 0; idx < selectedCategories.length; idx++) {
     const cat = selectedCategories[idx]
@@ -151,6 +167,14 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
   const tableauDealCount = dealPattern ? dealPattern.reduce((acc, n) => acc + n, 0) : tableauColumns * 3
+
+  // Ensure we have enough cards to fill the tableau and have at least one in the stock
+  if (cardsShuffled.length < tableauDealCount + 1) {
+    throw new Error(
+      `Not enough cards generated: have ${cardsShuffled.length} cards, need at least ${tableauDealCount + 1} (${tableauDealCount} for tableau + minimum 1 for stock). Generated ${categoryCount} categories.`,
+    )
+  }
+
   const dealt = cardsShuffled.slice(0, tableauDealCount)
 
   if (dealPattern) {

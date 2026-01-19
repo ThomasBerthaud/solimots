@@ -256,7 +256,10 @@ export function GameScreen() {
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
-      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] blur-[0.2px]" style={feltBackgroundStyle} />
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 rounded-[28px] blur-[0.2px]"
+        style={feltBackgroundStyle}
+      />
 
       <header className="mb-3 flex shrink-0 items-center justify-between pt-3">
         <Link
