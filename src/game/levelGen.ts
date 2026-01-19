@@ -73,7 +73,8 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const tableauCardsNeeded = tableauDealPattern.reduce((acc, n) => acc + n, 0)
 
   // Ensure we have enough cards: tableau + minimum stock (at least 1 card in stock for gameplay)
-  // Worst case: each category has 1 category card + 3 word cards = 4 cards per category
+  // Worst case for validation: each category has 1 category card + 3 word cards = 4 cards per category.
+  // (Actual word counts vary between 3-5, but we use 3 as a conservative minimum for validation.)
   const minCardsPerCategory = 4
   const minStockSize = 1
   const minTotalCardsNeeded = tableauCardsNeeded + minStockSize
@@ -168,7 +169,10 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
   const tableauDealCount = dealPattern ? dealPattern.reduce((acc, n) => acc + n, 0) : tableauColumns * 3
 
-  // Ensure we have enough cards to fill the tableau and have at least one in the stock
+  // Defensive validation: Ensure we generated enough cards to fill the tableau and stock.
+  // While the early validation should prevent this, this check protects against:
+  // - Future code changes that might affect card generation
+  // - Edge cases in word selection/clamping logic
   if (cardsShuffled.length < tableauDealCount + 1) {
     throw new Error(
       `Not enough cards generated: have ${cardsShuffled.length} cards, need at least ${tableauDealCount + 1} (${tableauDealCount} for tableau + minimum 1 for stock). Generated ${categoryCount} categories.`,

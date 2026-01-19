@@ -47,12 +47,12 @@ class SoundManager {
     // Clone and play to allow overlapping sounds
     const clone = audio.cloneNode() as HTMLAudioElement
     clone.volume = volume
-    
+
     // Track error sounds to prevent infinite playing
     if (effect === 'error') {
       this.lastErrorSound = clone
     }
-    
+
     clone.play().catch(() => {
       // Silently fail if audio can't play due to browser autoplay policies.
       // Modern browsers require user interaction before playing audio.
