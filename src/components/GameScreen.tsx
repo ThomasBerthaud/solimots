@@ -5,12 +5,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { CardId, LevelState } from '../game/types'
 import { useGameStore, type MoveSource, type MoveTarget } from '../store/gameStore'
+import { getTitleForLevel, useProgressionStore } from '../store/progressionStore'
 import { useSoundEffects } from '../utils/useSoundEffects'
 import { useTheme } from '../utils/useTheme'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
 import { ThumbDock } from './dock/ThumbDock'
 import { HelpModal } from './modals/HelpModal'
+import { ProgressionAnimation } from './modals/ProgressionAnimation'
 
 type Selected = { source: MoveSource; cardIds: CardId[] } | null
 type Toast = { key: number; message: string } | null
@@ -81,12 +83,29 @@ export function GameScreen() {
   const moveCard = useGameStore((s) => s.moveCard)
   const moveCards = useGameStore((s) => s.moveCards)
 
+  const progression = useProgressionStore((s) => ({
+    totalPoints: s.totalPoints,
+    currentLevel: s.currentLevel,
+    pointsInCurrentLevel: s.pointsInCurrentLevel,
+  }))
+  const awardPoints = useProgressionStore((s) => s.awardPoints)
+
   const { playSound, playMusic } = useSoundEffects()
   const theme = useTheme()
 
   const [selected, setSelected] = useState<Selected>(null)
   const [helpOpen, setHelpOpen] = useState(false)
   const [toast, setToast] = useState<Toast>(null)
+  const [showProgression, setShowProgression] = useState(false)
+  const [progressionData, setProgressionData] = useState<{
+    cardCount: number
+    pointsEarned: number
+    newLevel: number
+    oldPoints: number
+    newPoints: number
+    levelsGained: number
+    newTitle: string | null
+  } | null>(null)
   const lastAttemptRef = useRef<{ at: number; message: string | null } | null>(null)
 
   const lastActionAt = lastAction?.at
@@ -100,7 +119,28 @@ export function GameScreen() {
   useEffect(() => {
     // Auto-clear selection after end of game.
     if (status === 'won' || status === 'lost') setSelected(null)
-  }, [status])
+
+    // Award points and show progression when winning
+    if (status === 'won' && level) {
+      // Calculate total cards in the game
+      const cardCount = Object.keys(level.cardsById).length
+      const oldPoints = progression.totalPoints
+      
+      const result = awardPoints(cardCount)
+      const pointsEarned = cardCount * 10 // POINTS_PER_CARD from progressionStore
+      
+      setProgressionData({
+        cardCount,
+        pointsEarned,
+        newLevel: result.newLevel,
+        oldPoints,
+        newPoints: oldPoints + pointsEarned,
+        levelsGained: result.levelsGained,
+        newTitle: result.newTitle,
+      })
+      setShowProgression(true)
+    }
+  }, [status, level, progression, awardPoints])
 
   useEffect(() => {
     if (!lastError) return
@@ -274,7 +314,9 @@ export function GameScreen() {
         </Link>
 
         <div className="text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">Solimots</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">
+            {getTitleForLevel(progression.currentLevel)} • Niv. {progression.currentLevel}
+          </p>
           <p className="text-sm font-semibold text-white/90">Partie #{level.seed}</p>
         </div>
 
@@ -334,10 +376,25 @@ export function GameScreen() {
       <AnimatePresence>{helpOpen ? <HelpModal key="help" onClose={() => setHelpOpen(false)} /> : null}</AnimatePresence>
 
       <AnimatePresence>
-        {status === 'won' ? (
+        {status === 'won' && showProgression && progressionData ? (
           <WinOverlay
             key="win"
             reduceMotion={reduceMotion}
+            showProgression={true}
+            progressionData={progressionData}
+            onProgressionComplete={() => setShowProgression(false)}
+            onReplay={() => {
+              setSelected(null)
+              setShowProgression(false)
+              setProgressionData(null)
+              newGame()
+            }}
+          />
+        ) : status === 'won' && !showProgression ? (
+          <WinOverlay
+            key="win-final"
+            reduceMotion={reduceMotion}
+            showProgression={false}
             onReplay={() => {
               setSelected(null)
               newGame()
@@ -362,7 +419,27 @@ export function GameScreen() {
   )
 }
 
-function WinOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onReplay: () => void }) {
+function WinOverlay({
+  reduceMotion,
+  onReplay,
+  showProgression = false,
+  progressionData,
+  onProgressionComplete,
+}: {
+  reduceMotion: boolean
+  onReplay: () => void
+  showProgression?: boolean
+  progressionData?: {
+    cardCount: number
+    pointsEarned: number
+    newLevel: number
+    oldPoints: number
+    newPoints: number
+    levelsGained: number
+    newTitle: string | null
+  }
+  onProgressionComplete?: () => void
+}) {
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
@@ -377,41 +454,57 @@ function WinOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onRepla
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
       >
-        <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Victoire</p>
-        <h2 className="mt-2 text-2xl font-bold text-white">Bravo !</h2>
-        <p className="mt-2 text-sm text-white/75">Toutes les cartes sont rangées.</p>
+        {showProgression && progressionData && onProgressionComplete ? (
+          <ProgressionAnimation
+            cardCount={progressionData.cardCount}
+            pointsEarned={progressionData.pointsEarned}
+            newLevel={progressionData.newLevel}
+            oldPoints={progressionData.oldPoints}
+            newPoints={progressionData.newPoints}
+            levelsGained={progressionData.levelsGained}
+            newTitle={progressionData.newTitle}
+            onComplete={onProgressionComplete}
+            reduceMotion={reduceMotion}
+          />
+        ) : (
+          <>
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Victoire</p>
+            <h2 className="mt-2 text-2xl font-bold text-white">Bravo !</h2>
+            <p className="mt-2 text-sm text-white/75">Toutes les cartes sont rangées.</p>
 
-        <motion.div
-          className="pointer-events-none mt-5 h-10"
-          initial={false}
-          animate={reduceMotion ? { opacity: 1 } : { opacity: [0.6, 1, 0.6] }}
-          transition={reduceMotion ? undefined : { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <div className="mx-auto h-1.5 w-28 rounded-full bg-gradient-to-r from-amber-300/30 via-amber-300/90 to-amber-300/30" />
-        </motion.div>
+            <motion.div
+              className="pointer-events-none mt-5 h-10"
+              initial={false}
+              animate={reduceMotion ? { opacity: 1 } : { opacity: [0.6, 1, 0.6] }}
+              transition={reduceMotion ? undefined : { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <div className="mx-auto h-1.5 w-28 rounded-full bg-gradient-to-r from-amber-300/30 via-amber-300/90 to-amber-300/30" />
+            </motion.div>
 
-        <div className="mt-4 grid gap-2">
-          <button
-            type="button"
-            data-ui-control="true"
-            onClick={onReplay}
-            className="w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-bold text-black shadow active:bg-amber-500"
-            aria-label="Rejouer"
-            title="Rejouer"
-          >
-            Rejouer
-          </button>
+            <div className="mt-4 grid gap-2">
+              <button
+                type="button"
+                data-ui-control="true"
+                onClick={onReplay}
+                className="w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-bold text-black shadow active:bg-amber-500"
+                aria-label="Rejouer"
+                title="Rejouer"
+              >
+                Rejouer
+              </button>
 
-          <Link
-            to="/"
-            data-ui-control="true"
-            className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-sm font-bold text-white/90 shadow active:bg-black/45"
-            aria-label="Retour à l'accueil"
-            title="Retour à l'accueil"
-          >
-            Accueil
-          </Link>
-        </div>
+              <Link
+                to="/"
+                data-ui-control="true"
+                className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-sm font-bold text-white/90 shadow active:bg-black/45"
+                aria-label="Retour à l'accueil"
+                title="Retour à l'accueil"
+              >
+                Accueil
+              </Link>
+            </div>
+          </>
+        )}
       </motion.div>
     </motion.div>
   )
