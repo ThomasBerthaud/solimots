@@ -83,11 +83,8 @@ export function GameScreen() {
   const moveCard = useGameStore((s) => s.moveCard)
   const moveCards = useGameStore((s) => s.moveCards)
 
-  const progression = useProgressionStore((s) => ({
-    totalPoints: s.totalPoints,
-    currentLevel: s.currentLevel,
-    pointsInCurrentLevel: s.pointsInCurrentLevel,
-  }))
+  const currentLevel = useProgressionStore((s) => s.currentLevel)
+  const currentPoints = useProgressionStore((s) => s.totalPoints)
   const awardPoints = useProgressionStore((s) => s.awardPoints)
 
   const { playSound, playMusic } = useSoundEffects()
@@ -107,6 +104,7 @@ export function GameScreen() {
     newTitle: string | null
   } | null>(null)
   const lastAttemptRef = useRef<{ at: number; message: string | null } | null>(null)
+  const progressionAwardedRef = useRef(false)
 
   const lastActionAt = lastAction?.at
   const placedSlotIndex = lastAction?.type === 'slotPlaced' ? lastAction.slotIndex : undefined
@@ -118,13 +116,21 @@ export function GameScreen() {
 
   useEffect(() => {
     // Auto-clear selection after end of game.
-    if (status === 'won' || status === 'lost') setSelected(null)
+    if (status === 'won' || status === 'lost') {
+      setSelected(null)
+    }
+    // Reset progression awarded flag when leaving won state
+    if (status !== 'won') {
+      progressionAwardedRef.current = false
+    }
+  }, [status])
 
-    // Award points and show progression when winning
-    if (status === 'won' && level) {
+  useEffect(() => {
+    // Award points and show progression when winning (only once per win)
+    if (status === 'won' && level && !progressionAwardedRef.current) {
       // Calculate total cards in the game
       const cardCount = Object.keys(level.cardsById).length
-      const oldPoints = progression.totalPoints
+      const oldPoints = currentPoints
       
       const result = awardPoints(cardCount)
       const pointsEarned = cardCount * 10 // POINTS_PER_CARD from progressionStore
@@ -139,8 +145,9 @@ export function GameScreen() {
         newTitle: result.newTitle,
       })
       setShowProgression(true)
+      progressionAwardedRef.current = true
     }
-  }, [status, level, progression, awardPoints])
+  }, [status, level, currentPoints, awardPoints])
 
   useEffect(() => {
     if (!lastError) return
@@ -315,7 +322,7 @@ export function GameScreen() {
 
         <div className="text-center">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">
-            {getTitleForLevel(progression.currentLevel)} • Niv. {progression.currentLevel}
+            {getTitleForLevel(currentLevel)} • Niv. {currentLevel}
           </p>
           <p className="text-sm font-semibold text-white/90">Partie #{level.seed}</p>
         </div>
@@ -387,6 +394,7 @@ export function GameScreen() {
               setSelected(null)
               setShowProgression(false)
               setProgressionData(null)
+              progressionAwardedRef.current = false
               newGame()
             }}
           />
@@ -397,6 +405,7 @@ export function GameScreen() {
             showProgression={false}
             onReplay={() => {
               setSelected(null)
+              progressionAwardedRef.current = false
               newGame()
             }}
           />
@@ -410,6 +419,7 @@ export function GameScreen() {
             reduceMotion={reduceMotion}
             onReplay={() => {
               setSelected(null)
+              progressionAwardedRef.current = false
               newGame()
             }}
           />
