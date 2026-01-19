@@ -95,51 +95,78 @@ function generateTone(frequency, duration, sampleRate = 44100, envelope = true) 
 }
 
 function generateDrawSound() {
-  // Card flipping sound - quick sweep
+  // Card flipping sound - short percussive click
   const samples = []
   const sampleRate = 44100
-  const duration = 0.15
+  const duration = 0.05
   const numSamples = Math.floor(duration * sampleRate)
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate
-    const freq = 200 + 400 * (1 - t / duration)
-    const amplitude = 0.2 * (1 - t / duration)
-    const value = amplitude * Math.sin(2 * Math.PI * freq * t)
-    samples.push(value)
+    // White noise filtered with quick decay envelope
+    const noise = (Math.random() * 2 - 1) * 0.3
+    const envelope = Math.exp(-50 * t)
+    samples.push(noise * envelope)
   }
 
   return samples
 }
 
 function generateMoveSound() {
-  // Swoosh sound
-  return generateTone(400, 0.1, 44100, true)
-}
-
-function generateUndoSound() {
-  // Reverse swoosh
+  // Swoosh sound - short percussive sweep
   const samples = []
   const sampleRate = 44100
-  const duration = 0.12
+  const duration = 0.08
   const numSamples = Math.floor(duration * sampleRate)
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate
-    const freq = 300 + 300 * (t / duration)
-    const amplitude = 0.2 * (1 - t / duration)
-    const value = amplitude * Math.sin(2 * Math.PI * freq * t)
-    samples.push(value)
+    // Filtered noise sweep with quick decay
+    const noise = (Math.random() * 2 - 1) * 0.25
+    const envelope = Math.exp(-30 * t)
+    const filter = Math.sin(2 * Math.PI * (800 - 600 * t / duration) * t)
+    samples.push(noise * envelope * 0.5 + filter * envelope * 0.5)
+  }
+
+  return samples
+}
+
+function generateUndoSound() {
+  // Reverse swoosh - percussive with rising pitch
+  const samples = []
+  const sampleRate = 44100
+  const duration = 0.08
+  const numSamples = Math.floor(duration * sampleRate)
+
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate
+    // Filtered noise with rising frequency
+    const noise = (Math.random() * 2 - 1) * 0.25
+    const envelope = Math.exp(-25 * t)
+    const filter = Math.sin(2 * Math.PI * (400 + 600 * t / duration) * t)
+    samples.push(noise * envelope * 0.5 + filter * envelope * 0.5)
   }
 
   return samples
 }
 
 function generatePlaceSound() {
-  // Satisfying place sound
-  const tone1 = generateTone(523, 0.08) // C5
-  const tone2 = generateTone(659, 0.08) // E5
-  return tone1.map((v, i) => v + (tone2[i] || 0))
+  // Satisfying place sound - short percussive tap
+  const samples = []
+  const sampleRate = 44100
+  const duration = 0.06
+  const numSamples = Math.floor(duration * sampleRate)
+
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate
+    // Low frequency thump with quick decay
+    const freq = 150
+    const envelope = Math.exp(-40 * t)
+    const value = envelope * Math.sin(2 * Math.PI * freq * t) * 0.4
+    samples.push(value)
+  }
+
+  return samples
 }
 
 function generateCompleteSound() {
@@ -167,16 +194,19 @@ function generateCompleteSound() {
 }
 
 function generateErrorSound() {
-  // Error buzz
+  // Error buzz - short and distinct
   const samples = []
   const sampleRate = 44100
-  const duration = 0.2
+  const duration = 0.15
   const numSamples = Math.floor(duration * sampleRate)
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate
-    const amplitude = 0.2 * (1 - t / duration)
-    const value = amplitude * Math.sin(2 * Math.PI * 150 * t)
+    // Two-tone buzz with clear ending
+    const envelope = Math.exp(-8 * t)
+    const buzz1 = Math.sin(2 * Math.PI * 200 * t)
+    const buzz2 = Math.sin(2 * Math.PI * 150 * t)
+    const value = envelope * (buzz1 + buzz2) * 0.15
     samples.push(value)
   }
 
