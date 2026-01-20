@@ -11,6 +11,12 @@ export type WordBankCategory = {
   words: string[]
 }
 
+export type ImageBankCategory = {
+  id: CategoryId
+  label: string
+  images: string[]
+}
+
 export type CardId = string
 
 export type CardKind = 'word' | 'category'
@@ -26,6 +32,8 @@ export type Card = {
   categoryId: CategoryId
   /** All cards are face-up in the MVP for simplicity. */
   faceUp: boolean
+  /** Optional image URL for image-based cards. */
+  imageUrl?: string
 }
 
 export type SlotState = {
