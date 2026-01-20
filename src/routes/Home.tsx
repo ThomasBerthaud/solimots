@@ -1,7 +1,8 @@
-import { Dices, GraduationCap, Play, RotateCcw, ScrollText, Settings, Smartphone } from 'lucide-react'
+import { Dices, GraduationCap, Play, RotateCcw, ScrollText, Settings, Smartphone, TrendingUp } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
 import { useGameStore } from '../store/gameStore'
+import { getTitleForLevel, POINTS_PER_LEVEL, useProgressionStore } from '../store/progressionStore'
 
 export function Home() {
   const navigate = useNavigate()
@@ -9,7 +10,15 @@ export function Home() {
   const level = useGameStore((s) => s.level)
   const status = useGameStore((s) => s.status)
 
+  const currentLevel = useProgressionStore((s) => s.currentLevel)
+  const pointsInCurrentLevel = useProgressionStore((s) => s.pointsInCurrentLevel)
+  const totalPoints = useProgressionStore((s) => s.totalPoints)
+
   const hasSavedGame = level !== null && status === 'inProgress'
+
+  const progressPercentage = (pointsInCurrentLevel / POINTS_PER_LEVEL) * 100
+  const pointsToNextLevel = POINTS_PER_LEVEL - pointsInCurrentLevel
+  const currentTitle = getTitleForLevel(currentLevel)
 
   const handlePlay = () => {
     newGame()
@@ -74,6 +83,41 @@ export function Home() {
           >
             <IconLabel icon={Settings} label="Configuration" hideLabelOnMobile={false} />
           </Link>
+        </div>
+      </section>
+
+      {/* Progression Section */}
+      <section className="rounded-2xl border border-amber-400/20 bg-gradient-to-br from-amber-400/10 to-orange-500/10 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400/90">
+              <TrendingUp size={14} aria-hidden="true" />
+              <span>Progression</span>
+            </p>
+            <h2 className="mt-1 text-xl font-bold text-white">
+              {currentTitle} • Niveau {currentLevel}
+            </h2>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-bold text-amber-400">{totalPoints.toLocaleString()}</p>
+            <p className="text-xs text-white/60">Points totaux</p>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between text-xs text-white/70">
+            <span>Niveau {currentLevel + 1}</span>
+            <span>{pointsToNextLevel} points restants</span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-black/30">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+          <div className="mt-2 text-center text-xs text-white/60">
+            {pointsInCurrentLevel} / {POINTS_PER_LEVEL} points
+          </div>
         </div>
       </section>
 

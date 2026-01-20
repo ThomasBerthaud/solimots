@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 export const POINTS_PER_CARD = 10
 
 // Points needed for each level (simple linear progression)
-const POINTS_PER_LEVEL = 100
+export const POINTS_PER_LEVEL = 100
 
 // Title definitions: every 10 levels gets a new title
 export const TITLES = [
