@@ -60,20 +60,18 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Generate deal pattern based on column count: [4, 5, 6, ...] up to the number of columns
   const tableauDealPattern = options.tableauDealPattern ?? Array.from({ length: tableauColumns }, (_, i) => 4 + i)
 
-  // Randomly choose between word categories and image categories
-  const useImageCategories = rnd() < 0.5
-  const categoryBank: (WordBankCategory | ImageBankCategory)[] = useImageCategories ? IMAGE_CATEGORIES : WORD_BANK
+  // Validate both category banks
+  validateWordBank(WORD_BANK)
+  validateWordBank(IMAGE_CATEGORIES)
 
-  validateWordBank(categoryBank)
-
-  const playableCategories: (WordBankCategory | ImageBankCategory)[] = categoryBank
-  if (playableCategories.length < MIN_CATEGORIES_PER_LEVEL) {
+  const totalPlayableCategories = WORD_BANK.length + IMAGE_CATEGORIES.length
+  if (totalPlayableCategories < MIN_CATEGORIES_PER_LEVEL) {
     throw new Error(
-      `Category bank does not have enough playable categories (need >= ${MIN_CATEGORIES_PER_LEVEL}, got ${playableCategories.length}).`,
+      `Combined category banks do not have enough playable categories (need >= ${MIN_CATEGORIES_PER_LEVEL}, got ${totalPlayableCategories}).`,
     )
   }
 
-  const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, playableCategories.length)
+  const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, Math.min(WORD_BANK.length, totalPlayableCategories))
   let categoryCount: number
   if (options.categoryCount != null) {
     categoryCount = Math.floor(options.categoryCount)
@@ -84,7 +82,21 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     categoryCount = randomIntInclusive(MIN_CATEGORIES_PER_LEVEL, maxPick, rnd)
   }
 
-  const selectedCategories = pickN(playableCategories, categoryCount, rnd)
+  // Mix word and image categories with majority being word categories
+  // At least 2/3 (67%) should be word categories
+  const minWordCategories = Math.ceil(categoryCount * 0.67)
+  const maxImageCategories = categoryCount - minWordCategories
+
+  // Randomly decide how many image categories to include (0 to maxImageCategories)
+  const imageCount = Math.min(maxImageCategories, Math.floor(rnd() * (maxImageCategories + 1)))
+  const wordCount = categoryCount - imageCount
+
+  // Select categories from each bank
+  const selectedWordCategories = pickN(WORD_BANK, wordCount, rnd)
+  const selectedImageCategories = pickN(IMAGE_CATEGORIES, imageCount, rnd)
+
+  // Combine and shuffle all selected categories
+  const selectedCategories = shuffle([...selectedWordCategories, ...selectedImageCategories], rnd)
 
   const categories: CategoryDef[] = selectedCategories.map((c) => ({ id: c.id, label: c.label }))
 
