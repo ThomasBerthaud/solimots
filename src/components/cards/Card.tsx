@@ -151,7 +151,11 @@ export function Card({
         <div className="relative flex h-full w-full flex-col justify-between p-3">
           <div className="flex min-h-0 flex-1 items-center justify-center">
             {card.imageUrl ? (
-              <span className="text-center text-[clamp(24px,8vw,40px)]" role="img" aria-label={card.word || 'Image'}>
+              <span
+                className="text-center text-[clamp(24px,8vw,40px)]"
+                role="img"
+                aria-label={`Image de catégorie ${card.categoryId}`}
+              >
                 {card.imageUrl}
               </span>
             ) : (

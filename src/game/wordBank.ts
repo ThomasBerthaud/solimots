@@ -337,7 +337,7 @@ export const IMAGE_CATEGORIES: ImageBankCategory[] = [
   {
     id: 'img_birds',
     label: 'Oiseaux',
-    images: ['🦅', '🐦', '��️', '🦉', '🦆', '🦢', '🦜', '🐓'],
+    images: ['🦅', '🐦', '🕊️', '🦉', '🦆', '🦢', '🦜', '🐓'],
   },
   {
     id: 'img_weather',
@@ -382,12 +382,12 @@ export const IMAGE_CATEGORIES: ImageBankCategory[] = [
   {
     id: 'img_home',
     label: 'Maison',
-    images: ['🏠', '��', '🏘️', '🏚️', '🏗️', '🏢', '🏰', '🏛️'],
+    images: ['🏠', '🏡', '🏘️', '🏚️', '🏗️', '🏢', '🏰', '🏛️'],
   },
   {
     id: 'img_ocean',
     label: 'Océan',
-    images: ['🐠', '🐟', '🐡', '��', '🐙', '🦑', '🦀', '🦞'],
+    images: ['🐠', '🐟', '🐡', '🦈', '🐙', '🦑', '🦀', '🦞'],
   },
   {
     id: 'img_clothing',
