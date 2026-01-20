@@ -98,7 +98,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Randomly decide how many image categories to include (0 to availableImageCount)
   const imageCount = Math.floor(rnd() * (availableImageCount + 1))
 
-  // Adjust categoryCount if we can't fulfill the requirement
+  // Calculate actual category count based on available categories from both banks
   const actualCategoryCount = wordCount + imageCount
 
   // Select categories from each bank
