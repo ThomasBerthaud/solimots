@@ -150,16 +150,22 @@ export function Card({
 
         <div className="relative flex h-full w-full flex-col justify-between p-3">
           <div className="flex min-h-0 flex-1 items-center justify-center">
-            <span
-              lang="fr"
-              className="whitespace-normal break-words text-center font-extrabold leading-snug tracking-tight [font-size:clamp(9px,3.2vw,13px)] [hyphens:auto]"
-            >
-              {card.word}
-            </span>
+            {card.imageUrl ? (
+              <span className="text-center text-[clamp(24px,8vw,40px)]" role="img" aria-label={card.word || 'Image'}>
+                {card.imageUrl}
+              </span>
+            ) : (
+              <span
+                lang="fr"
+                className="whitespace-normal break-words text-center font-extrabold leading-snug tracking-tight [font-size:clamp(9px,3.2vw,13px)] [hyphens:auto]"
+              >
+                {card.word}
+              </span>
+            )}
           </div>
 
           <div className="mt-2 flex items-end text-[9px] font-semibold text-black/40">
-            <span className="truncate">{isCategory ? 'Catégorie' : 'Mot'}</span>
+            <span className="truncate">{isCategory ? 'Catégorie' : card.imageUrl ? 'Image' : 'Mot'}</span>
           </div>
         </div>
       </motion.div>

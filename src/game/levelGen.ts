@@ -1,5 +1,5 @@
-import type { Card, CardId, CategoryDef, LevelState } from './types'
-import { WORD_BANK } from './wordBank'
+import type { Card, CardId, CategoryDef, ImageBankCategory, LevelState, WordBankCategory } from './types'
+import { IMAGE_CATEGORIES, WORD_BANK } from './wordBank'
 
 // English comments per project rule.
 
@@ -60,12 +60,16 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Generate deal pattern based on column count: [4, 5, 6, ...] up to the number of columns
   const tableauDealPattern = options.tableauDealPattern ?? Array.from({ length: tableauColumns }, (_, i) => 4 + i)
 
-  validateWordBank(WORD_BANK)
+  // Randomly choose between word categories and image categories
+  const useImageCategories = rnd() < 0.5
+  const categoryBank: (WordBankCategory | ImageBankCategory)[] = useImageCategories ? IMAGE_CATEGORIES : WORD_BANK
 
-  const playableCategories = WORD_BANK
+  validateWordBank(categoryBank)
+
+  const playableCategories: (WordBankCategory | ImageBankCategory)[] = categoryBank
   if (playableCategories.length < MIN_CATEGORIES_PER_LEVEL) {
     throw new Error(
-      `WORD_BANK does not have enough playable categories (need >= ${MIN_CATEGORIES_PER_LEVEL}, got ${playableCategories.length}).`,
+      `Category bank does not have enough playable categories (need >= ${MIN_CATEGORIES_PER_LEVEL}, got ${playableCategories.length}).`,
     )
   }
 
@@ -114,10 +118,13 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   for (let idx = 0; idx < selectedCategories.length; idx++) {
     const cat = selectedCategories[idx]
-    const availableWords = uniqueWords(cat.words)
+    const isImageCategory = 'images' in cat
+    const availableItems = isImageCategory
+      ? uniqueWords((cat as ImageBankCategory).images)
+      : uniqueWords((cat as WordBankCategory).words)
     const requiredRaw = wordCounts[idx]
-    // Clamp required to not exceed the available unique words for that category.
-    const required = Math.min(requiredRaw, availableWords.length)
+    // Clamp required to not exceed the available unique items for that category.
+    const required = Math.min(requiredRaw, availableItems.length)
     requiredWordsByCategoryId[cat.id] = required
 
     // The category itself is a card in the deck.
@@ -129,14 +136,15 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
       faceUp: false,
     })
 
-    const words = pickN(availableWords, required, rnd)
-    for (const w of words) {
+    const items = pickN(availableItems, required, rnd)
+    for (const item of items) {
       cards.push({
         id: `card_${cards.length}`,
-        word: w,
+        word: isImageCategory ? '' : item,
         kind: 'word',
         categoryId: cat.id,
         faceUp: false,
+        imageUrl: isImageCategory ? item : undefined,
       })
     }
   }
@@ -204,19 +212,20 @@ function uniqueWords(words: string[]): string[] {
   return Array.from(new Set(words.map((w) => w.trim()).filter(Boolean)))
 }
 
-function validateWordBank(categories: Array<{ id: string; label: string; words: string[] }>): void {
-  if (categories.length === 0) throw new Error('WORD_BANK is empty')
+function validateWordBank(categories: Array<{ id: string; label: string; words?: string[]; images?: string[] }>): void {
+  if (categories.length === 0) throw new Error('Category bank is empty')
 
   const seen = new Set<string>()
   const bad: Array<{ id: string; label: string; uniqueWordCount: number }> = []
 
   for (const c of categories) {
     if (seen.has(c.id)) {
-      throw new Error(`WORD_BANK has a duplicate category id "${c.id}".`)
+      throw new Error(`Category bank has a duplicate category id "${c.id}".`)
     }
     seen.add(c.id)
 
-    const uniqueCount = uniqueWords(c.words).length
+    const items = c.words || c.images || []
+    const uniqueCount = uniqueWords(items).length
     if (uniqueCount < MIN_WORDS_PER_CATEGORY_IN_BANK) {
       bad.push({ id: c.id, label: c.label, uniqueWordCount: uniqueCount })
     }
@@ -225,7 +234,7 @@ function validateWordBank(categories: Array<{ id: string; label: string; words: 
   if (bad.length > 0) {
     const details = bad.map((c) => `${c.id} (${c.label}): ${c.uniqueWordCount}`).join(', ')
     throw new Error(
-      `WORD_BANK categories must have at least ${MIN_WORDS_PER_CATEGORY_IN_BANK} unique words. Invalid: ${details}`,
+      `Category bank categories must have at least ${MIN_WORDS_PER_CATEGORY_IN_BANK} unique items. Invalid: ${details}`,
     )
   }
 }

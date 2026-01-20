@@ -1,5 +1,5 @@
 // English comments per project rule.
-import type { WordBankCategory } from './types'
+import type { ImageBankCategory, WordBankCategory } from './types'
 
 export const WORD_BANK: WordBankCategory[] = [
   {
@@ -315,5 +315,83 @@ export const WORD_BANK: WordBankCategory[] = [
       'Agent de sécurité',
       'Caissier',
     ],
+  },
+]
+
+export const IMAGE_CATEGORIES: ImageBankCategory[] = [
+  {
+    id: 'img_fruits',
+    label: 'Fruits',
+    images: ['🍎', '🍌', '🍓', '🍊', '🍐', '🥭', '🍇', '🍋'],
+  },
+  {
+    id: 'img_vegetables',
+    label: 'Légumes',
+    images: ['🥕', '🍅', '🫑', '🥒', '🍆', '🥦', '🌽', '🥬'],
+  },
+  {
+    id: 'img_animals',
+    label: 'Animaux',
+    images: ['🦁', '🐬', '🐴', '🐻', '🐶', '🐱', '🐵', '🐺'],
+  },
+  {
+    id: 'img_birds',
+    label: 'Oiseaux',
+    images: ['🦅', '🐦', '��️', '🦉', '🦆', '🦢', '🦜', '🐓'],
+  },
+  {
+    id: 'img_weather',
+    label: 'Météo',
+    images: ['☀️', '⛅', '☁️', '🌧️', '⛈️', '❄️', '🌈', '🌪️'],
+  },
+  {
+    id: 'img_sports',
+    label: 'Sports',
+    images: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏓', '🏸'],
+  },
+  {
+    id: 'img_transport',
+    label: 'Transports',
+    images: ['✈️', '🚂', '🚇', '🚲', '🚗', '🚢', '🚌', '🚕'],
+  },
+  {
+    id: 'img_food',
+    label: 'Nourriture',
+    images: ['🍕', '🍔', '🌮', '🍜', '🍱', '🥗', '🍰', '🍦'],
+  },
+  {
+    id: 'img_nature',
+    label: 'Nature',
+    images: ['🌲', '🌳', '🌴', '🌵', '🌺', '🌻', '🌹', '🌷'],
+  },
+  {
+    id: 'img_space',
+    label: 'Espace',
+    images: ['🌍', '🌙', '⭐', '☄️', '🪐', '🚀', '🛸', '🌌'],
+  },
+  {
+    id: 'img_music',
+    label: 'Musique',
+    images: ['🎸', '🎹', '🎺', '🎷', '🥁', '🎻', '🎤', '🎧'],
+  },
+  {
+    id: 'img_tools',
+    label: 'Outils',
+    images: ['🔨', '🔧', '🪛', '⚒️', '🪚', '⛏️', '🔩', '⚙️'],
+  },
+  {
+    id: 'img_home',
+    label: 'Maison',
+    images: ['🏠', '��', '🏘️', '🏚️', '🏗️', '🏢', '🏰', '🏛️'],
+  },
+  {
+    id: 'img_ocean',
+    label: 'Océan',
+    images: ['🐠', '🐟', '🐡', '��', '🐙', '🦑', '🦀', '🦞'],
+  },
+  {
+    id: 'img_clothing',
+    label: 'Vêtements',
+    images: ['👕', '👔', '👗', '👖', '👞', '👟', '👢', '🧥'],
   },
 ]
