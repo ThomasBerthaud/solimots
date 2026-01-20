@@ -71,7 +71,11 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     )
   }
 
-  const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, Math.min(WORD_BANK.length, totalPlayableCategories))
+  // Max categories we can pick considering we need at least 67% from WORD_BANK
+  // If WORD_BANK has 10 categories, we can have at most 10 / 0.67 ≈ 14 total categories
+  const maxByWordBankSize = Math.floor(WORD_BANK.length / 0.67)
+  const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, totalPlayableCategories, maxByWordBankSize)
+  
   let categoryCount: number
   if (options.categoryCount != null) {
     categoryCount = Math.floor(options.categoryCount)
@@ -87,9 +91,15 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const minWordCategories = Math.ceil(categoryCount * 0.67)
   const maxImageCategories = categoryCount - minWordCategories
 
-  // Randomly decide how many image categories to include (0 to maxImageCategories)
-  const imageCount = Math.min(maxImageCategories, Math.floor(rnd() * (maxImageCategories + 1)))
-  const wordCount = categoryCount - imageCount
+  // Ensure we have enough categories in each bank
+  const wordCount = Math.min(minWordCategories, WORD_BANK.length)
+  const availableImageCount = Math.min(maxImageCategories, IMAGE_CATEGORIES.length)
+  
+  // Randomly decide how many image categories to include (0 to availableImageCount)
+  const imageCount = Math.floor(rnd() * (availableImageCount + 1))
+
+  // Adjust categoryCount if we can't fulfill the requirement
+  const actualCategoryCount = wordCount + imageCount
 
   // Select categories from each bank
   const selectedWordCategories = pickN(WORD_BANK, wordCount, rnd)
@@ -117,7 +127,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   }
 
   // Add remaining small categories (3-4 words each)
-  for (let i = largeCategoriesToCreate; i < categoryCount; i++) {
+  for (let i = largeCategoriesToCreate; i < actualCategoryCount; i++) {
     // Randomly choose between 3 or 4 words
     wordCounts.push(rnd() < 0.5 ? 3 : 4)
   }
