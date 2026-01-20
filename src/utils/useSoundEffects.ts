@@ -52,8 +52,11 @@ export function useStartupMusic() {
       }, 500)
 
       return () => clearTimeout(timer)
+    } else if (!musicEnabled && hasPlayedRef.current) {
+      // Stop music immediately when disabled
+      stopMusic()
     }
-  }, [musicEnabled, playMusic])
+  }, [musicEnabled, playMusic, stopMusic])
 
   useEffect(() => {
     return () => {
