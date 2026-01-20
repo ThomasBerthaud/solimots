@@ -164,9 +164,11 @@ export function Card({
             )}
           </div>
 
-          <div className="mt-2 flex items-end text-[9px] font-semibold text-black/40">
-            <span className="truncate">{isCategory ? 'Catégorie' : card.imageUrl ? 'Image' : 'Mot'}</span>
-          </div>
+          {!card.imageUrl && (
+            <div className="mt-2 flex items-end text-[9px] font-semibold text-black/40">
+              <span className="truncate">{isCategory ? 'Catégorie' : 'Mot'}</span>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
