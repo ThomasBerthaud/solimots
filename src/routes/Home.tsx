@@ -1,4 +1,4 @@
-import { Dices, GraduationCap, Play, RotateCcw, ScrollText, Settings, Smartphone, TrendingUp } from 'lucide-react'
+import { GraduationCap, Play, RotateCcw, ScrollText, Settings, TrendingUp } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
 import { useGameStore } from '../store/gameStore'
@@ -118,25 +118,6 @@ export function Home() {
           <div className="mt-2 text-center text-xs text-white/60">
             {pointsInCurrentLevel} / {POINTS_PER_LEVEL} points
           </div>
-        </div>
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
-          <p className="inline-flex items-center gap-2 text-sm font-semibold">
-            <Smartphone aria-hidden="true" className="shrink-0 opacity-90" size={16} />
-            <span>Mobile-first</span>
-          </p>
-          <p className="mt-1 text-sm text-white/75">
-            Conçu pour être agréable au pouce, avec une mise en page claire sur desktop.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
-          <p className="inline-flex items-center gap-2 text-sm font-semibold">
-            <Dices aria-hidden="true" className="shrink-0 opacity-90" size={16} />
-            <span>Niveaux rejouables</span>
-          </p>
-          <p className="mt-1 text-sm text-white/75">Génération locale de niveaux (4 catégories × 6 mots).</p>
         </div>
       </section>
     </div>
