@@ -140,7 +140,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     for (const item of items) {
       cards.push({
         id: `card_${cards.length}`,
-        word: isImageCategory ? item : item,
+        word: item,
         kind: 'word',
         categoryId: cat.id,
         faceUp: false,
