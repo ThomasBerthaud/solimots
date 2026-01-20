@@ -79,7 +79,7 @@ export function Card({
       data-card-interactive={draggable || onClick ? 'true' : 'false'}
       role="button"
       tabIndex={0}
-      aria-label={`Carte: ${card.word}`}
+      aria-label={card.imageUrl ? `Carte image: ${isCategory ? 'Catégorie' : 'Image'}` : `Carte: ${card.word}`}
       onClick={(e) => {
         e.stopPropagation()
         onClick?.()
@@ -151,11 +151,7 @@ export function Card({
         <div className="relative flex h-full w-full flex-col justify-between p-3">
           <div className="flex min-h-0 flex-1 items-center justify-center">
             {card.imageUrl ? (
-              <span
-                className="text-center text-[clamp(24px,8vw,40px)]"
-                role="img"
-                aria-label={`Image de catégorie ${card.categoryId}`}
-              >
+              <span className="text-center text-[clamp(24px,8vw,40px)]" role="img" aria-label="Icône">
                 {card.imageUrl}
               </span>
             ) : (
