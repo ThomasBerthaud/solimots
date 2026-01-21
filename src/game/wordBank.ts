@@ -59,8 +59,8 @@ export const WORD_BANK: WordBankCategory[] = [
   },
   {
     id: 'cat_actions',
-    label: 'Actions de voyage',
-    words: ['Réserver', 'Explorer', 'Marcher', 'Visiter', 'Prendre photo', 'Nager', 'Goûter', 'Randonner'],
+    label: 'Activités',
+    words: ['Réservation', 'Exploration', 'Marche', 'Visite', 'Photo', 'Baignade', 'Dégustation', 'Randonnée'],
   },
   {
     id: 'cat_sports_ball',
@@ -120,19 +120,19 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_internet',
     label: 'Internet',
-    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Télécharger', 'Streaming', 'Cookie', 'Lien'],
+    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Télécharge', 'Streaming', 'Cookie', 'Lien'],
   },
   {
     id: 'cat_tech_security',
     label: 'Sécurité',
     words: [
-      'Mot de passe',
+      'Identifiant',
       'Chiffrement',
-      'Pare-feu',
+      'Firewall',
       'Antivirus',
       'Phishing',
       'Sauvegarde',
-      'Code secret',
+      'Authentique',
       'VPN',
     ],
   },
@@ -164,7 +164,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_art_cinema',
     label: 'Cinéma',
-    words: ['Film', 'Scénario', 'Acteur', 'Réalisateur', 'Caméra', 'Montage', 'Bande-annonce', 'Festival'],
+    words: ['Film', 'Scénario', 'Acteur', 'Réalisateur', 'Caméra', 'Montage', 'Trailer', 'Festival'],
   },
   {
     id: 'cat_art_literature',
@@ -176,18 +176,18 @@ export const WORD_BANK: WordBankCategory[] = [
     label: 'Époques',
     words: [
       'Antiquité',
-      'Moyen Âge',
+      'Médiéval',
       'Renaissance',
       'Lumières',
       'Révolution',
       'Empire',
-      'Belle Époque',
-      'XXe siècle',
+      'Modernité',
+      'Contemporain',
     ],
   },
   {
     id: 'cat_history_places',
-    label: 'Lieux historiques',
+    label: 'Monuments',
     words: ['Château', 'Citadelle', 'Forteresse', 'Cathédrale', 'Temple', 'Amphithéâtre', 'Palais', 'Abbaye'],
   },
   {
@@ -253,7 +253,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_emotions_moods',
     label: 'Humeurs',
-    words: ['Optimisme', 'Morosité', 'Irritabilité', 'Calme', 'Nervosité', 'Motivation', 'Apathie', 'Bonne humeur'],
+    words: ['Optimisme', 'Morosité', 'Irritabilité', 'Calme', 'Nervosité', 'Motivation', 'Apathie', 'Gaîté'],
   },
   {
     id: 'cat_jobs_health',
@@ -263,8 +263,8 @@ export const WORD_BANK: WordBankCategory[] = [
       'Infirmier',
       'Pharmacien',
       'Dentiste',
-      'Sage-femme',
-      'Kinésithérapeute',
+      'Maïeuticien',
+      'Kiné',
       'Vétérinaire',
       'Psychologue',
     ],
@@ -297,7 +297,7 @@ export const WORD_BANK: WordBankCategory[] = [
       'Sysadmin',
       'Analyste',
       'Testeur',
-      'Chef produit',
+      'Manager',
       'DevOps',
       'Support',
     ],
