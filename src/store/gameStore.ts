@@ -718,24 +718,24 @@ function canPlaceOnSlot(level: LevelState, cardId: CardId, slotIndex: number): b
 }
 
 function findValidMove(level: LevelState): SuggestedMove {
-  const sources: Array<{ from: MoveSource; cardId: CardId }> = []
+  const availableCards: Array<{ from: MoveSource; cardId: CardId }> = []
   
-  // Collect all movable cards
+  // Collect all movable cards (waste top and revealed tableau tops)
   const wasteTop = level.waste.at(-1)
-  if (wasteTop) sources.push({ from: { type: 'waste' }, cardId: wasteTop })
+  if (wasteTop) availableCards.push({ from: { type: 'waste' }, cardId: wasteTop })
   
   level.tableau.forEach((col, idx) => {
     const top = col.at(-1)
     if (top) {
       const card = level.cardsById[top]
       if (card?.faceUp) {
-        sources.push({ from: { type: 'tableau', column: idx }, cardId: top })
+        availableCards.push({ from: { type: 'tableau', column: idx }, cardId: top })
       }
     }
   })
   
   // Priority 1: Try slot moves first (since the goal is completing slots)
-  for (const src of sources) {
+  for (const src of availableCards) {
     for (let slotIndex = 0; slotIndex < level.slots.length; slotIndex++) {
       if (canPlaceOnSlot(level, src.cardId, slotIndex)) {
         return { from: src.from, to: { type: 'slot', slotIndex }, cardId: src.cardId }
@@ -744,9 +744,9 @@ function findValidMove(level: LevelState): SuggestedMove {
   }
   
   // Priority 2: Try tableau moves as fallback
-  for (const src of sources) {
+  for (const src of availableCards) {
     for (let col = 0; col < level.tableau.length; col++) {
-      // Skip moving to the same column
+      // Skip moving to the same column (would be a no-op)
       if (src.from.type === 'tableau' && src.from.column === col) continue
       const destTop = level.tableau[col].at(-1)
       if (canPlaceOnTableau(level, src.cardId, destTop ?? null)) {

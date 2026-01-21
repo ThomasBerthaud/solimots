@@ -17,6 +17,9 @@ import { ProgressionAnimation } from './modals/ProgressionAnimation'
 type Selected = { source: MoveSource; cardIds: CardId[] } | null
 type Toast = { key: number; message: string } | null
 
+// UI messages
+const NO_VALID_MOVE_MESSAGE = 'Aucune action valide disponible'
+
 function isEventInside(el: EventTarget | null, selector: string): boolean {
   if (!(el instanceof Element)) return false
   return Boolean(el.closest(selector))
@@ -286,7 +289,7 @@ export function GameScreen() {
       playSound('draw', 0.3)
     } else {
       // No valid move available
-      setToast({ key: Date.now(), message: 'Aucune action valide disponible' })
+      setToast({ key: Date.now(), message: NO_VALID_MOVE_MESSAGE })
       playSound('error', 0.4)
     }
   }
