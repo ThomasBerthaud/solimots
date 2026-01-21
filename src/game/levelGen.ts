@@ -57,49 +57,17 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Randomly choose between 3, 4, or 5 columns if not specified
   const tableauColumns = options.tableauColumns ?? randomIntInclusive(3, 5, rnd)
 
-  // Valid deal patterns for each column count (each pattern has 4-6 cards per column)
-  const validPatterns: Record<number, number[][]> = {
-    3: [
-      [4, 5, 6],
-      [4, 6, 5],
-      [5, 4, 6],
-      [5, 5, 5],
-      [6, 4, 5],
-      [6, 5, 4],
-    ],
-    4: [
-      [4, 5, 6, 5],
-      [4, 5, 5, 6],
-      [5, 4, 6, 5],
-      [5, 5, 5, 5],
-      [5, 6, 4, 5],
-      [6, 4, 5, 5],
-      [6, 5, 4, 5],
-    ],
-    5: [
-      [4, 5, 6, 5, 4],
-      [4, 5, 5, 5, 6],
-      [5, 4, 6, 5, 5],
-      [5, 5, 4, 6, 5],
-      [5, 5, 5, 5, 5],
-      [6, 4, 5, 5, 5],
-      [6, 5, 4, 5, 5],
-    ],
-  }
-
-  // Randomly select a pattern from valid configurations for the chosen column count
+  // Generate an increasing sequence pattern with a random starting number.
+  // Starting number ranges from 3 to 5, ensuring reasonable card distribution.
+  // Examples: [3,4,5], [4,5,6], [5,6,7] for 3 columns
   let tableauDealPattern: number[]
   if (options.tableauDealPattern) {
     tableauDealPattern = options.tableauDealPattern
   } else {
-    const patterns = validPatterns[tableauColumns] ?? []
-    if (patterns.length > 0) {
-      const patternIndex = Math.floor(rnd() * patterns.length)
-      tableauDealPattern = patterns[patternIndex]
-    } else {
-      // Fallback to original pattern if no valid patterns are defined
-      tableauDealPattern = Array.from({ length: tableauColumns }, (_, i) => 4 + i)
-    }
+    // Randomly choose a starting number between 3 and 5
+    // This ensures all patterns remain within 3-9 cards per column range
+    const startNum = randomIntInclusive(3, 5, rnd)
+    tableauDealPattern = Array.from({ length: tableauColumns }, (_, i) => startNum + i)
   }
 
   // Validate both category banks
@@ -221,16 +189,31 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // Ensure we have enough cards for both tableau and stock (minimum 1 card in stock)
   // If not enough cards, reduce the tableau deal count to leave at least 1 card for stock
-  if (cardsShuffled.length < tableauDealCount + 1) {
-    tableauDealCount = Math.max(0, cardsShuffled.length - 1)
+  const maxTableauCards = Math.max(0, cardsShuffled.length - 1)
+  if (tableauDealCount > maxTableauCards) {
+    tableauDealCount = maxTableauCards
+  }
+
+  // Adjust the deal pattern if necessary to fit within available cards while maintaining
+  // an increasing sequence. For N columns starting at S: total = N*S + N*(N-1)/2
+  let adjustedDealPattern = dealPattern
+  if (dealPattern && dealPattern.reduce((acc, n) => acc + n, 0) > tableauDealCount) {
+    // Calculate the maximum starting number that fits within tableauDealCount
+    // For N columns: N*S + (0+1+2+...+(N-1)) = N*S + N*(N-1)/2 <= tableauDealCount
+    const sumOffset = (tableauColumns * (tableauColumns - 1)) / 2
+    const maxStartNum = Math.floor((tableauDealCount - sumOffset) / tableauColumns)
+    // Use the calculated start number, but prefer 3-5 range when possible
+    const newStartNum = maxStartNum >= 3 ? Math.min(5, maxStartNum) : Math.max(2, maxStartNum)
+    adjustedDealPattern = Array.from({ length: tableauColumns }, (_, i) => newStartNum + i)
+    tableauDealCount = adjustedDealPattern.reduce((acc, n) => acc + n, 0)
   }
 
   const dealt = cardsShuffled.slice(0, tableauDealCount)
 
-  if (dealPattern) {
+  if (adjustedDealPattern) {
     let k = 0
     for (let col = 0; col < tableauColumns; col++) {
-      const count = dealPattern[col] ?? 0
+      const count = adjustedDealPattern[col] ?? 0
       for (let i = 0; i < count; i++) {
         const c = dealt[k++]
         if (!c) break
