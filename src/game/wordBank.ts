@@ -120,7 +120,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_internet',
     label: 'Internet',
-    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Télécharge', 'Streaming', 'Cookie', 'Lien'],
+    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Email', 'Streaming', 'Cookie', 'Lien'],
   },
   {
     id: 'cat_tech_security',
@@ -128,11 +128,11 @@ export const WORD_BANK: WordBankCategory[] = [
     words: [
       'Identifiant',
       'Chiffrement',
-      'Firewall',
+      'Cryptage',
       'Antivirus',
       'Phishing',
       'Sauvegarde',
-      'Authentique',
+      'Certificat',
       'VPN',
     ],
   },
@@ -144,7 +144,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_data',
     label: 'Données',
-    words: ['Base', 'Table', 'Requête', 'Index', 'JSON', 'API', 'Cache', 'Pipeline'],
+    words: ['Tableau', 'Index', 'Requête', 'Archive', 'JSON', 'API', 'Cache', 'Pipeline'],
   },
   {
     id: 'cat_art_music',
@@ -164,7 +164,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_art_cinema',
     label: 'Cinéma',
-    words: ['Film', 'Scénario', 'Acteur', 'Réalisateur', 'Caméra', 'Montage', 'Trailer', 'Festival'],
+    words: ['Film', 'Scénario', 'Acteur', 'Réalisateur', 'Caméra', 'Montage', 'Cinéaste', 'Festival'],
   },
   {
     id: 'cat_art_literature',
@@ -263,8 +263,8 @@ export const WORD_BANK: WordBankCategory[] = [
       'Infirmier',
       'Pharmacien',
       'Dentiste',
-      'Maïeuticien',
-      'Kiné',
+      'Obstétricien',
+      'Radiologue',
       'Vétérinaire',
       'Psychologue',
     ],
