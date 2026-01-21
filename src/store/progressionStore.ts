@@ -2,10 +2,13 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 // Points per card completed (can be adjusted for balance)
-export const POINTS_PER_CARD = 10
+export const POINTS_PER_CARD = 4
 
-// Points needed for each level (simple linear progression)
-export const POINTS_PER_LEVEL = 100
+// Base points needed for level 1->2
+export const BASE_POINTS_PER_LEVEL = 100
+
+// Points increase per level (5% growth rate)
+export const POINTS_GROWTH_RATE = 0.05
 
 // Title definitions: every 10 levels gets a new title
 export const TITLES = [
@@ -20,6 +23,17 @@ export const TITLES = [
   { minLevel: 80, name: 'Mythique' },
   { minLevel: 90, name: 'Divin' },
 ]
+
+// Calculate XP cost to level up from (level-1) to (level)
+// For example: getPointsForLevel(2) returns XP needed to go from level 1 to level 2
+export function getPointsForLevel(level: number): number {
+  if (level <= 1) return 0
+  
+  // Progressive XP: each level requires slightly more XP than the previous
+  // Formula: BASE_POINTS_PER_LEVEL * (1 + POINTS_GROWTH_RATE) ^ (level - 2)
+  // This creates a gentle exponential curve
+  return Math.floor(BASE_POINTS_PER_LEVEL * Math.pow(1 + POINTS_GROWTH_RATE, level - 2))
+}
 
 export function getTitleForLevel(level: number): string {
   // Find the highest title the player qualifies for
@@ -71,11 +85,16 @@ export const useProgressionStore = create<ProgressionStore>()(
         let newLevel = state.currentLevel
         let levelsGained = 0
 
-        // Calculate level-ups
-        while (newPointsInLevel >= POINTS_PER_LEVEL) {
-          newPointsInLevel -= POINTS_PER_LEVEL
-          newLevel++
-          levelsGained++
+        // Calculate level-ups with progressive XP requirements
+        while (newLevel < 1000) { // Safety cap to prevent infinite loops
+          const pointsNeededForNextLevel = getPointsForLevel(newLevel + 1)
+          if (newPointsInLevel >= pointsNeededForNextLevel) {
+            newPointsInLevel -= pointsNeededForNextLevel
+            newLevel++
+            levelsGained++
+          } else {
+            break
+          }
         }
 
         const oldTitle = getTitleForLevel(state.currentLevel)
