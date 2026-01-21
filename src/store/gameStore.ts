@@ -19,6 +19,8 @@ export type LastAction =
   | { type: 'slotCompleted'; slotIndex: number; categoryId: CategoryId; at: number }
   | null
 
+export type SuggestedMove = { from: MoveSource; to: MoveTarget; cardId: CardId } | null
+
 type GameStore = {
   level: LevelState | null
   status: GameStatus
@@ -39,6 +41,7 @@ type GameStore = {
   finalizeSlotCompletion: (slotIndex: number, completedAt: number) => void
   undo: () => void
   clearError: () => void
+  getSuggestedMove: () => SuggestedMove
 }
 
 // English comments per project rule.
@@ -500,6 +503,13 @@ export const useGameStore = create<GameStore>()(
       },
 
       clearError: () => set({ lastError: null }),
+
+      getSuggestedMove: (): SuggestedMove => {
+        const { level, status } = get()
+        if (!level || status !== 'inProgress') return null
+
+        return findValidMove(level)
+      },
     }),
     {
       name: 'solimots-game-v1',
@@ -705,6 +715,47 @@ function canPlaceOnSlot(level: LevelState, cardId: CardId, slotIndex: number): b
 
   const required = level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
   return slot.pile.length < required
+}
+
+function findValidMove(level: LevelState): SuggestedMove {
+  const sources: Array<{ from: MoveSource; cardId: CardId }> = []
+  
+  // Collect all movable cards
+  const wasteTop = level.waste.at(-1)
+  if (wasteTop) sources.push({ from: { type: 'waste' }, cardId: wasteTop })
+  
+  level.tableau.forEach((col, idx) => {
+    const top = col.at(-1)
+    if (top) {
+      const card = level.cardsById[top]
+      if (card?.faceUp) {
+        sources.push({ from: { type: 'tableau', column: idx }, cardId: top })
+      }
+    }
+  })
+  
+  // Priority 1: Try slot moves first (since the goal is completing slots)
+  for (const src of sources) {
+    for (let slotIndex = 0; slotIndex < level.slots.length; slotIndex++) {
+      if (canPlaceOnSlot(level, src.cardId, slotIndex)) {
+        return { from: src.from, to: { type: 'slot', slotIndex }, cardId: src.cardId }
+      }
+    }
+  }
+  
+  // Priority 2: Try tableau moves as fallback
+  for (const src of sources) {
+    for (let col = 0; col < level.tableau.length; col++) {
+      // Skip moving to the same column
+      if (src.from.type === 'tableau' && src.from.column === col) continue
+      const destTop = level.tableau[col].at(-1)
+      if (canPlaceOnTableau(level, src.cardId, destTop ?? null)) {
+        return { from: src.from, to: { type: 'tableau', column: col }, cardId: src.cardId }
+      }
+    }
+  }
+  
+  return null
 }
 
 function computeDrawLoopKey(level: LevelState): string {

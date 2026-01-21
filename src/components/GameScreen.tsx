@@ -1,5 +1,5 @@
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion'
-import { HelpCircle, Undo2 } from 'lucide-react'
+import { HelpCircle, Lightbulb, Undo2 } from 'lucide-react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -82,6 +82,7 @@ export function GameScreen() {
   const undo = useGameStore((s) => s.undo)
   const moveCard = useGameStore((s) => s.moveCard)
   const moveCards = useGameStore((s) => s.moveCards)
+  const getSuggestedMove = useGameStore((s) => s.getSuggestedMove)
 
   const currentLevel = useProgressionStore((s) => s.currentLevel)
   const currentPoints = useProgressionStore((s) => s.totalPoints)
@@ -277,6 +278,19 @@ export function GameScreen() {
     playSound('undo', 0.4)
   }
 
+  const handleGetHelp = () => {
+    const suggestion = getSuggestedMove()
+    if (suggestion) {
+      // Select the suggested card to highlight it
+      setSelected({ source: suggestion.from, cardIds: [suggestion.cardId] })
+      playSound('draw', 0.3)
+    } else {
+      // No valid move available
+      setToast({ key: Date.now(), message: 'Aucune action valide disponible' })
+      playSound('error', 0.4)
+    }
+  }
+
   const onPointerDownCapture = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!selected) return
     const t = e.target as EventTarget | null
@@ -327,16 +341,29 @@ export function GameScreen() {
           <p className="text-sm font-semibold text-white/90">Partie #{level.seed}</p>
         </div>
 
-        <button
-          type="button"
-          data-ui-control="true"
-          onClick={() => setHelpOpen(true)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/25 text-white/85 active:bg-black/35"
-          aria-label="Aide"
-          title="Aide"
-        >
-          <HelpCircle size={18} aria-hidden="true" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            data-ui-control="true"
+            onClick={handleGetHelp}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500/90 text-white active:bg-amber-600"
+            aria-label="Suggestion d'action"
+            title="Suggestion d'action"
+            disabled={status !== 'inProgress'}
+          >
+            <Lightbulb size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            data-ui-control="true"
+            onClick={() => setHelpOpen(true)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/25 text-white/85 active:bg-black/35"
+            aria-label="Aide"
+            title="Aide"
+          >
+            <HelpCircle size={18} aria-hidden="true" />
+          </button>
+        </div>
       </header>
 
       {/* Flex spacer to push game content to bottom */}
