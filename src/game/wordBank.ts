@@ -253,7 +253,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_emotions_moods',
     label: 'Humeurs',
-    words: ['Optimisme', 'Morosité', 'Irritabilité', 'Calme', 'Nervosité', 'Motivation', 'Apathie', 'Gaîté'],
+    words: ['Optimisme', 'Morosité', 'Irritabilité', 'Calme', 'Nervosité', 'Motivation', 'Apathie', 'Gaieté'],
   },
   {
     id: 'cat_jobs_health',
