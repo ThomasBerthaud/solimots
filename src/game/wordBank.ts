@@ -49,18 +49,18 @@ export const WORD_BANK: WordBankCategory[] = [
   },
   {
     id: 'cat_places',
-    label: 'Lieux',
+    label: 'Lieux de voyage',
     words: ['Hôtel', 'Aéroport', 'Gare', 'Musée', 'Plage', 'Montagne', 'Port', 'Temple'],
   },
   {
     id: 'cat_items',
-    label: 'Objets',
-    words: ['Valise', 'Passeport', 'Carte', 'Billet', 'Appareil photo', 'Guide', 'Chargeur', 'Boussole'],
+    label: 'Objets de voyage',
+    words: ['Valise', 'Passeport', 'Carte', 'Billet', 'Appareil', 'Guide', 'Chargeur', 'Boussole'],
   },
   {
     id: 'cat_actions',
-    label: 'Actions',
-    words: ['Réserver', 'Explorer', 'Marcher', 'Visiter', 'Photographier', 'Nager', 'Goûter', 'Randonner'],
+    label: 'Actions de voyage',
+    words: ['Réserver', 'Explorer', 'Marcher', 'Visiter', 'Prendre photo', 'Nager', 'Goûter', 'Randonner'],
   },
   {
     id: 'cat_sports_ball',
@@ -70,7 +70,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_sports_racket',
     label: 'Sports de raquette',
-    words: ['Tennis', 'Badminton', 'Squash', 'Padel', 'Ping-pong', 'Tennis de table', 'Racquetball', 'Pelote'],
+    words: ['Tennis', 'Badminton', 'Squash', 'Padel', 'Ping-pong', 'Racquetball', 'Pelote', 'Speedball'],
   },
   {
     id: 'cat_sports_martial',
@@ -115,12 +115,12 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_devices',
     label: 'Appareils',
-    words: ['Smartphone', 'Tablette', 'Ordinateur', 'Casque', 'Montre connectée', 'Console', 'Imprimante', 'Routeur'],
+    words: ['Smartphone', 'Tablette', 'Ordinateur', 'Casque', 'Montre', 'Console', 'Imprimante', 'Routeur'],
   },
   {
     id: 'cat_tech_internet',
     label: 'Internet',
-    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Téléchargement', 'Streaming', 'Cookie', 'Lien'],
+    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Télécharger', 'Streaming', 'Cookie', 'Lien'],
   },
   {
     id: 'cat_tech_security',
@@ -132,7 +132,7 @@ export const WORD_BANK: WordBankCategory[] = [
       'Antivirus',
       'Phishing',
       'Sauvegarde',
-      'Authentification',
+      'Code secret',
       'VPN',
     ],
   },
@@ -144,7 +144,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_data',
     label: 'Données',
-    words: ['Base de données', 'Table', 'Requête', 'Index', 'JSON', 'API', 'Cache', 'Pipeline'],
+    words: ['Base', 'Table', 'Requête', 'Index', 'JSON', 'API', 'Cache', 'Pipeline'],
   },
   {
     id: 'cat_art_music',
@@ -178,7 +178,7 @@ export const WORD_BANK: WordBankCategory[] = [
       'Antiquité',
       'Moyen Âge',
       'Renaissance',
-      'Siècle des Lumières',
+      'Lumières',
       'Révolution',
       'Empire',
       'Belle Époque',
@@ -192,13 +192,13 @@ export const WORD_BANK: WordBankCategory[] = [
   },
   {
     id: 'cat_history_figures',
-    label: 'Figures',
+    label: 'Personnages',
     words: ['Roi', 'Reine', 'Empereur', 'Explorateur', 'Philosophe', 'Général', 'Artisan', 'Chroniqueur'],
   },
   {
     id: 'cat_history_inventions',
     label: 'Inventions',
-    words: ['Imprimerie', 'Boussole', 'Horloge', 'Machine à vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
+    words: ['Imprimerie', 'Boussole', 'Horloge', 'Vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
   },
   {
     id: 'cat_history_events',
@@ -290,14 +290,14 @@ export const WORD_BANK: WordBankCategory[] = [
   },
   {
     id: 'cat_jobs_tech',
-    label: 'Numérique',
+    label: 'Métiers tech',
     words: [
       'Développeur',
       'Designer',
-      'Administrateur système',
-      'Data analyst',
+      'Sysadmin',
+      'Analyste',
       'Testeur',
-      'Product manager',
+      'Chef produit',
       'DevOps',
       'Support',
     ],
@@ -310,9 +310,9 @@ export const WORD_BANK: WordBankCategory[] = [
       'Cuisinier',
       'Chauffeur',
       'Hôtelier',
-      'Agent d’accueil',
+      'Hôte',
       'Livreur',
-      'Agent de sécurité',
+      'Vigile',
       'Caissier',
     ],
   },
