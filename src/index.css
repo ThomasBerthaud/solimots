@@ -83,3 +83,17 @@ body {
   --dockCardW: clamp(64px, 20vw, 84px);
   --dockCardH: calc(var(--dockCardW) * 1.28);
 }
+
+/* Desktop game sizing - larger cards and spacing */
+@media (min-width: 1024px) {
+  .mobile-game {
+    --gap: 12px;
+    /* Larger cards on desktop for better comfort */
+    --cardW: clamp(100px, calc((100vw - 80px - (var(--gap) * 4)) / 5), 120px);
+    --cardH: calc(var(--cardW) * 1.38);
+    --stackStep: 32px;
+
+    --dockCardW: 100px;
+    --dockCardH: calc(var(--dockCardW) * 1.28);
+  }
+}

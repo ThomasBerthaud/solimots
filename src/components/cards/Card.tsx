@@ -151,13 +151,13 @@ export function Card({
         <div className="relative flex h-full w-full flex-col justify-between p-3">
           <div className="flex min-h-0 flex-1 items-center justify-center">
             {card.imageUrl ? (
-              <span className="text-center text-[clamp(24px,8vw,40px)]" role="img" aria-label={card.word}>
+              <span className="text-center text-[clamp(24px,8vw,40px)] lg:text-[clamp(32px,3vw,48px)]" role="img" aria-label={card.word}>
                 {card.imageUrl}
               </span>
             ) : (
               <span
                 lang="fr"
-                className="whitespace-normal break-words text-center font-extrabold leading-snug tracking-tight [font-size:clamp(9px,3.2vw,13px)] [hyphens:auto]"
+                className="whitespace-normal break-words text-center font-extrabold leading-snug tracking-tight [font-size:clamp(9px,3.2vw,13px)] lg:[font-size:clamp(12px,1.2vw,16px)] [hyphens:auto]"
               >
                 {card.word}
               </span>

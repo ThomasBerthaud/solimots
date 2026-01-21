@@ -28,9 +28,9 @@ export function SlotsRow({
   const columnCount = level.slots.length
 
   return (
-    <section className="rounded-[24px] bg-black/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+    <section className="rounded-[24px] bg-black/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:rounded-[28px] lg:p-3">
       <LayoutGroup>
-        <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
+        <div className="grid gap-2 lg:gap-3" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
           {level.slots.map((slot, idx) => (
             <SlotCell
               key={idx}

@@ -298,7 +298,7 @@ export function GameScreen() {
 
   return (
     <div
-      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col px-3 pb-3"
+      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col px-3 pb-3 lg:pb-8"
       style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
       onPointerDownCapture={onPointerDownCapture}
     >
@@ -308,42 +308,58 @@ export function GameScreen() {
         style={feltBackgroundStyle}
       />
 
-      <header className="mb-3 flex shrink-0 items-center justify-between pt-3">
+      <header className="mb-3 flex shrink-0 items-center justify-between pt-3 lg:mb-4 lg:pt-4">
         <Link
           to="/"
           data-ui-control="true"
-          className="inline-flex h-10 items-center gap-2 rounded-2xl bg-black/25 px-3 text-xs font-semibold text-white/85 active:bg-black/35"
-          aria-label="Retour à l’accueil"
-          title="Retour à l’accueil"
+          className="inline-flex h-10 items-center gap-2 rounded-2xl bg-black/25 px-3 text-xs font-semibold text-white/85 active:bg-black/35 lg:h-12 lg:px-4 lg:text-sm"
+          aria-label="Retour à l'accueil"
+          title="Retour à l'accueil"
         >
           <span aria-hidden="true">←</span>
           <span>Accueil</span>
         </Link>
 
         <div className="text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60 lg:text-xs">
             {getTitleForLevel(currentLevel)} • Niv. {currentLevel}
           </p>
-          <p className="text-sm font-semibold text-white/90">Partie #{level.seed}</p>
+          <p className="text-sm font-semibold text-white/90 lg:text-base">Partie #{level.seed}</p>
         </div>
 
         <button
           type="button"
           data-ui-control="true"
           onClick={() => setHelpOpen(true)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/25 text-white/85 active:bg-black/35"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/25 text-white/85 active:bg-black/35 lg:h-12 lg:w-12"
           aria-label="Aide"
           title="Aide"
         >
-          <HelpCircle size={18} aria-hidden="true" />
+          <HelpCircle size={18} className="lg:h-5 lg:w-5" aria-hidden="true" />
         </button>
       </header>
 
-      {/* Flex spacer to push game content to bottom */}
-      <div className="min-h-0 flex-1" />
-
       <LayoutGroup>
-        <div className="mb-3 shrink-0 space-y-3">
+        {/* Dock at top on desktop, bottom on mobile */}
+        <div className="order-3 lg:order-1 lg:mb-4">
+          <ThumbDock
+            level={level}
+            selected={selected}
+            onSelectSource={onSelectSource}
+            onDraw={handleDraw}
+            onUndo={handleUndo}
+            onDropCard={onDropCard}
+            errorCardId={lastError?.cardId}
+            errorAt={lastError?.at}
+            undoIcon={<Undo2 size={18} className="lg:h-5 lg:w-5" aria-hidden="true" />}
+            toast={toast}
+          />
+        </div>
+
+        {/* Flex spacer to push game content to bottom on mobile, stays at top on desktop */}
+        <div className="order-1 min-h-0 flex-1 lg:order-2 lg:hidden" />
+
+        <div className="order-2 mb-3 shrink-0 space-y-3 lg:order-3 lg:mb-0 lg:space-y-4">
           <SlotsRow
             level={level}
             selected={selected}
@@ -365,19 +381,6 @@ export function GameScreen() {
             errorAt={lastError?.at}
           />
         </div>
-
-        <ThumbDock
-          level={level}
-          selected={selected}
-          onSelectSource={onSelectSource}
-          onDraw={handleDraw}
-          onUndo={handleUndo}
-          onDropCard={onDropCard}
-          errorCardId={lastError?.cardId}
-          errorAt={lastError?.at}
-          undoIcon={<Undo2 size={18} aria-hidden="true" />}
-          toast={toast}
-        />
       </LayoutGroup>
 
       <AnimatePresence>{helpOpen ? <HelpModal key="help" onClose={() => setHelpOpen(false)} /> : null}</AnimatePresence>
