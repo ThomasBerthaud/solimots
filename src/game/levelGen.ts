@@ -190,7 +190,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Security: Ensure the majority of cards (>50%) remain in the stock at startup.
   // This prevents scenarios where too many cards are dealt to the tableau initially.
   const totalCards = cardsShuffled.length
-  const maxTableauCards = Math.floor(totalCards / 2)
+  const maxTableauCards = Math.floor((totalCards - 1) / 2)
   if (tableauDealCount > maxTableauCards) {
     tableauDealCount = maxTableauCards
   }
