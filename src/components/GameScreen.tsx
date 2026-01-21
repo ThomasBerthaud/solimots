@@ -241,8 +241,10 @@ export function GameScreen() {
       if (source.type === 'tableau') {
         target = { type: 'tableau', column: source.column }
       } else {
-        // For waste cards, we can't move to waste, so don't attempt the move
-        // Just proceed with normal selection logic
+        // Clicking on a waste card as a destination is not a valid move target
+        // (waste cards can only be sources, not destinations)
+        // Note: Cards in slots use different click handlers and don't call onSelectSource,
+        // so we don't need to handle slot targets here
         target = null
       }
 
