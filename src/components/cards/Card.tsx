@@ -157,7 +157,7 @@ export function Card({
             ) : (
               <span
                 lang="fr"
-                className="whitespace-normal break-words text-center font-extrabold leading-snug tracking-tight [font-size:clamp(9px,3.2vw,13px)] [hyphens:auto]"
+                className="whitespace-normal break-words text-center font-extrabold leading-snug tracking-tight [font-size:clamp(10px,3.5vw,14px)] [hyphens:auto]"
               >
                 {card.word}
               </span>
@@ -165,7 +165,7 @@ export function Card({
           </div>
 
           {!card.imageUrl && (
-            <div className="mt-2 flex items-end text-[9px] font-semibold text-black/40">
+            <div className="mt-2 flex items-end text-[10px] font-semibold text-black/40">
               <span className="truncate">{isCategory ? 'Catégorie' : 'Mot'}</span>
             </div>
           )}
