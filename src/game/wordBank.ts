@@ -70,7 +70,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_sports_racket',
     label: 'Sports de raquette',
-    words: ['Tennis', 'Badminton', 'Squash', 'Padel', 'Ping-pong', 'Racquetball', 'Pelote', 'Speedball'],
+    words: ['Tennis', 'Badminton', 'Squash', 'Padel', 'Ping-pong', 'Racquetball', 'Pelote', 'Frontenis'],
   },
   {
     id: 'cat_sports_martial',
