@@ -57,8 +57,18 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Randomly choose between 3, 4, or 5 columns if not specified
   const tableauColumns = options.tableauColumns ?? randomIntInclusive(3, 5, rnd)
 
-  // Generate deal pattern based on column count: [4, 5, 6, ...] up to the number of columns
-  const tableauDealPattern = options.tableauDealPattern ?? Array.from({ length: tableauColumns }, (_, i) => 4 + i)
+  // Generate an increasing sequence pattern with a random starting number.
+  // Starting number ranges from 3 to 5, ensuring reasonable card distribution.
+  // Examples: [3,4,5], [4,5,6], [5,6,7] for 3 columns
+  let tableauDealPattern: number[]
+  if (options.tableauDealPattern) {
+    tableauDealPattern = options.tableauDealPattern
+  } else {
+    // Randomly choose a starting number between 3 and 5
+    // This ensures all patterns remain within 3-9 cards per column range
+    const startNum = randomIntInclusive(3, 5, rnd)
+    tableauDealPattern = Array.from({ length: tableauColumns }, (_, i) => startNum + i)
+  }
 
   // Validate both category banks
   validateWordBank(WORD_BANK)
@@ -75,7 +85,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // If WORD_BANK has 10 categories, we can have at most 10 / 0.67 ≈ 14 total categories
   const maxByWordBankSize = Math.floor(WORD_BANK.length / 0.67)
   const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, totalPlayableCategories, maxByWordBankSize)
-  
+
   let categoryCount: number
   if (options.categoryCount != null) {
     categoryCount = Math.floor(options.categoryCount)
@@ -94,7 +104,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Ensure we have enough categories in each bank
   const wordCount = Math.min(minWordCategories, WORD_BANK.length)
   const availableImageCount = Math.min(maxImageCategories, IMAGE_CATEGORIES.length)
-  
+
   // Randomly decide how many image categories to include (0 to availableImageCount)
   const imageCount = Math.floor(rnd() * (availableImageCount + 1))
 
@@ -179,16 +189,31 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // Ensure we have enough cards for both tableau and stock (minimum 1 card in stock)
   // If not enough cards, reduce the tableau deal count to leave at least 1 card for stock
-  if (cardsShuffled.length < tableauDealCount + 1) {
-    tableauDealCount = Math.max(0, cardsShuffled.length - 1)
+  const maxTableauCards = Math.max(0, cardsShuffled.length - 1)
+  if (tableauDealCount > maxTableauCards) {
+    tableauDealCount = maxTableauCards
+  }
+
+  // Adjust the deal pattern if necessary to fit within available cards while maintaining
+  // an increasing sequence. For N columns starting at S: total = N*S + N*(N-1)/2
+  let adjustedDealPattern = dealPattern
+  if (dealPattern && dealPattern.reduce((acc, n) => acc + n, 0) > tableauDealCount) {
+    // Calculate the maximum starting number that fits within tableauDealCount
+    // For N columns: N*S + (0+1+2+...+(N-1)) = N*S + N*(N-1)/2 <= tableauDealCount
+    const sumOffset = (tableauColumns * (tableauColumns - 1)) / 2
+    const maxStartNum = Math.floor((tableauDealCount - sumOffset) / tableauColumns)
+    // Use the calculated start number, but prefer 3-5 range when possible
+    const newStartNum = maxStartNum >= 3 ? Math.min(5, maxStartNum) : Math.max(2, maxStartNum)
+    adjustedDealPattern = Array.from({ length: tableauColumns }, (_, i) => newStartNum + i)
+    tableauDealCount = adjustedDealPattern.reduce((acc, n) => acc + n, 0)
   }
 
   const dealt = cardsShuffled.slice(0, tableauDealCount)
 
-  if (dealPattern) {
+  if (adjustedDealPattern) {
     let k = 0
     for (let col = 0; col < tableauColumns; col++) {
-      const count = dealPattern[col] ?? 0
+      const count = adjustedDealPattern[col] ?? 0
       for (let i = 0; i < count; i++) {
         const c = dealt[k++]
         if (!c) break
