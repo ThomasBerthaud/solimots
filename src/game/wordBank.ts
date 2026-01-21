@@ -128,7 +128,7 @@ export const WORD_BANK: WordBankCategory[] = [
     words: [
       'Identifiant',
       'Chiffrement',
-      'Cryptage',
+      'Protection',
       'Antivirus',
       'Phishing',
       'Sauvegarde',
@@ -144,7 +144,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_data',
     label: 'Données',
-    words: ['Tableau', 'Index', 'Requête', 'Archive', 'JSON', 'API', 'Cache', 'Pipeline'],
+    words: ['Tableau', 'Requête', 'Index', 'Archive', 'JSON', 'API', 'Cache', 'Pipeline'],
   },
   {
     id: 'cat_art_music',
