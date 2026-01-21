@@ -2,7 +2,7 @@ import { GraduationCap, Play, RotateCcw, ScrollText, Settings, TrendingUp } from
 import { Link, useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
 import { useGameStore } from '../store/gameStore'
-import { getTitleForLevel, POINTS_PER_LEVEL, useProgressionStore } from '../store/progressionStore'
+import { getTitleForLevel, getPointsForLevel, useProgressionStore } from '../store/progressionStore'
 
 export function Home() {
   const navigate = useNavigate()
@@ -16,8 +16,9 @@ export function Home() {
 
   const hasSavedGame = level !== null && status === 'inProgress'
 
-  const progressPercentage = (pointsInCurrentLevel / POINTS_PER_LEVEL) * 100
-  const pointsToNextLevel = POINTS_PER_LEVEL - pointsInCurrentLevel
+  const pointsForNextLevel = getPointsForLevel(currentLevel + 1)
+  const progressPercentage = (pointsInCurrentLevel / pointsForNextLevel) * 100
+  const pointsToNextLevel = pointsForNextLevel - pointsInCurrentLevel
   const currentTitle = getTitleForLevel(currentLevel)
 
   const handlePlay = () => {
@@ -116,7 +117,7 @@ export function Home() {
             />
           </div>
           <div className="mt-2 text-center text-xs text-white/60">
-            {pointsInCurrentLevel} / {POINTS_PER_LEVEL} points
+            {pointsInCurrentLevel} / {pointsForNextLevel} points
           </div>
         </div>
       </section>
