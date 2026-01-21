@@ -116,6 +116,7 @@ export function SlotCell({
                 card={categoryCard}
                 draggable={false}
                 selected={selected?.cardIds.includes(categoryCard.id) ?? false}
+                onClick={() => tryMoveTo({ type: 'slot', slotIndex })}
                 className="h-full w-full"
               />
             </div>
@@ -135,6 +136,7 @@ export function SlotCell({
                     card={topWordCard}
                     draggable={false}
                     selected={selected?.cardIds.includes(topWordCard.id) ?? false}
+                    onClick={() => tryMoveTo({ type: 'slot', slotIndex })}
                     className="h-[calc(var(--cardH)-16px)] w-[calc(var(--cardW)-16px)]"
                   />
                 </motion.div>
