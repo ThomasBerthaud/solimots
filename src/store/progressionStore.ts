@@ -24,7 +24,8 @@ export const TITLES = [
   { minLevel: 90, name: 'Divin' },
 ]
 
-// Calculate points needed to reach a specific level from level 1
+// Calculate XP cost to level up from (level-1) to (level)
+// For example: getPointsForLevel(2) returns XP needed to go from level 1 to level 2
 export function getPointsForLevel(level: number): number {
   if (level <= 1) return 0
   
