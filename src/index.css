@@ -25,6 +25,20 @@ body {
   height: 100%;
 }
 
+/* Prevent scrolling in PWA/standalone mode (app mode) */
+@media (display-mode: standalone) {
+  html,
+  body {
+    overflow: hidden;
+  }
+}
+
+/* iOS standalone mode detection (when added to home screen) */
+html.ios-standalone,
+html.ios-standalone body {
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   background: radial-gradient(1200px 600px at 30% 0%, var(--theme-bg-from), var(--theme-bg-to));
