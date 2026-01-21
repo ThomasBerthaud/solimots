@@ -57,8 +57,50 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Randomly choose between 3, 4, or 5 columns if not specified
   const tableauColumns = options.tableauColumns ?? randomIntInclusive(3, 5, rnd)
 
-  // Generate deal pattern based on column count: [4, 5, 6, ...] up to the number of columns
-  const tableauDealPattern = options.tableauDealPattern ?? Array.from({ length: tableauColumns }, (_, i) => 4 + i)
+  // Valid deal patterns for each column count (each pattern has 4-6 cards per column)
+  const validPatterns: Record<number, number[][]> = {
+    3: [
+      [4, 5, 6],
+      [4, 6, 5],
+      [5, 4, 6],
+      [5, 5, 5],
+      [6, 4, 5],
+      [6, 5, 4],
+    ],
+    4: [
+      [4, 5, 6, 5],
+      [4, 5, 5, 6],
+      [5, 4, 6, 5],
+      [5, 5, 5, 5],
+      [5, 6, 4, 5],
+      [6, 4, 5, 5],
+      [6, 5, 4, 5],
+    ],
+    5: [
+      [4, 5, 6, 5, 4],
+      [4, 5, 5, 5, 6],
+      [5, 4, 6, 5, 5],
+      [5, 5, 4, 6, 5],
+      [5, 5, 5, 5, 5],
+      [6, 4, 5, 5, 5],
+      [6, 5, 4, 5, 5],
+    ],
+  }
+
+  // Randomly select a pattern from valid configurations for the chosen column count
+  let tableauDealPattern: number[]
+  if (options.tableauDealPattern) {
+    tableauDealPattern = options.tableauDealPattern
+  } else {
+    const patterns = validPatterns[tableauColumns] ?? []
+    if (patterns.length > 0) {
+      const patternIndex = Math.floor(rnd() * patterns.length)
+      tableauDealPattern = patterns[patternIndex]
+    } else {
+      // Fallback to original pattern if no valid patterns are defined
+      tableauDealPattern = Array.from({ length: tableauColumns }, (_, i) => 4 + i)
+    }
+  }
 
   // Validate both category banks
   validateWordBank(WORD_BANK)
@@ -75,7 +117,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // If WORD_BANK has 10 categories, we can have at most 10 / 0.67 ≈ 14 total categories
   const maxByWordBankSize = Math.floor(WORD_BANK.length / 0.67)
   const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, totalPlayableCategories, maxByWordBankSize)
-  
+
   let categoryCount: number
   if (options.categoryCount != null) {
     categoryCount = Math.floor(options.categoryCount)
@@ -94,7 +136,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Ensure we have enough categories in each bank
   const wordCount = Math.min(minWordCategories, WORD_BANK.length)
   const availableImageCount = Math.min(maxImageCategories, IMAGE_CATEGORIES.length)
-  
+
   // Randomly decide how many image categories to include (0 to availableImageCount)
   const imageCount = Math.floor(rnd() * (availableImageCount + 1))
 
