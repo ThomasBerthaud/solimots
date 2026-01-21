@@ -232,6 +232,36 @@ export function GameScreen() {
   }
 
   const onSelectSource = (source: MoveSource, cardId: CardId) => {
+    // If a card is already selected, try to move it to the clicked card's location instead of selecting the new card
+    if (selected) {
+      // Determine the target based on where the clicked card is located
+      let target: MoveTarget | null = null
+
+      // Check if the clicked card is in a tableau column
+      if (source.type === 'tableau') {
+        target = { type: 'tableau', column: source.column }
+      } else {
+        // For waste cards, we can't move to waste, so don't attempt the move
+        // Just proceed with normal selection logic
+        target = null
+      }
+
+      // If we found a valid target and it's different from the current selection source, try the move
+      if (target) {
+        const isSameLocation =
+          selected.source.type === 'tableau' &&
+          target.type === 'tableau' &&
+          selected.source.column === target.column
+
+        if (!isSameLocation) {
+          // Attempt the move
+          tryMoveTo(target)
+          return // Don't change selection - tryMoveTo handles it
+        }
+      }
+    }
+
+    // Normal selection logic (no card selected yet, or clicked on same location)
     setSelected((prev) => {
       // Toggle off if same exact selection is clicked again.
       if (prev?.source.type === source.type) {
