@@ -45,9 +45,11 @@ type DraggableCardStackProps = {
   children: React.ReactNode
   onDrop: (point: Point, draggedEl: HTMLElement | null) => boolean
   reduceMotion: boolean
+  onDragStart?: () => void
+  onDragEnd?: () => void
 }
 
-function DraggableCardStack({ children, onDrop, reduceMotion }: DraggableCardStackProps) {
+function DraggableCardStack({ children, onDrop, reduceMotion, onDragStart: onDragStartProp, onDragEnd: onDragEndProp }: DraggableCardStackProps) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const x = useMotionValue(0)
@@ -82,10 +84,14 @@ function DraggableCardStack({ children, onDrop, reduceMotion }: DraggableCardSta
       drag
       dragMomentum={false}
       dragElastic={0.15}
-      onDragStart={() => setIsDragging(true)}
+      onDragStart={() => {
+        setIsDragging(true)
+        onDragStartProp?.()
+      }}
       whileDrag={reduceMotion ? { zIndex: 9999 } : { scale: 1.03, rotate: -0.6, zIndex: 9999 }}
       onDragEnd={(event, info) => {
         setIsDragging(false)
+        onDragEndProp?.()
         const point = getClientPoint(event, info.point)
         const ok = onDrop(point, ref.current)
         if (ok) {
@@ -118,6 +124,7 @@ export function TableauCell({
   const visible = ids.slice(Math.max(0, ids.length - 10))
   const topId = ids.at(-1)
   const hint = Boolean(selectedCard)
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
 
   // Helper to check if a card can be dragged (all cards from this one to the end must be face-up)
   const canDragCard = (cardId: CardId): boolean => {
@@ -153,18 +160,27 @@ export function TableauCell({
             if (isDraggable) {
               // Get all cards from this position to the end that should move together
               const cardsAbove = visible.slice(idx)
+              
+              // Hide this stack if a lower card is being dragged (to avoid duplicates)
+              const shouldHide = draggingIndex !== null && idx > draggingIndex
 
               return (
                 <div 
                   key={id} 
                   className="absolute left-0 right-0" 
-                  style={{ top, zIndex: 100 + idx }}
+                  style={{ 
+                    top, 
+                    zIndex: 100 + idx,
+                    visibility: shouldHide ? 'hidden' : 'visible'
+                  }}
                 >
                   <DraggableCardStack
                     onDrop={(point, draggedEl) =>
                       onDropCard({ type: 'tableau', column: columnIndex }, id, { x: point.x, y: point.y }, draggedEl)
                     }
                     reduceMotion={reduceMotion ?? false}
+                    onDragStart={() => setDraggingIndex(idx)}
+                    onDragEnd={() => setDraggingIndex(null)}
                   >
                     {cardsAbove.map((stackId, stackIdx) => {
                       const stackCard = level.cardsById[stackId]
