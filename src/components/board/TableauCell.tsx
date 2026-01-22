@@ -78,7 +78,7 @@ function DraggableCardStack({ children, onDrop, reduceMotion }: DraggableCardSta
   return (
     <motion.div
       ref={ref}
-      className="relative"
+      className="relative pointer-events-auto"
       drag
       dragMomentum={false}
       dragElastic={0.15}
@@ -143,83 +143,86 @@ export function TableauCell({
     >
       <div className="relative">
         {visible.length ? (
-          (() => {
-            const rendered = new Set<CardId>()
-            return visible.map((id, idx) => {
-              // Skip if already rendered as part of a draggable stack
-              if (rendered.has(id)) return null
+          visible.map((id, idx) => {
+            const card = level.cardsById[id]
+            const top = `calc(var(--stackStep) * ${idx})`
+            const isDraggable = card?.faceUp && canDragCard(id)
 
-              const card = level.cardsById[id]
-              const top = `calc(var(--stackStep) * ${idx})`
-              const isDraggable = card?.faceUp && canDragCard(id)
+            // For draggable cards, render as a stack with all cards above
+            // For non-draggable cards (face-down), render individually
+            if (isDraggable) {
+              // Get all cards from this position to the end that should move together
+              const cardsAbove = visible.slice(idx)
 
-              // For draggable cards, render as a stack with all cards above
-              // For non-draggable cards (face-down), render individually
-              if (isDraggable) {
-                // Get all cards from this position to the end that should move together
-                const cardsAbove = visible.slice(idx)
+              return (
+                <div 
+                  key={id} 
+                  className="absolute left-0 right-0 pointer-events-none" 
+                  style={{ top, zIndex: 9000 + idx }}
+                >
+                  <DraggableCardStack
+                    onDrop={(point, draggedEl) =>
+                      onDropCard({ type: 'tableau', column: columnIndex }, id, { x: point.x, y: point.y }, draggedEl)
+                    }
+                    reduceMotion={reduceMotion ?? false}
+                  >
+                    {cardsAbove.map((stackId, stackIdx) => {
+                      const stackCard = level.cardsById[stackId]
+                      const stackTop = `calc(var(--stackStep) * ${stackIdx})`
+                      // Only the first card (at this draggable position) should be interactive
+                      const isInteractive = stackIdx === 0
 
-                // Mark all cards in this stack as rendered
-                cardsAbove.forEach((stackId) => rendered.add(stackId))
-
-                return (
-                  <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx + 1 }}>
-                    <DraggableCardStack
-                      onDrop={(point, draggedEl) =>
-                        onDropCard({ type: 'tableau', column: columnIndex }, id, { x: point.x, y: point.y }, draggedEl)
-                      }
-                      reduceMotion={reduceMotion ?? false}
-                    >
-                      {cardsAbove.map((stackId, stackIdx) => {
-                        const stackCard = level.cardsById[stackId]
-                        const stackTop = `calc(var(--stackStep) * ${stackIdx})`
-
-                        return (
-                          <div key={stackId} className="absolute left-0 right-0" style={{ top: stackTop }}>
-                            {stackCard?.faceUp ? (
-                              <Card
-                                card={stackCard}
-                                draggable={false}
-                                onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, stackId)}
-                                selected={selected?.cardIds.includes(stackId) ?? false}
-                                feedback={errorCardId === stackId ? 'error' : undefined}
-                                feedbackKey={errorCardId === stackId ? errorAt : undefined}
-                                className="h-[var(--cardH)] w-[var(--cardW)]"
-                              />
-                            ) : (
-                              <CardBack className="h-[var(--cardH)] w-[var(--cardW)]" />
-                            )}
-                          </div>
-                        )
-                      })}
-                      {/* Reserve height for this stack */}
-                      <div style={{ height: `calc(var(--cardH) + var(--stackStep) * ${cardsAbove.length - 1})` }} />
-                    </DraggableCardStack>
-                  </div>
-                )
-              } else {
-                // Render non-draggable card individually (face-down or can't be dragged)
-                rendered.add(id)
-                return (
-                  <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx + 1 }}>
-                    {card?.faceUp ? (
-                      <Card
-                        card={card}
-                        draggable={false}
-                        onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, id)}
-                        selected={selected?.cardIds.includes(id) ?? false}
-                        feedback={errorCardId === id ? 'error' : undefined}
-                        feedbackKey={errorCardId === id ? errorAt : undefined}
-                        className="h-[var(--cardH)] w-[var(--cardW)]"
-                      />
-                    ) : (
-                      <CardBack className="h-[var(--cardH)] w-[var(--cardW)]" />
-                    )}
-                  </div>
-                )
-              }
-            })
-          })()
+                      return (
+                        <div 
+                          key={stackId} 
+                          className="absolute left-0 right-0" 
+                          style={{ 
+                            top: stackTop,
+                            pointerEvents: isInteractive ? 'auto' : 'none'
+                          }}
+                        >
+                          {stackCard?.faceUp ? (
+                            <Card
+                              card={stackCard}
+                              draggable={false}
+                              onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, stackId)}
+                              selected={selected?.cardIds.includes(stackId) ?? false}
+                              feedback={errorCardId === stackId ? 'error' : undefined}
+                              feedbackKey={errorCardId === stackId ? errorAt : undefined}
+                              className="h-[var(--cardH)] w-[var(--cardW)]"
+                            />
+                          ) : (
+                            <CardBack className="h-[var(--cardH)] w-[var(--cardW)]" />
+                          )}
+                        </div>
+                      )
+                    })}
+                    {/* Reserve height for this stack */}
+                    <div style={{ height: `calc(var(--cardH) + var(--stackStep) * ${cardsAbove.length - 1})` }} />
+                  </DraggableCardStack>
+                </div>
+              )
+            } else {
+              // Render non-draggable card individually (face-down or can't be dragged)
+              return (
+                <div key={id} className="absolute left-0 right-0" style={{ top, zIndex: idx + 1 }}>
+                  {card?.faceUp ? (
+                    <Card
+                      card={card}
+                      draggable={false}
+                      onClick={() => onSelectSource({ type: 'tableau', column: columnIndex }, id)}
+                      selected={selected?.cardIds.includes(id) ?? false}
+                      feedback={errorCardId === id ? 'error' : undefined}
+                      feedbackKey={errorCardId === id ? errorAt : undefined}
+                      className="h-[var(--cardH)] w-[var(--cardW)]"
+                    />
+                  ) : (
+                    <CardBack className="h-[var(--cardH)] w-[var(--cardW)]" />
+                  )}
+                </div>
+              )
+            }
+          })
         ) : (
           <div className="h-[var(--cardH)] w-[var(--cardW)] rounded-[18px] border border-dashed border-white/15 bg-black/10" />
         )}
