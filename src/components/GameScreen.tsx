@@ -398,7 +398,6 @@ export function GameScreen() {
           <SlotsRow
             level={level}
             selected={selected}
-            selectedCard={selectedCard}
             tryMoveTo={tryMoveTo}
             placedSlotIndex={placedSlotIndex}
             completedSlotIndex={completedSlotIndex}

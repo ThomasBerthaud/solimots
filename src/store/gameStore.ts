@@ -320,16 +320,7 @@ export const useGameStore = create<GameStore>()(
               }
 
               const categoryCardId = cardIds[categoryIndex]
-              const categoryCard = next.cardsById[categoryCardId]
-              if (!categoryCard || categoryCard.kind !== 'category') {
-                pushBackMany(next, cardIds, from)
-                ok = false
-                return {
-                  ...state,
-                  lastError: { message: 'Déplacement invalide', cardId: categoryCardId, at: now },
-                  lastAction: null,
-                }
-              }
+              const categoryCard = next.cardsById[categoryCardId]!
 
               // All other cards must be words matching this category
               const required = next.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0

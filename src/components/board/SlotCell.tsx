@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Crown } from 'lucide-react'
-import type { CardId, Card as GameCard, LevelState, SlotState } from '../../game/types'
+import type { CardId, LevelState, SlotState } from '../../game/types'
 import type { MoveSource, MoveTarget } from '../../store/gameStore'
 import { Card } from '../cards/Card'
 
@@ -11,7 +11,6 @@ export type SlotCellProps = {
   slotIndex: number
   slot: SlotState
   selected: Selected
-  selectedCard: GameCard | null
   tryMoveTo: (target: MoveTarget) => void
   placedAt?: number
   completedAt?: number
@@ -40,19 +39,18 @@ export function SlotCell({
   const hint =
     selected && !isLocked
       ? (() => {
-          // Check if any card in the selection is a category card
-          const hasCategoryCard = selected.cardIds.some((id) => level.cardsById[id]?.kind === 'category')
+          // Find category card in the selection (if any)
           const categoryInSelection = selected.cardIds
             .map((id) => level.cardsById[id])
             .find((card) => card?.kind === 'category')
 
-          if (hasCategoryCard && slot.categoryCardId == null) {
+          if (categoryInSelection && slot.categoryCardId == null) {
             // Can drop on empty slot if selection contains a category card
             return true
           }
 
           // Check if all selected cards are words matching the slot's category
-          if (slot.categoryCardId != null && categoryInSelection == null) {
+          if (slot.categoryCardId != null && !categoryInSelection) {
             const c = level.cardsById[slot.categoryCardId]
             if (!c || c.kind !== 'category') return false
             // All selected cards must be words matching this category
