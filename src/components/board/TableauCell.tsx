@@ -157,8 +157,8 @@ export function TableauCell({
               return (
                 <div 
                   key={id} 
-                  className="absolute left-0 right-0 pointer-events-none" 
-                  style={{ top, zIndex: 9000 + idx }}
+                  className="absolute left-0 right-0" 
+                  style={{ top, zIndex: 100 + idx }}
                 >
                   <DraggableCardStack
                     onDrop={(point, draggedEl) =>
