@@ -187,9 +187,10 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
   let tableauDealCount = dealPattern ? dealPattern.reduce((acc, n) => acc + n, 0) : tableauColumns * 3
 
-  // Ensure we have enough cards for both tableau and stock (minimum 1 card in stock)
-  // If not enough cards, reduce the tableau deal count to leave at least 1 card for stock
-  const maxTableauCards = Math.max(0, cardsShuffled.length - 1)
+  // Security: Ensure the majority of cards (>50%) remain in the stock at startup.
+  // This prevents scenarios where too many cards are dealt to the tableau initially.
+  const totalCards = cardsShuffled.length
+  const maxTableauCards = Math.floor((totalCards - 1) / 2)
   if (tableauDealCount > maxTableauCards) {
     tableauDealCount = maxTableauCards
   }
