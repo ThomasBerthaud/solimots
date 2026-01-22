@@ -283,7 +283,7 @@ export const useGameStore = create<GameStore>()(
               return { ...state, lastError: { message: 'Déplacement invalide', at: now }, lastAction: null }
             }
             const bottomId = cardIds[0]
-            if (!canPlaceOnTableau(next, bottomId, dest.at(-1) ?? null)) {
+            if (!canPlaceOnTableau(next, bottomId, dest.at(-1) ?? null, dest)) {
               pushBackMany(next, cardIds, from)
               ok = false
               return {
@@ -568,7 +568,7 @@ function revealTopAfterMove(level: LevelState, from: MoveSource): void {
   if (top) top.faceUp = true
 }
 
-function canPlaceOnTableau(level: LevelState, movingId: CardId, destTopId: CardId | null): boolean {
+function canPlaceOnTableau(level: LevelState, movingId: CardId, destTopId: CardId | null, destColumn?: CardId[]): boolean {
   const card = level.cardsById[movingId]
   if (!card) return false
 
@@ -584,6 +584,14 @@ function canPlaceOnTableau(level: LevelState, movingId: CardId, destTopId: CardI
 
   // Word card: can be placed if the top card is a category or word of the same category.
   if (top.kind !== 'category' && top.kind !== 'word') return false
+  
+  // New rule: cannot place a word card on a category card when the category card is in a pile
+  // (i.e., when the category card has cards below it)
+  if (card.kind === 'word' && top.kind === 'category' && destColumn && destColumn.length > 1) {
+    // The category card is in a pile (not at the bottom), so we cannot place a word on it
+    return false
+  }
+  
   return top.categoryId === card.categoryId
 }
 
@@ -598,7 +606,7 @@ function pushTo(
     if (!column) return { ok: false, action: null }
 
     const topId = column.at(-1)
-    if (!canPlaceOnTableau(level, cardId, topId ?? null)) return { ok: false, action: null }
+    if (!canPlaceOnTableau(level, cardId, topId ?? null, column)) return { ok: false, action: null }
 
     column.push(cardId)
     return { ok: true, action: null }
