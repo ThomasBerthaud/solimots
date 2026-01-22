@@ -588,7 +588,7 @@ function canPlaceOnTableau(level: LevelState, movingId: CardId, destTopId: CardI
   // New rule: cannot place a word card on a category card when the category card is in a pile
   // (i.e., when the category card has cards below it)
   if (card.kind === 'word' && top.kind === 'category' && destColumn && destColumn.length > 1) {
-    // The category card is in a pile (not at the bottom), so we cannot place a word on it
+    // The category card has cards below it (is at the top of a pile), so we cannot place a word on it
     return false
   }
   
