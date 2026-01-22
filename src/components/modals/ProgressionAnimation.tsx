@@ -91,7 +91,7 @@ export function ProgressionAnimation({
           </motion.div>
         )}
 
-        {stage === 'levelup' && levelsGained > 0 && (
+        {(stage === 'levelup' || stage === 'done') && levelsGained > 0 && (
           <motion.div
             key="levelup"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -101,7 +101,7 @@ export function ProgressionAnimation({
           >
             <motion.div
               className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500"
-              animate={reduceMotion ? {} : { rotate: [0, 5, -5, 0], scale: [1, 1.1, 1] }}
+              animate={reduceMotion || stage === 'done' ? {} : { rotate: [0, 5, -5, 0], scale: [1, 1.1, 1] }}
               transition={{ duration: 0.5, repeat: 2 }}
             >
               <Award size={40} className="text-white" />
@@ -128,6 +128,28 @@ export function ProgressionAnimation({
                 <p className="mt-1 text-xs text-white/60">Nouveau titre débloqué !</p>
               </motion.div>
             )}
+          </motion.div>
+        )}
+
+        {stage === 'done' && levelsGained === 0 && (
+          <motion.div
+            key="final-points"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-3"
+          >
+            <div className="flex items-center justify-center gap-2 text-amber-400">
+              <TrendingUp size={24} />
+              <span className="text-2xl font-bold">+{pointsEarned} points</span>
+            </div>
+            <p className="text-center text-sm text-white/70">
+              {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
+            </p>
+            <div className="mt-4 text-center">
+              <div className="text-3xl font-bold text-white">{displayPoints.toLocaleString()}</div>
+              <div className="text-xs text-white/50">Points totaux</div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
