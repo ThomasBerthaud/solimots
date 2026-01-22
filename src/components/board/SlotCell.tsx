@@ -23,7 +23,6 @@ export function SlotCell({
   slotIndex,
   slot,
   selected,
-  selectedCard,
   tryMoveTo,
   placedAt,
   completedAt,
@@ -39,14 +38,32 @@ export function SlotCell({
   const progress = categoryCard ? `${count}/${required}` : ''
 
   const hint =
-    selectedCard && !isLocked
-      ? selectedCard.kind === 'category'
-        ? slot.categoryCardId == null
-        : slot.categoryCardId != null &&
-          (() => {
+    selected && !isLocked
+      ? (() => {
+          // Check if any card in the selection is a category card
+          const hasCategoryCard = selected.cardIds.some((id) => level.cardsById[id]?.kind === 'category')
+          const categoryInSelection = selected.cardIds
+            .map((id) => level.cardsById[id])
+            .find((card) => card?.kind === 'category')
+
+          if (hasCategoryCard && slot.categoryCardId == null) {
+            // Can drop on empty slot if selection contains a category card
+            return true
+          }
+
+          // Check if all selected cards are words matching the slot's category
+          if (slot.categoryCardId != null && categoryInSelection == null) {
             const c = level.cardsById[slot.categoryCardId]
-            return c?.kind === 'category' && c.categoryId === selectedCard.categoryId && slot.pile.length < required
-          })()
+            if (!c || c.kind !== 'category') return false
+            // All selected cards must be words matching this category
+            return selected.cardIds.every((id) => {
+              const card = level.cardsById[id]
+              return card && card.kind === 'word' && card.categoryId === c.categoryId
+            }) && slot.pile.length < required
+          }
+
+          return false
+        })()
       : false
 
   return (

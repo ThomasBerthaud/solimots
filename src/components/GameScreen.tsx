@@ -42,30 +42,35 @@ function getCardsToMove(from: MoveSource, draggedCardId: CardId, level: LevelSta
   return [draggedCardId]
 }
 
-function explainInvalidMove(level: LevelState, cardId: CardId, to: MoveTarget): string | null {
+function explainInvalidMove(level: LevelState, cardIds: CardId[], to: MoveTarget): string | null {
   if (to.type === 'tableau') return null
 
   const slot = level.slots[to.slotIndex]
   if (!slot) return 'Ce slot n’existe pas.'
   if (slot.isCompleting) return 'Ce slot est en cours de validation.'
 
-  const card = level.cardsById[cardId]
-  if (!card) return 'Carte introuvable.'
-
   if (slot.categoryCardId == null) {
-    if (card.kind !== 'category') return 'Pose d’abord une catégorie sur ce slot.'
+    // Check if any card in the group is a category card
+    const hasCategoryCard = cardIds.some((id) => level.cardsById[id]?.kind === 'category')
+    if (!hasCategoryCard) return 'Pose d’abord une catégorie sur ce slot.'
     return null
   }
 
   const categoryCard = level.cardsById[slot.categoryCardId]
   if (!categoryCard || categoryCard.kind !== 'category') return 'Ce slot est invalide.'
 
-  if (card.kind !== 'word') return 'Tu dois poser un mot sur ce slot.'
+  // Check if all cards are words matching the category
+  for (const id of cardIds) {
+    const card = level.cardsById[id]
+    if (!card) return 'Carte introuvable.'
+    if (card.kind !== 'word') return 'Tu dois poser un mot sur ce slot.'
+    if (card.categoryId !== categoryCard.categoryId) {
+      return `Ce mot n'appartient pas à la catégorie "${categoryCard.word}".`
+    }
+  }
+
   const required = level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
   if (slot.pile.length >= required) return 'Cette catégorie est déjà complétée.'
-  if (card.categoryId !== categoryCard.categoryId) {
-    return `Ce mot n’appartient pas à la catégorie “${categoryCard.word}”.`
-  }
 
   return null
 }
@@ -221,8 +226,7 @@ export function GameScreen() {
     if (from.type === 'tableau' && to.type === 'tableau' && from.column === to.column) return false
 
     const cardIdsToMove = getCardsToMove(from, draggedCardId, level!)
-    const bottomId = cardIdsToMove[0]
-    lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, bottomId, to) }
+    lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, cardIdsToMove, to) }
     const ok = cardIdsToMove.length === 1 ? moveCard(from, to) : moveCards(from, to, cardIdsToMove)
     if (ok) {
       setSelected(null)
@@ -290,8 +294,7 @@ export function GameScreen() {
   const tryMoveTo = (target: MoveTarget) => {
     const sel = selected
     if (!sel) return
-    const bottomId = sel.cardIds[0]
-    lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, bottomId, target) }
+    lastAttemptRef.current = { at: Date.now(), message: explainInvalidMove(level!, sel.cardIds, target) }
     const ok = sel.cardIds.length === 1 ? moveCard(sel.source, target) : moveCards(sel.source, target, sel.cardIds)
     if (ok) {
       setSelected(null)
