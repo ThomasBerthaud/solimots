@@ -307,8 +307,9 @@ export const useGameStore = create<GameStore>()(
 
             // Case A: placing a category onto an empty slot.
             if (slot.categoryCardId == null) {
-              const categoryCard = next.cardsById[cardIds[0]]
-              if (!categoryCard || categoryCard.kind !== 'category') {
+              // Find a category card anywhere in the dragged group
+              const categoryIndex = cardIds.findIndex((id) => next.cardsById[id]?.kind === 'category')
+              if (categoryIndex < 0) {
                 pushBackMany(next, cardIds, from)
                 ok = false
                 return {
@@ -318,12 +319,15 @@ export const useGameStore = create<GameStore>()(
                 }
               }
 
-              // If dragging multiple cards, validate that all subsequent cards are matching words
+              const categoryCardId = cardIds[categoryIndex]
+              const categoryCard = next.cardsById[categoryCardId]!
+
+              // All other cards must be words matching this category
               const required = next.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
-              const wordCards = cardIds.slice(1)
+              const wordCards = cardIds.filter((id) => id !== categoryCardId)
 
               if (wordCards.length > 0) {
-                // Check that all subsequent cards are valid words for this category
+                // Check that the slot has capacity for all word cards being placed
                 if (wordCards.length > required) {
                   pushBackMany(next, cardIds, from)
                   ok = false
@@ -334,6 +338,7 @@ export const useGameStore = create<GameStore>()(
                   }
                 }
 
+                // Validate that all other cards are words matching the category
                 for (const id of wordCards) {
                   const wordCard = next.cardsById[id]
                   if (!wordCard || wordCard.kind !== 'word' || wordCard.categoryId !== categoryCard.categoryId) {
@@ -349,7 +354,7 @@ export const useGameStore = create<GameStore>()(
               }
 
               // Place the category card
-              slot.categoryCardId = cardIds[0]
+              slot.categoryCardId = categoryCardId
               categoryCard.faceUp = true
 
               // Place all matching word cards
@@ -371,7 +376,7 @@ export const useGameStore = create<GameStore>()(
                 completedSlotIndex = to.slotIndex
                 completedAt = now
               } else {
-                action = { type: 'slotPlaced', cardId: cardIds[0], slotIndex: to.slotIndex, at: now }
+                action = { type: 'slotPlaced', cardId: categoryCardId, slotIndex: to.slotIndex, at: now }
               }
             } else {
               // Case B: placing words onto an existing category slot.

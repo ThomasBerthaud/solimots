@@ -1,5 +1,5 @@
 import { LayoutGroup } from 'framer-motion'
-import type { Card, CardId, LevelState } from '../../game/types'
+import type { CardId, LevelState } from '../../game/types'
 import type { MoveSource, MoveTarget } from '../../store/gameStore'
 import { SlotCell } from './SlotCell'
 
@@ -8,7 +8,6 @@ type Selected = { source: MoveSource; cardIds: CardId[] } | null
 export type SlotsRowProps = {
   level: LevelState
   selected: Selected
-  selectedCard: Card | null
   tryMoveTo: (target: MoveTarget) => void
   placedSlotIndex?: number
   completedSlotIndex?: number
@@ -19,7 +18,6 @@ export type SlotsRowProps = {
 export function SlotsRow({
   level,
   selected,
-  selectedCard,
   tryMoveTo,
   placedSlotIndex,
   completedSlotIndex,
@@ -38,7 +36,6 @@ export function SlotsRow({
               slotIndex={idx}
               slot={slot}
               selected={selected}
-              selectedCard={selectedCard}
               tryMoveTo={tryMoveTo}
               placedAt={placedSlotIndex === idx ? actionAt : undefined}
               completedAt={completedSlotIndex === idx ? actionAt : undefined}

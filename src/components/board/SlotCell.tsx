@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Crown } from 'lucide-react'
-import type { CardId, Card as GameCard, LevelState, SlotState } from '../../game/types'
+import type { CardId, LevelState, SlotState } from '../../game/types'
 import type { MoveSource, MoveTarget } from '../../store/gameStore'
 import { Card } from '../cards/Card'
 
@@ -11,7 +11,6 @@ export type SlotCellProps = {
   slotIndex: number
   slot: SlotState
   selected: Selected
-  selectedCard: GameCard | null
   tryMoveTo: (target: MoveTarget) => void
   placedAt?: number
   completedAt?: number
@@ -23,7 +22,6 @@ export function SlotCell({
   slotIndex,
   slot,
   selected,
-  selectedCard,
   tryMoveTo,
   placedAt,
   completedAt,
@@ -39,14 +37,32 @@ export function SlotCell({
   const progress = categoryCard ? `${count}/${required}` : ''
 
   const hint =
-    selectedCard && !isLocked
-      ? selectedCard.kind === 'category'
-        ? slot.categoryCardId == null
-        : slot.categoryCardId != null &&
-          (() => {
+    selected && !isLocked
+      ? (() => {
+          // Find category card in the selection (if any)
+          const categoryInSelection = selected.cardIds
+            .map((id) => level.cardsById[id])
+            .find((card) => card?.kind === 'category')
+          const hasCategoryInSelection = Boolean(categoryInSelection)
+
+          if (hasCategoryInSelection && slot.categoryCardId == null) {
+            // Can drop on empty slot if selection contains a category card
+            return true
+          }
+
+          // Check if all selected cards are words matching the slot's category
+          if (slot.categoryCardId != null && !hasCategoryInSelection) {
             const c = level.cardsById[slot.categoryCardId]
-            return c?.kind === 'category' && c.categoryId === selectedCard.categoryId && slot.pile.length < required
-          })()
+            if (!c || c.kind !== 'category') return false
+            // All selected cards must be words matching this category
+            return selected.cardIds.every((id) => {
+              const card = level.cardsById[id]
+              return card && card.kind === 'word' && card.categoryId === c.categoryId
+            }) && slot.pile.length < required
+          }
+
+          return false
+        })()
       : false
 
   return (
