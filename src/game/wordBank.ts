@@ -49,18 +49,18 @@ export const WORD_BANK: WordBankCategory[] = [
   },
   {
     id: 'cat_places',
-    label: 'Lieux',
+    label: 'Lieux de voyage',
     words: ['Hôtel', 'Aéroport', 'Gare', 'Musée', 'Plage', 'Montagne', 'Port', 'Temple'],
   },
   {
     id: 'cat_items',
-    label: 'Objets',
-    words: ['Valise', 'Passeport', 'Carte', 'Billet', 'Appareil photo', 'Guide', 'Chargeur', 'Boussole'],
+    label: 'Objets de voyage',
+    words: ['Valise', 'Passeport', 'Carte', 'Billet', 'Appareil', 'Guide', 'Chargeur', 'Boussole'],
   },
   {
     id: 'cat_actions',
-    label: 'Actions',
-    words: ['Réserver', 'Explorer', 'Marcher', 'Visiter', 'Photographier', 'Nager', 'Goûter', 'Randonner'],
+    label: 'Activités',
+    words: ['Réservation', 'Exploration', 'Marche', 'Visite', 'Photo', 'Baignade', 'Dégustation', 'Randonnée'],
   },
   {
     id: 'cat_sports_ball',
@@ -70,7 +70,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_sports_racket',
     label: 'Sports de raquette',
-    words: ['Tennis', 'Badminton', 'Squash', 'Padel', 'Ping-pong', 'Tennis de table', 'Racquetball', 'Pelote'],
+    words: ['Tennis', 'Badminton', 'Squash', 'Padel', 'Ping-pong', 'Racquetball', 'Pelote', 'Frontenis'],
   },
   {
     id: 'cat_sports_martial',
@@ -115,24 +115,24 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_devices',
     label: 'Appareils',
-    words: ['Smartphone', 'Tablette', 'Ordinateur', 'Casque', 'Montre connectée', 'Console', 'Imprimante', 'Routeur'],
+    words: ['Smartphone', 'Tablette', 'Ordinateur', 'Casque', 'Montre', 'Console', 'Imprimante', 'Routeur'],
   },
   {
     id: 'cat_tech_internet',
     label: 'Internet',
-    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Téléchargement', 'Streaming', 'Cookie', 'Lien'],
+    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Email', 'Streaming', 'Cookie', 'Lien'],
   },
   {
     id: 'cat_tech_security',
     label: 'Sécurité',
     words: [
-      'Mot de passe',
+      'Identifiant',
       'Chiffrement',
-      'Pare-feu',
+      'Protection',
       'Antivirus',
       'Phishing',
       'Sauvegarde',
-      'Authentification',
+      'Certificat',
       'VPN',
     ],
   },
@@ -144,7 +144,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_data',
     label: 'Données',
-    words: ['Base de données', 'Table', 'Requête', 'Index', 'JSON', 'API', 'Cache', 'Pipeline'],
+    words: ['Tableau', 'Requête', 'Index', 'Archive', 'JSON', 'API', 'Cache', 'Pipeline'],
   },
   {
     id: 'cat_art_music',
@@ -164,7 +164,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_art_cinema',
     label: 'Cinéma',
-    words: ['Film', 'Scénario', 'Acteur', 'Réalisateur', 'Caméra', 'Montage', 'Bande-annonce', 'Festival'],
+    words: ['Film', 'Scénario', 'Acteur', 'Réalisateur', 'Caméra', 'Montage', 'Cinéaste', 'Festival'],
   },
   {
     id: 'cat_art_literature',
@@ -176,29 +176,29 @@ export const WORD_BANK: WordBankCategory[] = [
     label: 'Époques',
     words: [
       'Antiquité',
-      'Moyen Âge',
+      'Médiéval',
       'Renaissance',
-      'Siècle des Lumières',
+      'Lumières',
       'Révolution',
       'Empire',
-      'Belle Époque',
-      'XXe siècle',
+      'Modernité',
+      'Contemporain',
     ],
   },
   {
     id: 'cat_history_places',
-    label: 'Lieux historiques',
+    label: 'Monuments',
     words: ['Château', 'Citadelle', 'Forteresse', 'Cathédrale', 'Temple', 'Amphithéâtre', 'Palais', 'Abbaye'],
   },
   {
     id: 'cat_history_figures',
-    label: 'Figures',
+    label: 'Personnages',
     words: ['Roi', 'Reine', 'Empereur', 'Explorateur', 'Philosophe', 'Général', 'Artisan', 'Chroniqueur'],
   },
   {
     id: 'cat_history_inventions',
     label: 'Inventions',
-    words: ['Imprimerie', 'Boussole', 'Horloge', 'Machine à vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
+    words: ['Imprimerie', 'Boussole', 'Horloge', 'Vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
   },
   {
     id: 'cat_history_events',
@@ -253,7 +253,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_emotions_moods',
     label: 'Humeurs',
-    words: ['Optimisme', 'Morosité', 'Irritabilité', 'Calme', 'Nervosité', 'Motivation', 'Apathie', 'Bonne humeur'],
+    words: ['Optimisme', 'Morosité', 'Irritabilité', 'Calme', 'Nervosité', 'Motivation', 'Apathie', 'Gaieté'],
   },
   {
     id: 'cat_jobs_health',
@@ -263,8 +263,8 @@ export const WORD_BANK: WordBankCategory[] = [
       'Infirmier',
       'Pharmacien',
       'Dentiste',
-      'Sage-femme',
-      'Kinésithérapeute',
+      'Obstétricien',
+      'Radiologue',
       'Vétérinaire',
       'Psychologue',
     ],
@@ -290,14 +290,14 @@ export const WORD_BANK: WordBankCategory[] = [
   },
   {
     id: 'cat_jobs_tech',
-    label: 'Numérique',
+    label: 'Métiers tech',
     words: [
       'Développeur',
       'Designer',
-      'Administrateur système',
-      'Data analyst',
+      'Sysadmin',
+      'Analyste',
       'Testeur',
-      'Product manager',
+      'Manager',
       'DevOps',
       'Support',
     ],
@@ -310,9 +310,9 @@ export const WORD_BANK: WordBankCategory[] = [
       'Cuisinier',
       'Chauffeur',
       'Hôtelier',
-      'Agent d’accueil',
+      'Hôte',
       'Livreur',
-      'Agent de sécurité',
+      'Vigile',
       'Caissier',
     ],
   },
