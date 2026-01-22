@@ -327,7 +327,7 @@ export const useGameStore = create<GameStore>()(
               const wordCards = cardIds.filter((id) => id !== categoryCardId)
 
               if (wordCards.length > 0) {
-                // Check that we don't exceed the required word count
+                // Check that the slot has capacity for all word cards being placed
                 if (wordCards.length > required) {
                   pushBackMany(next, cardIds, from)
                   ok = false

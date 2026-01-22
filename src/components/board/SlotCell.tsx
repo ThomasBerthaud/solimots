@@ -43,14 +43,15 @@ export function SlotCell({
           const categoryInSelection = selected.cardIds
             .map((id) => level.cardsById[id])
             .find((card) => card?.kind === 'category')
+          const hasCategoryInSelection = Boolean(categoryInSelection)
 
-          if (categoryInSelection && slot.categoryCardId == null) {
+          if (hasCategoryInSelection && slot.categoryCardId == null) {
             // Can drop on empty slot if selection contains a category card
             return true
           }
 
           // Check if all selected cards are words matching the slot's category
-          if (slot.categoryCardId != null && !categoryInSelection) {
+          if (slot.categoryCardId != null && !hasCategoryInSelection) {
             const c = level.cardsById[slot.categoryCardId]
             if (!c || c.kind !== 'category') return false
             // All selected cards must be words matching this category
