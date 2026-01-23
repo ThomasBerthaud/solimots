@@ -56,11 +56,10 @@ export function ProgressionAnimation({
     // Check if we will level up during this animation
     const willLevelUpThisRound = levelsAnimatedSoFar < levelsGained
     
-    // Calculate remaining points to add in this animation cycle
+    // Calculate how many points to add during this animation cycle
     // Capture the current displayPoints at the start of the animation
     const startDisplayPoints = displayPoints
-    let remainingPointsToAdd = newPoints - startDisplayPoints
-    let pointsToAddThisLevel = remainingPointsToAdd
+    let pointsToAddThisLevel = newPoints - startDisplayPoints
     
     if (willLevelUpThisRound) {
       // We're filling the bar to 100% for this level
@@ -111,6 +110,10 @@ export function ProgressionAnimation({
     }, duration / steps)
 
     return () => clearInterval(interval)
+    // Note: displayPoints is intentionally NOT in dependencies - we capture startDisplayPoints
+    // at the beginning of each animation cycle and don't want changes to displayPoints during
+    // the interval to trigger a new effect run. The effect correctly re-runs when stage changes
+    // back to 'points' after each level animation completes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, currentLevelBeingAnimated, currentLevelProgress, levelsAnimatedSoFar, levelsGained, reduceMotion, newPoints])
 
