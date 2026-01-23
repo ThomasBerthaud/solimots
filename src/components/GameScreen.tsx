@@ -90,6 +90,7 @@ export function GameScreen() {
 
   const currentLevel = useProgressionStore((s) => s.currentLevel)
   const currentPoints = useProgressionStore((s) => s.totalPoints)
+  const currentPointsInLevel = useProgressionStore((s) => s.pointsInCurrentLevel)
   const awardPoints = useProgressionStore((s) => s.awardPoints)
 
   const { playSound, playMusic } = useSoundEffects()
@@ -107,6 +108,8 @@ export function GameScreen() {
     newPoints: number
     levelsGained: number
     newTitle: string | null
+    oldLevel: number
+    oldPointsInLevel: number
   } | null>(null)
   const lastAttemptRef = useRef<{ at: number; message: string | null } | null>(null)
   const progressionAwardedRef = useRef(false)
@@ -136,6 +139,8 @@ export function GameScreen() {
       // Calculate total cards in the game
       const cardCount = Object.keys(level.cardsById).length
       const oldPoints = currentPoints
+      const oldLevel = currentLevel
+      const oldPointsInLevel = currentPointsInLevel
       
       const result = awardPoints(cardCount)
       const pointsEarned = cardCount * POINTS_PER_CARD
@@ -148,11 +153,13 @@ export function GameScreen() {
         newPoints: oldPoints + pointsEarned,
         levelsGained: result.levelsGained,
         newTitle: result.newTitle,
+        oldLevel,
+        oldPointsInLevel,
       })
       setShowProgression(true)
       progressionAwardedRef.current = true
     }
-  }, [status, level, currentPoints, awardPoints])
+  }, [status, level, currentPoints, currentLevel, currentPointsInLevel, awardPoints])
 
   useEffect(() => {
     if (!lastError) return
@@ -484,6 +491,8 @@ function WinOverlay({
     newPoints: number
     levelsGained: number
     newTitle: string | null
+    oldLevel: number
+    oldPointsInLevel: number
   }
   onProgressionComplete?: () => void
 }) {
@@ -512,6 +521,8 @@ function WinOverlay({
             newTitle={progressionData.newTitle}
             onComplete={onProgressionComplete}
             reduceMotion={reduceMotion}
+            oldLevel={progressionData.oldLevel}
+            oldPointsInLevel={progressionData.oldPointsInLevel}
           />
         ) : (
           <>
