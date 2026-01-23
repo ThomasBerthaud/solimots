@@ -87,15 +87,16 @@ export function ProgressionAnimation({
             // We just completed a level, move to next one
             const nextLevel = currentLevelBeingAnimated + 1
             const pointsOverflow = currentLevelProgress + pointsToAddThisLevel - pointsNeededForCurrentLevel
+            const newLevelsAnimated = levelsAnimatedSoFar + 1
             
             setCurrentLevelBeingAnimated(nextLevel)
             setCurrentLevelProgress(pointsOverflow)
-            setLevelsAnimatedSoFar(levelsAnimatedSoFar + 1)
+            setLevelsAnimatedSoFar(newLevelsAnimated)
             setProgressWidth(0) // Reset progress bar for next level
             
             // If there are more levels to animate, stay in 'points' stage
             // Otherwise, move to 'levelup' stage to show the celebration
-            if (levelsAnimatedSoFar + 1 >= levelsGained) {
+            if (newLevelsAnimated >= levelsGained) {
               setStage('levelup')
             }
           } else {
