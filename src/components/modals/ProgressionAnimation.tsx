@@ -85,11 +85,11 @@ export function ProgressionAnimation({
           if (willLevelUpThisRound) {
             // We just completed a level, move to next one
             const nextLevel = currentLevelBeingAnimated + 1
-            const pointsOverflow = currentLevelProgress + pointsToAddThisLevel - pointsNeededForCurrentLevel
+            const pointsCarriedOver = currentLevelProgress + pointsToAddThisLevel - pointsNeededForCurrentLevel
             const newLevelsAnimated = levelsAnimatedSoFar + 1
             
             setCurrentLevelBeingAnimated(nextLevel)
-            setCurrentLevelProgress(pointsOverflow)
+            setCurrentLevelProgress(pointsCarriedOver)
             setLevelsAnimatedSoFar(newLevelsAnimated)
             setProgressWidth(0) // Reset progress bar for next level
             
