@@ -82,7 +82,7 @@ function DraggableCardStack({ children, onDrop, reduceMotion, onDragStart: onDra
       ref={ref}
       className="relative pointer-events-auto"
       drag
-      dragMomentum={false}
+      dragMomentum={true}
       dragElastic={0.15}
       onDragStart={() => {
         setIsDragging(true)
