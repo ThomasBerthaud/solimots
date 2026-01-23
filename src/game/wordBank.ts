@@ -25,7 +25,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_mammals',
     label: 'Mammifères',
-    words: ['Lion', 'Dauphin', 'Cheval', 'Ours', 'Chien', 'Chat', 'Singe', 'Loup'],
+    words: ['Lion', 'Dauphin', 'Éléphant', 'Ours', 'Chien', 'Chat', 'Singe', 'Loup'],
   },
   {
     id: 'cat_birds',
@@ -60,7 +60,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_actions',
     label: 'Activités',
-    words: ['Réservation', 'Exploration', 'Marche', 'Visite', 'Photo', 'Baignade', 'Dégustation', 'Randonnée'],
+    words: ['Réservation', 'Exploration', 'Marche', 'Visite', 'Selfie', 'Baignade', 'Dégustation', 'Excursion'],
   },
   {
     id: 'cat_sports_ball',
@@ -120,7 +120,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_internet',
     label: 'Internet',
-    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Email', 'Streaming', 'Cookie', 'Lien'],
+    words: ['Wi‑Fi', 'Navigateur', 'Réseau', 'Cloud', 'Email', 'Streaming', 'Cookie', 'Lien'],
   },
   {
     id: 'cat_tech_security',
@@ -188,7 +188,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_history_places',
     label: 'Monuments',
-    words: ['Château', 'Citadelle', 'Forteresse', 'Cathédrale', 'Temple', 'Amphithéâtre', 'Palais', 'Abbaye'],
+    words: ['Château', 'Citadelle', 'Forteresse', 'Cathédrale', 'Basilique', 'Amphithéâtre', 'Palais', 'Abbaye'],
   },
   {
     id: 'cat_history_figures',
@@ -198,12 +198,12 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_history_inventions',
     label: 'Inventions',
-    words: ['Imprimerie', 'Boussole', 'Horloge', 'Vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
+    words: ['Imprimerie', 'Poudre', 'Horloge', 'Vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
   },
   {
     id: 'cat_history_events',
     label: 'Événements',
-    words: ['Traité', 'Bataille', 'Siège', 'Alliance', 'Couronnement', 'Réforme', 'Exposition', 'Découverte'],
+    words: ['Traité', 'Guerre', 'Siège', 'Alliance', 'Couronnement', 'Réforme', 'Exposition', 'Découverte'],
   },
   {
     id: 'cat_science_space',
@@ -319,12 +319,12 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_food_meat',
     label: 'Viandes',
-    words: ['Poulet', 'Bœuf', 'Porc', 'Agneau', 'Veau', 'Dinde', 'Canard', 'Lapin'],
+    words: ['Poulet', 'Bœuf', 'Porc', 'Agneau', 'Veau', 'Dinde', 'Oie', 'Gibier'],
   },
   {
     id: 'cat_food_desserts',
     label: 'Desserts',
-    words: ['Gâteau', 'Tarte', 'Mousse', 'Crème', 'Sorbet', 'Flan', 'Tiramisu', 'Éclair'],
+    words: ['Gâteau', 'Tarte', 'Mousse', 'Glace', 'Sorbet', 'Flan', 'Tiramisu', 'Éclair'],
   },
   {
     id: 'cat_food_drinks',
@@ -344,7 +344,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_animals_farm',
     label: 'Animaux de la ferme',
-    words: ['Vache', 'Cochon', 'Poule', 'Mouton', 'Chèvre', 'Âne', 'Oie', 'Lapin'],
+    words: ['Vache', 'Cochon', 'Poule', 'Mouton', 'Chèvre', 'Cheval', 'Âne', 'Lapin'],
   },
   {
     id: 'cat_geography_countries',
@@ -379,7 +379,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_home_rooms',
     label: 'Pièces',
-    words: ['Salon', 'Cuisine', 'Chambre', 'Salle', 'Bureau', 'Cave', 'Grenier', 'Garage'],
+    words: ['Salon', 'Cuisine', 'Chambre', 'Salle', 'Vestibule', 'Cave', 'Grenier', 'Garage'],
   },
   {
     id: 'cat_body_parts',
@@ -389,7 +389,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_colors',
     label: 'Couleurs',
-    words: ['Rouge', 'Bleu', 'Vert', 'Jaune', 'Orange', 'Violet', 'Rose', 'Noir'],
+    words: ['Rouge', 'Bleu', 'Vert', 'Jaune', 'Brun', 'Violet', 'Beige', 'Noir'],
   },
   {
     id: 'cat_time_seasons',
@@ -434,7 +434,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_entertainment_hobbies',
     label: 'Loisirs',
-    words: ['Lecture', 'Dessin', 'Jardinage', 'Cuisine', 'Photographie', 'Bricolage', 'Collection', 'Danse'],
+    words: ['Lecture', 'Dessin', 'Jardinage', 'Pâtisserie', 'Photo', 'Bricolage', 'Collection', 'Danse'],
   },
 ]
 
