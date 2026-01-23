@@ -91,7 +91,7 @@ export function Card({
         }
       }}
       drag={draggable}
-      dragMomentum={false}
+      dragMomentum={true}
       dragElastic={0.15}
       whileTap={draggable || onClick ? { scale: 0.98 } : undefined}
       onDragStart={() => setIsDragging(true)}
