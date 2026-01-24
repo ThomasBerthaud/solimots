@@ -184,10 +184,26 @@ export function ProgressionAnimation({
               </div>
               <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500"
+                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 relative"
                   style={{ width: `${progressWidth}%` }}
                   transition={{ duration: 0.3, ease: 'easeOut' }}
-                />
+                >
+                  {/* Shimmer effect overlay - only shown when motion is not reduced */}
+                  {!reduceMotion && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                      animate={{
+                        x: ['-100%', '150%'],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'linear',
+                        repeatDelay: 0.5,
+                      }}
+                    />
+                  )}
+                </motion.div>
               </div>
             </div>
             
