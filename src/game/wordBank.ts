@@ -25,7 +25,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_mammals',
     label: 'Mammifères',
-    words: ['Lion', 'Dauphin', 'Cheval', 'Ours', 'Chien', 'Chat', 'Singe', 'Loup'],
+    words: ['Lion', 'Dauphin', 'Éléphant', 'Ours', 'Chien', 'Chat', 'Singe', 'Loup'],
   },
   {
     id: 'cat_birds',
@@ -60,7 +60,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_actions',
     label: 'Activités',
-    words: ['Réservation', 'Exploration', 'Marche', 'Visite', 'Photo', 'Baignade', 'Dégustation', 'Randonnée'],
+    words: ['Réservation', 'Exploration', 'Marche', 'Visite', 'Selfie', 'Baignade', 'Dégustation', 'Excursion'],
   },
   {
     id: 'cat_sports_ball',
@@ -120,7 +120,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_tech_internet',
     label: 'Internet',
-    words: ['Wi‑Fi', 'Navigateur', 'Serveur', 'Cloud', 'Email', 'Streaming', 'Cookie', 'Lien'],
+    words: ['Wi‑Fi', 'Navigateur', 'Réseau', 'Cloud', 'Email', 'Streaming', 'Cookie', 'Lien'],
   },
   {
     id: 'cat_tech_security',
@@ -188,7 +188,7 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_history_places',
     label: 'Monuments',
-    words: ['Château', 'Citadelle', 'Forteresse', 'Cathédrale', 'Temple', 'Amphithéâtre', 'Palais', 'Abbaye'],
+    words: ['Château', 'Citadelle', 'Forteresse', 'Cathédrale', 'Basilique', 'Amphithéâtre', 'Palais', 'Abbaye'],
   },
   {
     id: 'cat_history_figures',
@@ -198,12 +198,12 @@ export const WORD_BANK: WordBankCategory[] = [
   {
     id: 'cat_history_inventions',
     label: 'Inventions',
-    words: ['Imprimerie', 'Boussole', 'Horloge', 'Vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
+    words: ['Imprimerie', 'Poudre', 'Horloge', 'Vapeur', 'Télégraphe', 'Photographie', 'Aviation', 'Radio'],
   },
   {
     id: 'cat_history_events',
     label: 'Événements',
-    words: ['Traité', 'Bataille', 'Siège', 'Alliance', 'Couronnement', 'Réforme', 'Exposition', 'Découverte'],
+    words: ['Traité', 'Guerre', 'Siège', 'Alliance', 'Couronnement', 'Réforme', 'Exposition', 'Découverte'],
   },
   {
     id: 'cat_science_space',
@@ -316,6 +316,126 @@ export const WORD_BANK: WordBankCategory[] = [
       'Caissier',
     ],
   },
+  {
+    id: 'cat_food_meat',
+    label: 'Viandes',
+    words: ['Poulet', 'Bœuf', 'Porc', 'Agneau', 'Veau', 'Dinde', 'Oie', 'Gibier'],
+  },
+  {
+    id: 'cat_food_desserts',
+    label: 'Desserts',
+    words: ['Gâteau', 'Tarte', 'Mousse', 'Glace', 'Sorbet', 'Flan', 'Tiramisu', 'Éclair'],
+  },
+  {
+    id: 'cat_food_drinks',
+    label: 'Boissons',
+    words: ['Café', 'Thé', 'Jus', 'Soda', 'Sirop', 'Tisane', 'Smoothie', 'Chocolat'],
+  },
+  {
+    id: 'cat_food_grains',
+    label: 'Céréales',
+    words: ['Blé', 'Riz', 'Maïs', 'Avoine', 'Orge', 'Seigle', 'Quinoa', 'Épeautre'],
+  },
+  {
+    id: 'cat_animals_reptiles',
+    label: 'Reptiles',
+    words: ['Serpent', 'Lézard', 'Tortue', 'Crocodile', 'Caméléon', 'Iguane', 'Gecko', 'Varan'],
+  },
+  {
+    id: 'cat_animals_farm',
+    label: 'Animaux de la ferme',
+    words: ['Vache', 'Cochon', 'Poule', 'Mouton', 'Chèvre', 'Cheval', 'Âne', 'Lapin'],
+  },
+  {
+    id: 'cat_geography_countries',
+    label: 'Pays',
+    words: ['France', 'Espagne', 'Italie', 'Allemagne', 'Belgique', 'Suisse', 'Portugal', 'Grèce'],
+  },
+  {
+    id: 'cat_geography_cities',
+    label: 'Villes',
+    words: ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Lille', 'Toulouse', 'Nantes', 'Strasbourg'],
+  },
+  {
+    id: 'cat_geography_continents',
+    label: 'Continents',
+    words: ['Europe', 'Asie', 'Afrique', 'Amérique', 'Océanie', 'Antarctique', 'Arctique', 'Pacifique'],
+  },
+  {
+    id: 'cat_home_furniture',
+    label: 'Meubles',
+    words: ['Table', 'Chaise', 'Canapé', 'Lit', 'Armoire', 'Étagère', 'Bureau', 'Commode'],
+  },
+  {
+    id: 'cat_home_appliances',
+    label: 'Électroménager',
+    words: ['Frigo', 'Four', 'Lave-linge', 'Aspirateur', 'Micro-ondes', 'Grille-pain', 'Cafetière', 'Mixer'],
+  },
+  {
+    id: 'cat_home_kitchen',
+    label: 'Ustensiles',
+    words: ['Couteau', 'Fourchette', 'Cuillère', 'Casserole', 'Poêle', 'Passoire', 'Fouet', 'Louche'],
+  },
+  {
+    id: 'cat_home_rooms',
+    label: 'Pièces',
+    words: ['Salon', 'Cuisine', 'Chambre', 'Salle', 'Vestibule', 'Cave', 'Grenier', 'Garage'],
+  },
+  {
+    id: 'cat_body_parts',
+    label: 'Corps',
+    words: ['Tête', 'Bras', 'Jambe', 'Main', 'Pied', 'Dos', 'Ventre', 'Épaule'],
+  },
+  {
+    id: 'cat_colors',
+    label: 'Couleurs',
+    words: ['Rouge', 'Bleu', 'Vert', 'Jaune', 'Brun', 'Violet', 'Beige', 'Noir'],
+  },
+  {
+    id: 'cat_time_seasons',
+    label: 'Saisons',
+    words: ['Printemps', 'Été', 'Automne', 'Hiver', 'Équinoxe', 'Solstice', 'Floraison', 'Vendange'],
+  },
+  {
+    id: 'cat_time_months',
+    label: 'Mois',
+    words: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août'],
+  },
+  {
+    id: 'cat_school_subjects',
+    label: 'Matières',
+    words: ['Français', 'Mathématiques', 'Histoire', 'Géographie', 'Sciences', 'Anglais', 'Sport', 'Musique'],
+  },
+  {
+    id: 'cat_school_supplies',
+    label: 'Fournitures',
+    words: ['Cahier', 'Stylo', 'Crayon', 'Gomme', 'Règle', 'Trousse', 'Cartable', 'Classeur'],
+  },
+  {
+    id: 'cat_clothing_clothes',
+    label: 'Vêtements',
+    words: ['Pantalon', 'Chemise', 'Robe', 'Jupe', 'Pull', 'Veste', 'Manteau', 'Short'],
+  },
+  {
+    id: 'cat_clothing_shoes',
+    label: 'Chaussures',
+    words: ['Basket', 'Bottine', 'Sandale', 'Botte', 'Escarpin', 'Mocassin', 'Chausson', 'Tong'],
+  },
+  {
+    id: 'cat_clothing_accessories',
+    label: 'Accessoires',
+    words: ['Chapeau', 'Écharpe', 'Ceinture', 'Gant', 'Cravate', 'Foulard', 'Bonnet', 'Casquette'],
+  },
+  {
+    id: 'cat_entertainment_games',
+    label: 'Jeux',
+    words: ['Échecs', 'Cartes', 'Dames', 'Puzzle', 'Dominos', 'Scrabble', 'Monopoly', 'Bataille'],
+  },
+  {
+    id: 'cat_entertainment_hobbies',
+    label: 'Loisirs',
+    words: ['Lecture', 'Dessin', 'Jardinage', 'Pâtisserie', 'Photo', 'Bricolage', 'Collection', 'Danse'],
+  },
 ]
 
 export const IMAGE_CATEGORIES: ImageBankCategory[] = [
@@ -393,5 +513,75 @@ export const IMAGE_CATEGORIES: ImageBankCategory[] = [
     id: 'img_clothing',
     label: 'Vêtements',
     images: ['👕', '👔', '👗', '👖', '👞', '👟', '👢', '🧥'],
+  },
+  {
+    id: 'img_desserts',
+    label: 'Desserts',
+    images: ['🍰', '🎂', '🧁', '🥧', '🍮', '🍩', '🍪', '🍫'],
+  },
+  {
+    id: 'img_drinks',
+    label: 'Boissons',
+    images: ['☕', '🍵', '🥤', '🧃', '🧋', '🍹', '🍺', '🍷'],
+  },
+  {
+    id: 'img_insects',
+    label: 'Insectes',
+    images: ['🐝', '🐛', '🐞', '🦋', '🦗', '🪲', '🪳', '🕷️'],
+  },
+  {
+    id: 'img_farm',
+    label: 'Ferme',
+    images: ['🐄', '🐖', '🐓', '🐑', '🐐', '🐴', '🦆', '🐇'],
+  },
+  {
+    id: 'img_sea_creatures',
+    label: 'Créatures marines',
+    images: ['🐳', '🐋', '🦭', '🐢', '🦈', '🐙', '🦑', '🦞'],
+  },
+  {
+    id: 'img_school',
+    label: 'École',
+    images: ['📚', '✏️', '📝', '📖', '🎒', '📐', '✂️', '🖍️'],
+  },
+  {
+    id: 'img_body',
+    label: 'Corps',
+    images: ['👁️', '👂', '👃', '👄', '🦷', '🦴', '🧠', '❤️'],
+  },
+  {
+    id: 'img_electronics',
+    label: 'Électronique',
+    images: ['📱', '💻', '⌚', '📷', '🎮', '🖨️', '⌨️', '🖱️'],
+  },
+  {
+    id: 'img_flags',
+    label: 'Drapeaux',
+    images: ['🇫🇷', '🇪🇸', '🇮🇹', '🇩🇪', '🇬🇧', '🇺🇸', '🇯🇵', '🇨🇳'],
+  },
+  {
+    id: 'img_time',
+    label: 'Temps',
+    images: ['⏰', '⌚', '⏳', '⏱️', '🕐', '🕑', '🕒', '🕰️'],
+  },
+  {
+    id: 'img_emotions',
+    label: 'Émotions',
+    images: ['😀', '😢', '😡', '😱', '😴', '🤔', '😍', '😎'],
+  },
+  {
+    id: 'img_activities',
+    label: 'Activités',
+    images: ['🎨', '🎭', '🎪', '🎬', '🎯', '🎲', '🧩', '🎳'],
+  },
+  {
+    id: 'img_heart',
+    label: 'Cœur',
+    images: ['❤️', '💛', '💚', '💙', '💜', '🖤', '🤍', '🧡'],
+  },
+  {
+    id: 'img_shapes',
+    label: 'Formes',
+    images: ['⭐', '🔴', '🔵', '🟢', '🟡', '🟣', '⬛', '⬜'],
   },
 ]
