@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { GraduationCap, Play, ScrollText, Settings } from 'lucide-react'
+import { useEffect } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { IconLabel } from './components/ui/IconLabel'
 import { useGameStore } from './store/gameStore'
@@ -14,6 +15,18 @@ function App() {
 
   useStartupMusic()
   useTheme()
+
+  // Prevent scrolling on the game page only
+  useEffect(() => {
+    if (isGame) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isGame])
 
   const handlePlay = () => {
     newGame()
