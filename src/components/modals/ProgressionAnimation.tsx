@@ -33,50 +33,89 @@ export function ProgressionAnimation({
   const [stage, setStage] = useState<'points' | 'levelup' | 'done'>('points')
   const [displayPoints, setDisplayPoints] = useState(oldPoints)
   const [progressWidth, setProgressWidth] = useState(0)
+  const [currentLevelBeingAnimated, setCurrentLevelBeingAnimated] = useState(oldLevel)
+  const [currentLevelProgress, setCurrentLevelProgress] = useState(oldPointsInLevel)
+  const [levelsAnimatedSoFar, setLevelsAnimatedSoFar] = useState(0)
   const [fireworks, setFireworks] = useState<Array<{ id: number; x: number; y: number }>>([])
   const nextFireworkIdRef = useRef(0)
   const fireworksTriggeredRef = useRef(false)
 
   useEffect(() => {
     // Stage 1: Animate points counting up and progress bar
-    const duration = reduceMotion ? 300 : 1000
+    // This effect handles animating one level at a time
+    if (stage !== 'points') return
+
+    const duration = reduceMotion ? 300 : 800
     const steps = reduceMotion ? 10 : 30
-    const increment = pointsEarned / steps
     let currentStep = 0
 
-    // Calculate progress bar values
-    const pointsNeededForOldLevel = getPointsForLevel(oldLevel + 1)
-    const startProgress = pointsNeededForOldLevel > 0 ? (oldPointsInLevel / pointsNeededForOldLevel) * 100 : 0
+    // Calculate how many points to animate for this level
+    const pointsNeededForCurrentLevel = getPointsForLevel(currentLevelBeingAnimated + 1)
+    const startProgress = pointsNeededForCurrentLevel > 0 ? (currentLevelProgress / pointsNeededForCurrentLevel) * 100 : 0
     
-    // If we leveled up, animate to 100% first, then reset for new level
-    const targetProgress = levelsGained > 0 ? 100 : 
-      (pointsNeededForOldLevel > 0 ? ((oldPointsInLevel + pointsEarned) / pointsNeededForOldLevel) * 100 : 0)
+    // Check if we will level up during this animation
+    const willLevelUpThisRound = levelsAnimatedSoFar < levelsGained
+    
+    // Calculate how many points to add during this animation cycle
+    // Capture the current displayPoints at the start of the animation
+    const startDisplayPoints = displayPoints
+    let pointsToAddThisLevel = newPoints - startDisplayPoints
+    
+    if (willLevelUpThisRound) {
+      // We're filling the bar to 100% for this level
+      pointsToAddThisLevel = pointsNeededForCurrentLevel - currentLevelProgress
+    }
+    
+    const targetProgress = willLevelUpThisRound ? 100 : 
+      (pointsNeededForCurrentLevel > 0 ? ((currentLevelProgress + pointsToAddThisLevel) / pointsNeededForCurrentLevel) * 100 : 0)
 
     setProgressWidth(startProgress)
     const progressIncrement = (targetProgress - startProgress) / steps
+    const pointIncrement = pointsToAddThisLevel / steps
 
     const interval = setInterval(() => {
       currentStep++
       if (currentStep >= steps) {
-        setDisplayPoints(newPoints)
+        // Animation for this level complete
+        setDisplayPoints(startDisplayPoints + pointsToAddThisLevel)
         setProgressWidth(targetProgress)
         clearInterval(interval)
-        // Move to level-up stage if there were level-ups
+        
         setTimeout(() => {
-          if (levelsGained > 0) {
-            setStage('levelup')
+          if (willLevelUpThisRound) {
+            // We just completed a level, move to next one
+            const nextLevel = currentLevelBeingAnimated + 1
+            const pointsCarriedOver = currentLevelProgress + pointsToAddThisLevel - pointsNeededForCurrentLevel
+            const newLevelsAnimated = levelsAnimatedSoFar + 1
+            
+            setCurrentLevelBeingAnimated(nextLevel)
+            setCurrentLevelProgress(pointsCarriedOver)
+            setLevelsAnimatedSoFar(newLevelsAnimated)
+            setProgressWidth(0) // Reset progress bar for next level
+            
+            // If there are more levels to animate, stay in 'points' stage
+            // Otherwise, move to 'levelup' stage to show the celebration
+            if (newLevelsAnimated >= levelsGained) {
+              setStage('levelup')
+            }
           } else {
-            setStage('done')
+            // No more level-ups, we're done with points animation
+            setStage(levelsGained > 0 ? 'levelup' : 'done')
           }
-        }, reduceMotion ? 200 : 400)
+        }, reduceMotion ? 100 : 300)
       } else {
-        setDisplayPoints(oldPoints + Math.floor(increment * currentStep))
+        setDisplayPoints(startDisplayPoints + Math.floor(pointIncrement * currentStep))
         setProgressWidth(startProgress + progressIncrement * currentStep)
       }
     }, duration / steps)
 
     return () => clearInterval(interval)
-  }, [oldPoints, newPoints, pointsEarned, levelsGained, reduceMotion, oldLevel, oldPointsInLevel])
+    // Note: displayPoints is intentionally NOT in dependencies - we capture startDisplayPoints
+    // at the beginning of each animation cycle and don't want changes to displayPoints during
+    // the interval to trigger a new effect run. The effect correctly re-runs when stage changes
+    // back to 'points' after each level animation completes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage, currentLevelBeingAnimated, currentLevelProgress, levelsAnimatedSoFar, levelsGained, reduceMotion, newPoints])
 
   useEffect(() => {
     if (stage === 'levelup' && !fireworksTriggeredRef.current) {
@@ -140,8 +179,8 @@ export function ProgressionAnimation({
             {/* Progress bar */}
             <div className="mt-4 space-y-2">
               <div className="flex items-center justify-between text-xs text-white/60">
-                <span>Niveau {oldLevel}</span>
-                <span>Niveau {oldLevel + 1}</span>
+                <span>Niveau {currentLevelBeingAnimated}</span>
+                <span>Niveau {currentLevelBeingAnimated + 1}</span>
               </div>
               <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
                 <motion.div
