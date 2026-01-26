@@ -7,7 +7,6 @@ import { IMAGE_CATEGORIES, WORD_BANK } from './wordBank'
 
 // Stock pile configuration
 const TARGET_STOCK_SIZE = 10 // Ideally around 10 cards in stock pile
-const MIN_STOCK_RATIO = 0.51 // Stock must have majority of cards (>50%)
 
 // Tableau configuration
 const COLUMN_OPTIONS = [3, 4, 5] // Randomly choose between 3, 4, or 5 columns
@@ -92,9 +91,9 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // ==================== PRIORITY 3: Stock pile majority ====================
   // Calculate total cards needed to ensure stock has majority
-  // If tableau has N cards, stock must have at least N+1 cards (to have >50%)
+  // Stock must have more cards than tableau (>50%)
   // Aim for TARGET_STOCK_SIZE cards in stock
-  const minStockSize = Math.ceil(cardsInTableau / (1 - MIN_STOCK_RATIO))
+  const minStockSize = cardsInTableau + 1 // Stock must have at least tableau + 1 to ensure majority
   const targetStockSize = Math.max(TARGET_STOCK_SIZE, minStockSize)
   const totalCardsNeeded = cardsInTableau + targetStockSize
 
@@ -112,11 +111,17 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // Calculate how many categories we need to reach totalCardsNeeded
   // Each category = 1 category card + N word cards
-  // We need to distribute word counts according to the rules
+  // We need to distribute word counts according to the rules:
+  // - Majority (60%) have 4 words
+  // - Some (30%) have 3 words
+  // - Max 2 categories have 5 words
   
-  // Start with a reasonable estimate of categories needed
-  const avgWordsPerCategory = 4 // Most categories have 4 words
-  let estimatedCategories = Math.ceil(totalCardsNeeded / (avgWordsPerCategory + 1))
+  // Estimate average words per category based on distribution
+  // If we have many categories: 0-2 with 5 words, 60% with 4 words, 30% with 3 words
+  // Average ≈ (0.6 * 4) + (0.3 * 3) + (small contribution from 5-word categories)
+  // For small category counts, the average is closer to 3.9, for larger counts closer to 3.7
+  const avgWordsPerCategory = 3.8 // Weighted average accounting for distribution
+  let estimatedCategories = Math.ceil(totalCardsNeeded / (avgWordsPerCategory + 1)) // +1 for category card
   estimatedCategories = Math.max(MIN_CATEGORIES_PER_LEVEL, Math.min(estimatedCategories, MAX_CATEGORIES_PER_LEVEL))
   
   // Mix word and image categories with majority being word categories
@@ -206,10 +211,10 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
   
-  // Ensure we don't deal more cards than available
-  const actualTableauDealCount = Math.min(cardsInTableau, cardsShuffled.length - 1)
-  
   // Distribute cards to tableau following the pattern
+  // Ensure we have enough cards for both tableau and target stock
+  const actualTableauDealCount = Math.min(cardsInTableau, Math.max(0, cardsShuffled.length - targetStockSize))
+  
   let k = 0
   for (let col = 0; col < tableauColumns; col++) {
     const targetCount = tableauDealPattern[col] ?? 0
