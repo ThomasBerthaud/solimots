@@ -109,18 +109,14 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     )
   }
 
-  // Calculate how many categories we need to reach totalCardsNeeded
-  // Each category = 1 category card + N word cards
-  // We need to distribute word counts according to the rules:
-  // - Majority (60%) have 4 words
-  // - Some (30%) have 3 words
-  // - Max 2 categories have 5 words
-  
-  // Estimate average words per category based on distribution
-  // If we have many categories: 0-2 with 5 words, 60% with 4 words, 30% with 3 words
-  // Average ≈ (0.6 * 4) + (0.3 * 3) + (small contribution from 5-word categories)
-  // For small category counts, the average is closer to 3.9, for larger counts closer to 3.7
-  const avgWordsPerCategory = 3.8 // Weighted average accounting for distribution
+  // Calculate how many categories we need to reach approximately totalCardsNeeded
+  // Each category = 1 category card + N word cards (3-5 words per distribution)
+  // Word distribution: 60% with 4 words, 30% with 3 words, up to 2 with 5 words
+  // 
+  // Weighted average calculation:
+  // - For large sets: 0.6*4 + 0.3*3 + 0.1*5 = 2.4 + 0.9 + 0.5 = 3.8
+  // - This is an approximation; actual card count may vary slightly
+  const avgWordsPerCategory = 3.8 
   let estimatedCategories = Math.ceil(totalCardsNeeded / (avgWordsPerCategory + 1)) // +1 for category card
   estimatedCategories = Math.max(MIN_CATEGORIES_PER_LEVEL, Math.min(estimatedCategories, MAX_CATEGORIES_PER_LEVEL))
   
@@ -212,7 +208,8 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
   
   // Distribute cards to tableau following the pattern
-  // Ensure we have enough cards for both tableau and target stock
+  // Note: Due to estimation, we may not have exactly totalCardsNeeded cards
+  // Prioritize maintaining stock majority while filling the tableau pattern
   const actualTableauDealCount = Math.min(cardsInTableau, Math.max(0, cardsShuffled.length - targetStockSize))
   
   let k = 0
