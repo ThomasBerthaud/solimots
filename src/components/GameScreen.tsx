@@ -607,10 +607,10 @@ function LostOverlay({
             data-ui-control="true"
             onClick={onReplaySameSeed}
             className="w-full rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-black shadow active:bg-white"
-            aria-label="Recommencer même partie"
-            title="Recommencer même partie"
+            aria-label="Recommencer la même partie"
+            title="Recommencer la même partie"
           >
-            Recommencer même partie
+            Recommencer la même partie
           </button>
 
           <button
