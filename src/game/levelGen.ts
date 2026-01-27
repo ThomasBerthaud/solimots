@@ -3,6 +3,29 @@ import { IMAGE_CATEGORIES, WORD_BANK } from './wordBank'
 
 // English comments per project rule.
 
+// ==================== CONFIGURABLE CONSTANTS ====================
+
+// Stock pile configuration
+const TARGET_STOCK_SIZE = 10 // Ideally around 10 cards in stock pile
+
+// Tableau configuration
+const COLUMN_OPTIONS = [3, 4, 5] // Randomly choose between 3, 4, or 5 columns
+
+// Face-down card patterns: starting number for leftmost column
+// Each subsequent column will have exactly 1 more card than the previous
+const PATTERN_START_OPTIONS = [3, 4, 5] // Start with 3, 4, or 5 cards in first column
+
+// Category word count distribution
+const WORDS_PER_CATEGORY_DISTRIBUTION = {
+  // Majority of categories have 4 words
+  fourWords: { weight: 0.6, count: 4 },
+  // Some categories have 3 words
+  threeWords: { weight: 0.3, count: 3 },
+  // Maximum 2 categories with 5 words
+  fiveWords: { maxCount: 2, count: 5 },
+}
+
+// Word bank validation
 const MIN_WORDS_PER_CATEGORY_IN_BANK = 8
 const MIN_CATEGORIES_PER_LEVEL = 6
 const MAX_CATEGORIES_PER_LEVEL = 12
@@ -32,44 +55,41 @@ function pickN<T>(arr: T[], n: number, rnd: () => number): T[] {
   return shuffle(arr, rnd).slice(0, n)
 }
 
-function randomIntInclusive(min: number, max: number, rnd: () => number): number {
-  if (max < min) return min
-  return min + Math.floor(rnd() * (max - min + 1))
-}
-
 export type GenerateLevelOptions = {
   seed?: number
-  /** How many categories are included in the level (must be > 4 for slot gameplay). */
-  categoryCount?: number
-  /** Number of columns (3-5, randomly chosen if not specified). */
-  tableauColumns?: number
-  /**
-   * Tableau deal pattern from left to right (top is last).
-   * Auto-generated based on column count if not specified.
-   */
-  tableauDealPattern?: number[]
 }
 
 export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const seed = options.seed ?? Date.now()
   const rnd = mulberry32(seed)
 
-  // Randomly choose between 3, 4, or 5 columns if not specified
-  const tableauColumns = options.tableauColumns ?? randomIntInclusive(3, 5, rnd)
+  // ==================== PRIORITY 1: Column count ====================
+  // Randomly choose between 3, 4, or 5 columns
+  const tableauColumns = COLUMN_OPTIONS[Math.floor(rnd() * COLUMN_OPTIONS.length)]
 
-  // Generate an increasing sequence pattern with a random starting number.
-  // Starting number ranges from 3 to 5, ensuring reasonable card distribution.
-  // Examples: [3,4,5], [4,5,6], [5,6,7] for 3 columns
-  let tableauDealPattern: number[]
-  if (options.tableauDealPattern) {
-    tableauDealPattern = options.tableauDealPattern
-  } else {
-    // Randomly choose a starting number between 3 and 5
-    // This ensures all patterns remain within 3-9 cards per column range
-    const startNum = randomIntInclusive(3, 5, rnd)
-    tableauDealPattern = Array.from({ length: tableauColumns }, (_, i) => startNum + i)
+  // ==================== PRIORITY 2: Pattern selection ====================
+  // Randomly select a starting number for the leftmost column
+  // Each column will have exactly 1 more card than the column to its left
+  const startingCardCount = PATTERN_START_OPTIONS[Math.floor(rnd() * PATTERN_START_OPTIONS.length)]
+  
+  // Build pattern: each column has exactly 1 more card than the previous
+  const tableauDealPattern: number[] = []
+  for (let i = 0; i < tableauColumns; i++) {
+    tableauDealPattern.push(startingCardCount + i)
   }
 
+  // Calculate cards needed in tableau based on pattern
+  const cardsInTableau = tableauDealPattern.reduce((acc, n) => acc + n, 0)
+
+  // ==================== PRIORITY 3: Stock pile majority ====================
+  // Calculate total cards needed to ensure stock has majority
+  // Stock must have more cards than tableau (>50%)
+  // Aim for TARGET_STOCK_SIZE cards in stock
+  const minStockSize = cardsInTableau + 1 // Stock must have at least tableau + 1 to ensure majority
+  const targetStockSize = Math.max(TARGET_STOCK_SIZE, minStockSize)
+  const totalCardsNeeded = cardsInTableau + targetStockSize
+
+  // ==================== Select categories and word counts ====================
   // Validate both category banks
   validateWordBank(WORD_BANK)
   validateWordBank(IMAGE_CATEGORIES)
@@ -81,72 +101,64 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     )
   }
 
-  // Max categories we can pick considering we need at least 67% from WORD_BANK
-  // If WORD_BANK has 10 categories, we can have at most 10 / 0.67 ≈ 14 total categories
-  const maxByWordBankSize = Math.floor(WORD_BANK.length / 0.67)
-  const maxPick = Math.min(MAX_CATEGORIES_PER_LEVEL, totalPlayableCategories, maxByWordBankSize)
-
-  let categoryCount: number
-  if (options.categoryCount != null) {
-    categoryCount = Math.floor(options.categoryCount)
-    if (categoryCount < MIN_CATEGORIES_PER_LEVEL || categoryCount > maxPick) {
-      categoryCount = Math.max(MIN_CATEGORIES_PER_LEVEL, Math.min(categoryCount, maxPick))
-    }
-  } else {
-    categoryCount = randomIntInclusive(MIN_CATEGORIES_PER_LEVEL, maxPick, rnd)
-  }
-
+  // Calculate how many categories we need to reach at least totalCardsNeeded
+  // Each category = 1 category card + N word cards (3-5 words per distribution)
+  // Word distribution: 60% with 4 words, 30% with 3 words, up to 2 with 5 words
+  // 
+  // Weighted average calculation:
+  // - For large sets: 0.6*4 + 0.3*3 + 0.1*5 = 2.4 + 0.9 + 0.5 = 3.8
+  // - Use minimum (3 words) to ensure we always have enough cards
+  const minWordsPerCategory = 3 // Conservative estimate using minimum
+  let estimatedCategories = Math.ceil(totalCardsNeeded / (minWordsPerCategory + 1)) // +1 for category card
+  estimatedCategories = Math.max(MIN_CATEGORIES_PER_LEVEL, Math.min(estimatedCategories, MAX_CATEGORIES_PER_LEVEL))
+  
   // Mix word and image categories with majority being word categories
-  // At least 2/3 (67%) should be word categories
-  const minWordCategories = Math.ceil(categoryCount * 0.67)
-  const maxImageCategories = categoryCount - minWordCategories
-
-  // Ensure we have enough categories in each bank
+  const minWordCategories = Math.ceil(estimatedCategories * 0.67)
+  const maxImageCategories = estimatedCategories - minWordCategories
   const wordCount = Math.min(minWordCategories, WORD_BANK.length)
   const availableImageCount = Math.min(maxImageCategories, IMAGE_CATEGORIES.length)
-
-  // Randomly decide how many image categories to include (0 to availableImageCount)
   const imageCount = Math.floor(rnd() * (availableImageCount + 1))
-
-  // Calculate actual category count based on available categories from both banks
   const actualCategoryCount = wordCount + imageCount
 
   // Select categories from each bank
   const selectedWordCategories = pickN(WORD_BANK, wordCount, rnd)
   const selectedImageCategories = pickN(IMAGE_CATEGORIES, imageCount, rnd)
-
-  // Combine and shuffle all selected categories
   const selectedCategories = shuffle([...selectedWordCategories, ...selectedImageCategories], rnd)
 
   const categories: CategoryDef[] = selectedCategories.map((c) => ({ id: c.id, label: c.label }))
 
-  const cards: Card[] = []
-  const requiredWordsByCategoryId: LevelState['requiredWordsByCategoryId'] = {}
-
-  // New distribution logic: Majority of categories should have 3-4 words.
-  // Between 0-3 categories can have 5 words (randomized for variety).
-  const maxLargeCategories = 3
-  const largeCategoriesToCreate = Math.min(maxLargeCategories, Math.floor(rnd() * (maxLargeCategories + 1)))
-
-  // Create an array of word counts for each category
+  // ==================== Distribute word counts per category ====================
+  // Rules: Majority have 4 words, some have 3 words, max 2 have 5 words
   const wordCounts: number[] = []
-
-  // Add large categories (5 words each)
-  for (let i = 0; i < largeCategoriesToCreate; i++) {
-    wordCounts.push(5)
+  
+  // Determine how many categories get 5 words (max 2)
+  const maxFiveWordCategories = Math.min(WORDS_PER_CATEGORY_DISTRIBUTION.fiveWords.maxCount, actualCategoryCount)
+  const fiveWordCount = Math.floor(rnd() * (maxFiveWordCategories + 1))
+  
+  // Add categories with 5 words
+  for (let i = 0; i < fiveWordCount; i++) {
+    wordCounts.push(WORDS_PER_CATEGORY_DISTRIBUTION.fiveWords.count)
   }
-
-  // Add remaining small categories (3-4 words each)
-  for (let i = largeCategoriesToCreate; i < actualCategoryCount; i++) {
-    // Randomly choose between 3 or 4 words
-    wordCounts.push(rnd() < 0.5 ? 3 : 4)
+  
+  // For remaining categories, distribute between 3 and 4 words
+  const remainingCategories = actualCategoryCount - fiveWordCount
+  // Majority should have 4 words, some should have 3
+  const fourWordCategories = Math.ceil(remainingCategories * WORDS_PER_CATEGORY_DISTRIBUTION.fourWords.weight)
+  const threeWordCategories = remainingCategories - fourWordCategories
+  
+  for (let i = 0; i < fourWordCategories; i++) {
+    wordCounts.push(WORDS_PER_CATEGORY_DISTRIBUTION.fourWords.count)
   }
-
-  // Shuffle the word counts to distribute them randomly among categories
+  for (let i = 0; i < threeWordCategories; i++) {
+    wordCounts.push(WORDS_PER_CATEGORY_DISTRIBUTION.threeWords.count)
+  }
+  
+  // Shuffle word counts to distribute randomly
   shuffle(wordCounts, rnd)
 
-  const dealPattern =
-    tableauColumns === tableauDealPattern.length ? tableauDealPattern.map((n) => Math.max(0, Math.floor(n))) : null
+  // ==================== Create cards ====================
+  const cards: Card[] = []
+  const requiredWordsByCategoryId: LevelState['requiredWordsByCategoryId'] = {}
 
   for (let idx = 0; idx < selectedCategories.length; idx++) {
     const cat = selectedCategories[idx]
@@ -155,11 +167,10 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
       ? uniqueWords((cat as ImageBankCategory).images)
       : uniqueWords((cat as WordBankCategory).words)
     const requiredRaw = wordCounts[idx]
-    // Clamp required to not exceed the available unique items for that category.
     const required = Math.min(requiredRaw, availableItems.length)
     requiredWordsByCategoryId[cat.id] = required
 
-    // The category itself is a card in the deck.
+    // Category card
     cards.push({
       id: `card_${cards.length}`,
       word: cat.label,
@@ -168,6 +179,7 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
       faceUp: false,
     })
 
+    // Word cards
     const items = pickN(availableItems, required, rnd)
     for (const item of items) {
       cards.push({
@@ -181,57 +193,29 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     }
   }
 
+  // ==================== Distribute cards ====================
   const cardsShuffled = shuffle(cards, rnd)
   const cardsById: Record<CardId, Card> = Object.fromEntries(cardsShuffled.map((c) => [c.id, c]))
 
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
-  let tableauDealCount = dealPattern ? dealPattern.reduce((acc, n) => acc + n, 0) : tableauColumns * 3
-
-  // Security: Ensure the majority of cards (>50%) remain in the stock at startup.
-  // This prevents scenarios where too many cards are dealt to the tableau initially.
-  const totalCards = cardsShuffled.length
-  const maxTableauCards = Math.floor((totalCards - 1) / 2)
-  if (tableauDealCount > maxTableauCards) {
-    tableauDealCount = maxTableauCards
-  }
-
-  // Adjust the deal pattern if necessary to fit within available cards while maintaining
-  // an increasing sequence. For N columns starting at S: total = N*S + N*(N-1)/2
-  let adjustedDealPattern = dealPattern
-  if (dealPattern && dealPattern.reduce((acc, n) => acc + n, 0) > tableauDealCount) {
-    // Calculate the maximum starting number that fits within tableauDealCount
-    // For N columns: N*S + (0+1+2+...+(N-1)) = N*S + N*(N-1)/2 <= tableauDealCount
-    const sumOffset = (tableauColumns * (tableauColumns - 1)) / 2
-    const maxStartNum = Math.floor((tableauDealCount - sumOffset) / tableauColumns)
-    // Use the calculated start number, but prefer 3-5 range when possible
-    const newStartNum = maxStartNum >= 3 ? Math.min(5, maxStartNum) : Math.max(2, maxStartNum)
-    adjustedDealPattern = Array.from({ length: tableauColumns }, (_, i) => newStartNum + i)
-    tableauDealCount = adjustedDealPattern.reduce((acc, n) => acc + n, 0)
-  }
-
-  const dealt = cardsShuffled.slice(0, tableauDealCount)
-
-  if (adjustedDealPattern) {
-    let k = 0
-    for (let col = 0; col < tableauColumns; col++) {
-      const count = adjustedDealPattern[col] ?? 0
-      for (let i = 0; i < count; i++) {
-        const c = dealt[k++]
-        if (!c) break
-        tableau[col].push(c.id)
-      }
+  
+  // IMPORTANT: Always respect the pattern - each column must have exactly the specified number of cards
+  // If we don't have enough cards, the pattern generation was wrong, but we must maintain the increment
+  let k = 0
+  for (let col = 0; col < tableauColumns; col++) {
+    const targetCount = tableauDealPattern[col] ?? 0
+    for (let i = 0; i < targetCount && k < cardsShuffled.length; i++) {
+      const c = cardsShuffled[k++]
+      if (!c) break
+      tableau[col].push(c.id)
     }
-  } else {
-    // Fallback: even distribution if pattern is invalid.
-    dealt.forEach((c, idx) => {
-      tableau[idx % tableauColumns].push(c.id)
-    })
   }
 
-  const stock = cardsShuffled.slice(tableauDealCount).map((c) => c.id)
+  // Remaining cards go to stock
+  const stock = cardsShuffled.slice(k).map((c) => c.id)
   const waste: CardId[] = []
 
-  // Reveal the top card of each tableau column (solitaire-like).
+  // Reveal the top card of each tableau column
   for (let col = 0; col < tableau.length; col++) {
     const topId = tableau[col]?.at(-1)
     if (!topId) continue
