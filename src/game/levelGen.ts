@@ -11,12 +11,9 @@ const TARGET_STOCK_SIZE = 10 // Ideally around 10 cards in stock pile
 // Tableau configuration
 const COLUMN_OPTIONS = [3, 4, 5] // Randomly choose between 3, 4, or 5 columns
 
-// Face-down card patterns (one will be randomly chosen per game)
-const PATTERN_OPTIONS = [
-  [3, 4, 5], // Pattern 1: starts at 3
-  [4, 5, 6], // Pattern 2: starts at 4
-  [5, 6, 7], // Pattern 3: starts at 5
-]
+// Face-down card patterns: starting number for leftmost column
+// Each subsequent column will have exactly 1 more card than the previous
+const PATTERN_START_OPTIONS = [3, 4, 5] // Start with 3, 4, or 5 cards in first column
 
 // Category word count distribution
 const WORDS_PER_CATEGORY_DISTRIBUTION = {
@@ -71,19 +68,14 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const tableauColumns = COLUMN_OPTIONS[Math.floor(rnd() * COLUMN_OPTIONS.length)]
 
   // ==================== PRIORITY 2: Pattern selection ====================
-  // Randomly select a pattern from available options
-  const patternIndex = Math.floor(rnd() * PATTERN_OPTIONS.length)
-  const basePattern = PATTERN_OPTIONS[patternIndex]
+  // Randomly select a starting number for the leftmost column
+  // Each column will have exactly 1 more card than the column to its left
+  const startingCardCount = PATTERN_START_OPTIONS[Math.floor(rnd() * PATTERN_START_OPTIONS.length)]
   
-  // Extend or truncate pattern to match column count
+  // Build pattern: each column has exactly 1 more card than the previous
   const tableauDealPattern: number[] = []
   for (let i = 0; i < tableauColumns; i++) {
-    if (i < basePattern.length) {
-      tableauDealPattern.push(basePattern[i])
-    } else {
-      // Continue the incrementing pattern
-      tableauDealPattern.push(basePattern[basePattern.length - 1] + (i - basePattern.length + 1))
-    }
+    tableauDealPattern.push(startingCardCount + i)
   }
 
   // Calculate cards needed in tableau based on pattern
@@ -109,15 +101,15 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
     )
   }
 
-  // Calculate how many categories we need to reach approximately totalCardsNeeded
+  // Calculate how many categories we need to reach at least totalCardsNeeded
   // Each category = 1 category card + N word cards (3-5 words per distribution)
   // Word distribution: 60% with 4 words, 30% with 3 words, up to 2 with 5 words
   // 
   // Weighted average calculation:
   // - For large sets: 0.6*4 + 0.3*3 + 0.1*5 = 2.4 + 0.9 + 0.5 = 3.8
-  // - This is an approximation; actual card count may vary slightly
-  const avgWordsPerCategory = 3.8 
-  let estimatedCategories = Math.ceil(totalCardsNeeded / (avgWordsPerCategory + 1)) // +1 for category card
+  // - Use minimum (3 words) to ensure we always have enough cards
+  const minWordsPerCategory = 3 // Conservative estimate using minimum
+  let estimatedCategories = Math.ceil(totalCardsNeeded / (minWordsPerCategory + 1)) // +1 for category card
   estimatedCategories = Math.max(MIN_CATEGORIES_PER_LEVEL, Math.min(estimatedCategories, MAX_CATEGORIES_PER_LEVEL))
   
   // Mix word and image categories with majority being word categories
@@ -207,15 +199,12 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   const tableau: CardId[][] = Array.from({ length: tableauColumns }, () => [])
   
-  // Distribute cards to tableau following the pattern
-  // Note: Due to estimation, we may not have exactly totalCardsNeeded cards
-  // Prioritize maintaining stock majority while filling the tableau pattern
-  const actualTableauDealCount = Math.min(cardsInTableau, Math.max(0, cardsShuffled.length - targetStockSize))
-  
+  // IMPORTANT: Always respect the pattern - each column must have exactly the specified number of cards
+  // If we don't have enough cards, the pattern generation was wrong, but we must maintain the increment
   let k = 0
   for (let col = 0; col < tableauColumns; col++) {
     const targetCount = tableauDealPattern[col] ?? 0
-    for (let i = 0; i < targetCount && k < actualTableauDealCount; i++) {
+    for (let i = 0; i < targetCount && k < cardsShuffled.length; i++) {
       const c = cardsShuffled[k++]
       if (!c) break
       tableau[col].push(c.id)
