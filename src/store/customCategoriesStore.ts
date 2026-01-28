@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import type { WordBankCategory } from '../game/types'
 
 interface CustomCategoriesState {
@@ -21,7 +21,7 @@ export const useCustomCategoriesStore = create<CustomCategoriesState>()(
           customCategories: [
             ...state.customCategories,
             {
-              id: `custom_${Date.now()}`,
+              id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
               label,
               words: [],
             },
@@ -35,11 +35,20 @@ export const useCustomCategoriesStore = create<CustomCategoriesState>()(
       
       addWordToCategory: (categoryId, word) =>
         set((state) => ({
-          customCategories: state.customCategories.map((cat) =>
-            cat.id === categoryId
-              ? { ...cat, words: [...cat.words, word] }
-              : cat
-          ),
+          customCategories: state.customCategories.map((cat) => {
+            if (cat.id === categoryId) {
+              // Prevent duplicate words (case-insensitive comparison)
+              const normalizedWord = word.trim()
+              const wordExists = cat.words.some(
+                (w) => w.toLowerCase() === normalizedWord.toLowerCase()
+              )
+              if (wordExists) {
+                return cat
+              }
+              return { ...cat, words: [...cat.words, normalizedWord] }
+            }
+            return cat
+          }),
         })),
       
       removeWordFromCategory: (categoryId, wordIndex) =>
@@ -60,6 +69,19 @@ export const useCustomCategoriesStore = create<CustomCategoriesState>()(
     }),
     {
       name: 'solimots-custom-categories',
+      storage: createJSONStorage(() => localStorage),
     }
   )
 )
+
+// Export a function to get custom categories for use in levelGen
+export function getValidCustomCategories(): WordBankCategory[] {
+  try {
+    const state = useCustomCategoriesStore.getState()
+    // Only return categories with at least 8 words (matching default word bank requirement)
+    return state.customCategories.filter((cat) => cat.words.length >= 8)
+  } catch (error) {
+    console.error('Failed to load custom categories:', error)
+    return []
+  }
+}

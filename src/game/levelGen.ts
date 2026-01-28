@@ -1,24 +1,8 @@
 import type { Card, CardId, CategoryDef, ImageBankCategory, LevelState, WordBankCategory } from './types'
 import { IMAGE_CATEGORIES, WORD_BANK } from './wordBank'
+import { getValidCustomCategories } from '../store/customCategoriesStore'
 
 // English comments per project rule.
-
-// Get custom categories from localStorage (if available)
-function getCustomCategories(): WordBankCategory[] {
-  try {
-    const stored = localStorage.getItem('solimots-custom-categories')
-    if (stored) {
-      const parsed = JSON.parse(stored)
-      // The zustand persist middleware stores the state in a specific structure
-      if (parsed && parsed.state && parsed.state.customCategories) {
-        return parsed.state.customCategories
-      }
-    }
-  } catch (error) {
-    console.error('Failed to load custom categories:', error)
-  }
-  return []
-}
 
 // ==================== CONFIGURABLE CONSTANTS ====================
 
@@ -107,14 +91,17 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const totalCardsNeeded = cardsInTableau + targetStockSize
 
   // ==================== Select categories and word counts ====================
-  // Validate both category banks and merge with custom categories
+  // Validate both category banks
   validateWordBank(WORD_BANK)
   validateWordBank(IMAGE_CATEGORIES)
 
-  // Get custom categories from localStorage and filter those with at least 8 words
-  const customCategories = getCustomCategories().filter(
-    (cat) => cat.words.length >= MIN_WORDS_PER_CATEGORY_IN_BANK
-  )
+  // Get valid custom categories (already filtered to have at least 8 words)
+  const customCategories = getValidCustomCategories()
+  
+  // Validate custom categories as well
+  if (customCategories.length > 0) {
+    validateWordBank(customCategories)
+  }
   
   // Merge default word bank with custom categories
   const mergedWordBank = [...WORD_BANK, ...customCategories]
