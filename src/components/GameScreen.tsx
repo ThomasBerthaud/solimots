@@ -83,6 +83,7 @@ export function GameScreen() {
   const lastError = useGameStore((s) => s.lastError)
   const lastAction = useGameStore((s) => s.lastAction)
   const newGame = useGameStore((s) => s.newGame)
+  const resetLevel = useGameStore((s) => s.resetLevel)
   const draw = useGameStore((s) => s.draw)
   const undo = useGameStore((s) => s.undo)
   const moveCard = useGameStore((s) => s.moveCard)
@@ -466,6 +467,11 @@ export function GameScreen() {
               progressionAwardedRef.current = false
               newGame()
             }}
+            onReplaySameSeed={() => {
+              setSelected(null)
+              progressionAwardedRef.current = false
+              resetLevel()
+            }}
           />
         ) : null}
       </AnimatePresence>
@@ -568,7 +574,15 @@ function WinOverlay({
   )
 }
 
-function LostOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onReplay: () => void }) {
+function LostOverlay({
+  reduceMotion,
+  onReplay,
+  onReplaySameSeed,
+}: {
+  reduceMotion: boolean
+  onReplay: () => void
+  onReplaySameSeed: () => void
+}) {
   return (
     <motion.div
       className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
@@ -591,12 +605,23 @@ function LostOverlay({ reduceMotion, onReplay }: { reduceMotion: boolean; onRepl
           <button
             type="button"
             data-ui-control="true"
-            onClick={onReplay}
+            onClick={onReplaySameSeed}
             className="w-full rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-black shadow active:bg-white"
-            aria-label="Rejouer"
-            title="Rejouer"
+            aria-label="Recommencer la même partie"
+            title="Recommencer la même partie"
           >
-            Rejouer
+            Recommencer la même partie
+          </button>
+
+          <button
+            type="button"
+            data-ui-control="true"
+            onClick={onReplay}
+            className="w-full rounded-2xl bg-white/70 px-4 py-3 text-sm font-bold text-black shadow active:bg-white/80"
+            aria-label="Nouvelle partie"
+            title="Nouvelle partie"
+          >
+            Nouvelle partie
           </button>
 
           <Link
