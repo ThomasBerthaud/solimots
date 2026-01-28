@@ -77,7 +77,7 @@ export function ThumbDock({
 
   return (
     <div className="pointer-events-none relative z-40">
-      <div className="mx-auto w-full max-w-screen-sm lg:max-w-4xl">
+      <div className="mx-auto w-full max-w-screen-sm px-3 lg:max-w-4xl">
         <div className="relative">
           <AnimatePresence>
             {toast ? (
