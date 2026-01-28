@@ -3,6 +3,23 @@ import { IMAGE_CATEGORIES, WORD_BANK } from './wordBank'
 
 // English comments per project rule.
 
+// Get custom categories from localStorage (if available)
+function getCustomCategories(): WordBankCategory[] {
+  try {
+    const stored = localStorage.getItem('solimots-custom-categories')
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      // The zustand persist middleware stores the state in a specific structure
+      if (parsed && parsed.state && parsed.state.customCategories) {
+        return parsed.state.customCategories
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load custom categories:', error)
+  }
+  return []
+}
+
 // ==================== CONFIGURABLE CONSTANTS ====================
 
 // Stock pile configuration
@@ -90,11 +107,19 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const totalCardsNeeded = cardsInTableau + targetStockSize
 
   // ==================== Select categories and word counts ====================
-  // Validate both category banks
+  // Validate both category banks and merge with custom categories
   validateWordBank(WORD_BANK)
   validateWordBank(IMAGE_CATEGORIES)
 
-  const totalPlayableCategories = WORD_BANK.length + IMAGE_CATEGORIES.length
+  // Get custom categories from localStorage and filter those with at least 8 words
+  const customCategories = getCustomCategories().filter(
+    (cat) => cat.words.length >= MIN_WORDS_PER_CATEGORY_IN_BANK
+  )
+  
+  // Merge default word bank with custom categories
+  const mergedWordBank = [...WORD_BANK, ...customCategories]
+
+  const totalPlayableCategories = mergedWordBank.length + IMAGE_CATEGORIES.length
   if (totalPlayableCategories < MIN_CATEGORIES_PER_LEVEL) {
     throw new Error(
       `Combined category banks do not have enough playable categories (need >= ${MIN_CATEGORIES_PER_LEVEL}, got ${totalPlayableCategories}).`,
@@ -115,13 +140,13 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Mix word and image categories with majority being word categories
   const minWordCategories = Math.ceil(estimatedCategories * 0.67)
   const maxImageCategories = estimatedCategories - minWordCategories
-  const wordCount = Math.min(minWordCategories, WORD_BANK.length)
+  const wordCount = Math.min(minWordCategories, mergedWordBank.length)
   const availableImageCount = Math.min(maxImageCategories, IMAGE_CATEGORIES.length)
   const imageCount = Math.floor(rnd() * (availableImageCount + 1))
   const actualCategoryCount = wordCount + imageCount
 
-  // Select categories from each bank
-  const selectedWordCategories = pickN(WORD_BANK, wordCount, rnd)
+  // Select categories from each bank (now including custom categories)
+  const selectedWordCategories = pickN(mergedWordBank, wordCount, rnd)
   const selectedImageCategories = pickN(IMAGE_CATEGORIES, imageCount, rnd)
   const selectedCategories = shuffle([...selectedWordCategories, ...selectedImageCategories], rnd)
 
