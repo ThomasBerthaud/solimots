@@ -49,7 +49,7 @@ export function CustomCategories() {
 
       <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
         <h2 className="text-lg font-semibold">Ajouter une catégorie</h2>
-        <form onSubmit={handleAddCategory} className="mt-4 flex gap-3">
+        <form onSubmit={handleAddCategory} className="mt-4 flex flex-col gap-3 sm:flex-row">
           <input
             type="text"
             value={newCategoryLabel}
@@ -59,7 +59,7 @@ export function CustomCategories() {
           />
           <button
             type="submit"
-            className="flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-amber-300 hover:bg-amber-400/20 transition-colors"
+            className="flex items-center justify-center gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-amber-300 hover:bg-amber-400/20 transition-colors sm:justify-start"
             aria-label="Ajouter la catégorie"
             title="Ajouter la catégorie"
           >
@@ -131,7 +131,7 @@ export function CustomCategories() {
                     e.preventDefault()
                     handleAddWord(category.id)
                   }}
-                  className="flex gap-2"
+                  className="flex flex-col gap-2 sm:flex-row"
                 >
                   <input
                     type="text"
@@ -144,7 +144,7 @@ export function CustomCategories() {
                   />
                   <button
                     type="submit"
-                    className="flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm text-amber-300 hover:bg-amber-400/20 transition-colors"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm text-amber-300 hover:bg-amber-400/20 transition-colors sm:justify-start"
                     aria-label="Ajouter le mot"
                     title="Ajouter le mot"
                   >
