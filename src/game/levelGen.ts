@@ -1,5 +1,6 @@
 import type { Card, CardId, CategoryDef, ImageBankCategory, LevelState, WordBankCategory } from './types'
 import { IMAGE_CATEGORIES, WORD_BANK } from './wordBank'
+import { getValidCustomCategories } from '../store/customCategoriesStore'
 
 // English comments per project rule.
 
@@ -94,7 +95,18 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   validateWordBank(WORD_BANK)
   validateWordBank(IMAGE_CATEGORIES)
 
-  const totalPlayableCategories = WORD_BANK.length + IMAGE_CATEGORIES.length
+  // Get valid custom categories (already filtered to have at least 8 words)
+  const customCategories = getValidCustomCategories()
+  
+  // Validate custom categories as well
+  if (customCategories.length > 0) {
+    validateWordBank(customCategories)
+  }
+  
+  // Merge default word bank with custom categories
+  const mergedWordBank = [...WORD_BANK, ...customCategories]
+
+  const totalPlayableCategories = mergedWordBank.length + IMAGE_CATEGORIES.length
   if (totalPlayableCategories < MIN_CATEGORIES_PER_LEVEL) {
     throw new Error(
       `Combined category banks do not have enough playable categories (need >= ${MIN_CATEGORIES_PER_LEVEL}, got ${totalPlayableCategories}).`,
@@ -115,13 +127,13 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   // Mix word and image categories with majority being word categories
   const minWordCategories = Math.ceil(estimatedCategories * 0.67)
   const maxImageCategories = estimatedCategories - minWordCategories
-  const wordCount = Math.min(minWordCategories, WORD_BANK.length)
+  const wordCount = Math.min(minWordCategories, mergedWordBank.length)
   const availableImageCount = Math.min(maxImageCategories, IMAGE_CATEGORIES.length)
   const imageCount = Math.floor(rnd() * (availableImageCount + 1))
   const actualCategoryCount = wordCount + imageCount
 
-  // Select categories from each bank
-  const selectedWordCategories = pickN(WORD_BANK, wordCount, rnd)
+  // Select categories from each bank (now including custom categories)
+  const selectedWordCategories = pickN(mergedWordBank, wordCount, rnd)
   const selectedImageCategories = pickN(IMAGE_CATEGORIES, imageCount, rnd)
   const selectedCategories = shuffle([...selectedWordCategories, ...selectedImageCategories], rnd)
 

@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App.tsx'
 import './index.css'
+import { CustomCategories } from './routes/CustomCategories.tsx'
 import { Game } from './routes/Game.tsx'
 import { Home } from './routes/Home.tsx'
 import { HowTo } from './routes/HowTo.tsx'
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
       { path: '/how-to', element: <HowTo /> },
       { path: '/tutorial', element: <Tutorial /> },
       { path: '/settings', element: <Settings /> },
+      { path: '/custom-categories', element: <CustomCategories /> },
       { path: '*', element: <NotFound /> },
     ],
   },

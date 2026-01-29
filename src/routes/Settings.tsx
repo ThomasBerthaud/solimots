@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useSettingsStore, themes } from '../store/settingsStore'
 
@@ -28,6 +28,26 @@ export function Settings() {
         </Link>
         <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Configuration</h1>
         <p className="mt-2 text-white/75">Personnalise ton expérience de jeu.</p>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
+        <h2 className="text-lg font-semibold">Contenu du jeu</h2>
+        <p className="mt-1 text-sm text-white/75">Personnalise les catégories et mots utilisés dans le jeu.</p>
+
+        <div className="mt-4">
+          <Link
+            to="/custom-categories"
+            className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-left transition-colors hover:bg-white/10"
+            aria-label="Catégories personnalisées"
+            title="Catégories personnalisées"
+          >
+            <div>
+              <p className="font-semibold">Catégories personnalisées</p>
+              <p className="text-sm text-white/60">Ajoute tes propres catégories et mots</p>
+            </div>
+            <ChevronRight size={20} className="text-white/40" aria-hidden="true" />
+          </Link>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
