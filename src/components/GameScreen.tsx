@@ -88,6 +88,8 @@ export function GameScreen() {
   const undo = useGameStore((s) => s.undo)
   const moveCard = useGameStore((s) => s.moveCard)
   const moveCards = useGameStore((s) => s.moveCards)
+  const markPointsAwarded = useGameStore((s) => s.markPointsAwarded)
+  const lastAwardedSeed = useGameStore((s) => s.lastAwardedSeed)
 
   const currentLevel = useProgressionStore((s) => s.currentLevel)
   const currentPoints = useProgressionStore((s) => s.totalPoints)
@@ -113,7 +115,6 @@ export function GameScreen() {
     oldPointsInLevel: number
   } | null>(null)
   const lastAttemptRef = useRef<{ at: number; message: string | null } | null>(null)
-  const progressionAwardedRef = useRef(false)
 
   const lastActionAt = lastAction?.at
   const placedSlotIndex = lastAction?.type === 'slotPlaced' ? lastAction.slotIndex : undefined
@@ -128,15 +129,12 @@ export function GameScreen() {
     if (status === 'won' || status === 'lost') {
       setSelected(null)
     }
-    // Reset progression awarded flag when leaving won state
-    if (status !== 'won') {
-      progressionAwardedRef.current = false
-    }
   }, [status])
 
   useEffect(() => {
     // Award points and show progression when winning (only once per win)
-    if (status === 'won' && level && !progressionAwardedRef.current) {
+    // Check that we haven't already awarded points for this specific game seed
+    if (status === 'won' && level && level.seed !== lastAwardedSeed) {
       // Calculate total cards in the game
       const cardCount = Object.keys(level.cardsById).length
       const oldPoints = currentPoints
@@ -158,9 +156,9 @@ export function GameScreen() {
         oldPointsInLevel,
       })
       setShowProgression(true)
-      progressionAwardedRef.current = true
+      markPointsAwarded()
     }
-  }, [status, level, currentPoints, currentLevel, currentPointsInLevel, awardPoints])
+  }, [status, level, lastAwardedSeed, currentPoints, currentLevel, currentPointsInLevel, awardPoints, markPointsAwarded])
 
   useEffect(() => {
     if (!lastError) return
@@ -439,7 +437,6 @@ export function GameScreen() {
               setSelected(null)
               setShowProgression(false)
               setProgressionData(null)
-              progressionAwardedRef.current = false
               newGame()
             }}
           />
@@ -450,7 +447,6 @@ export function GameScreen() {
             showProgression={false}
             onReplay={() => {
               setSelected(null)
-              progressionAwardedRef.current = false
               newGame()
             }}
           />
@@ -464,12 +460,10 @@ export function GameScreen() {
             reduceMotion={reduceMotion}
             onReplay={() => {
               setSelected(null)
-              progressionAwardedRef.current = false
               newGame()
             }}
             onReplaySameSeed={() => {
               setSelected(null)
-              progressionAwardedRef.current = false
               resetLevel()
             }}
           />
