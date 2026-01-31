@@ -514,7 +514,7 @@ export const useGameStore = create<GameStore>()(
       },
 
       clearError: () => set({ lastError: null }),
-      
+
       markPointsAwarded: () => {
         const level = get().level
         if (level) {
