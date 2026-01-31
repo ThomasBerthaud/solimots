@@ -30,6 +30,11 @@ type GameStore = {
    * Not persisted; used to detect Klondike-like "loop" losses.
    */
   drawLoopSeen: Record<string, true>
+  /**
+   * Tracks the seed of the last game for which experience points were awarded.
+   * Persisted to prevent duplicate point awards when navigating back to a won game.
+   */
+  lastAwardedSeed: number | null
 
   newGame: (seed?: number) => void
   resetLevel: () => void
@@ -39,6 +44,7 @@ type GameStore = {
   finalizeSlotCompletion: (slotIndex: number, completedAt: number) => void
   undo: () => void
   clearError: () => void
+  markPointsAwarded: () => void
 }
 
 // English comments per project rule.
@@ -52,6 +58,7 @@ export const useGameStore = create<GameStore>()(
       lastError: null,
       lastAction: null,
       drawLoopSeen: {},
+      lastAwardedSeed: null,
 
       newGame: (seed) => {
         const level = generateLevel({ seed })
@@ -62,6 +69,7 @@ export const useGameStore = create<GameStore>()(
           lastError: null,
           lastAction: null,
           drawLoopSeen: {},
+          lastAwardedSeed: null,
         })
       },
 
@@ -76,6 +84,7 @@ export const useGameStore = create<GameStore>()(
           lastError: null,
           lastAction: null,
           drawLoopSeen: {},
+          lastAwardedSeed: null,
         })
       },
 
@@ -505,6 +514,13 @@ export const useGameStore = create<GameStore>()(
       },
 
       clearError: () => set({ lastError: null }),
+      
+      markPointsAwarded: () => {
+        const level = get().level
+        if (level) {
+          set({ lastAwardedSeed: level.seed })
+        }
+      },
     }),
     {
       name: 'solimots-game-v1',
@@ -514,6 +530,7 @@ export const useGameStore = create<GameStore>()(
       partialize: (state) => ({
         level: state.level,
         status: state.status,
+        lastAwardedSeed: state.lastAwardedSeed,
       }),
     },
   ),
