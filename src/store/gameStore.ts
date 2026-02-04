@@ -604,9 +604,12 @@ function canPlaceOnTableau(level: LevelState, movingId: CardId, destTopId: CardI
     return top.kind === 'word' && top.categoryId === card.categoryId
   }
 
-  // Word card: can be placed if the top card is a category or word of the same category.
-  if (top.kind !== 'category' && top.kind !== 'word') return false
-  return top.categoryId === card.categoryId
+  // Word card: can only be placed on another word of the same category, not on a category card.
+  if (card.kind === 'word') {
+    return top.kind === 'word' && top.categoryId === card.categoryId
+  }
+
+  return false
 }
 
 function pushTo(
