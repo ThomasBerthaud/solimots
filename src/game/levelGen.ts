@@ -6,24 +6,49 @@ import { getValidCustomCategories } from '../store/customCategoriesStore'
 
 // ==================== CONFIGURABLE CONSTANTS ====================
 
-// Stock pile configuration
-const TARGET_STOCK_SIZE = 10 // Ideally around 10 cards in stock pile
+// Difficulty levels - randomly selected like solitaire
+// Distribution: 50% easy, 30% medium, 20% hard
+type DifficultyLevel = 'easy' | 'medium' | 'hard'
 
-// Tableau configuration
-const COLUMN_OPTIONS = [3, 4, 5] // Randomly choose between 3, 4, or 5 columns
+// Difficulty-based configuration
+const DIFFICULTY_CONFIG = {
+  easy: {
+    columnOptions: [3, 4], // Fewer columns (easier to manage)
+    patternStartOptions: [3, 4], // Fewer starting cards
+    targetStockSize: 12, // More cards in stock
+    wordDistribution: {
+      fourWords: { weight: 0.7, count: 4 }, // More 4-word categories
+      threeWords: { weight: 0.3, count: 3 },
+      fiveWords: { maxCount: 1, count: 5 }, // Max 1 category with 5 words
+    },
+  },
+  medium: {
+    columnOptions: [3, 4, 5], // Standard columns
+    patternStartOptions: [3, 4, 5], // Standard starting cards
+    targetStockSize: 10, // Standard stock
+    wordDistribution: {
+      fourWords: { weight: 0.6, count: 4 },
+      threeWords: { weight: 0.3, count: 3 },
+      fiveWords: { maxCount: 2, count: 5 }, // Max 2 categories with 5 words
+    },
+  },
+  hard: {
+    columnOptions: [4, 5], // More columns (harder to manage)
+    patternStartOptions: [4, 5, 6], // More starting cards (more buried cards)
+    targetStockSize: 8, // Fewer cards in stock (less flexibility)
+    wordDistribution: {
+      fourWords: { weight: 0.5, count: 4 },
+      threeWords: { weight: 0.2, count: 3 },
+      fiveWords: { maxCount: 3, count: 5 }, // Max 3 categories with 5 words (harder to complete)
+    },
+  },
+}
 
-// Face-down card patterns: starting number for leftmost column
-// Each subsequent column will have exactly 1 more card than the previous
-const PATTERN_START_OPTIONS = [3, 4, 5] // Start with 3, 4, or 5 cards in first column
-
-// Category word count distribution
-const WORDS_PER_CATEGORY_DISTRIBUTION = {
-  // Majority of categories have 4 words
-  fourWords: { weight: 0.6, count: 4 },
-  // Some categories have 3 words
-  threeWords: { weight: 0.3, count: 3 },
-  // Maximum 2 categories with 5 words
-  fiveWords: { maxCount: 2, count: 5 },
+// Difficulty selection weights (like solitaire - varies each game)
+const DIFFICULTY_WEIGHTS = {
+  easy: 0.5, // 50% of games
+  medium: 0.3, // 30% of games
+  hard: 0.2, // 20% of games
 }
 
 // Word bank validation
@@ -40,6 +65,15 @@ function mulberry32(seed: number) {
     x ^= x + Math.imul(x ^ (x >>> 7), 61 | x)
     return ((x ^ (x >>> 14)) >>> 0) / 4294967296
   }
+}
+
+function selectDifficulty(rnd: () => number): DifficultyLevel {
+  // Randomly select difficulty based on weights
+  // 50% easy, 30% medium, 20% hard - like solitaire varies each game
+  const roll = rnd()
+  if (roll < DIFFICULTY_WEIGHTS.easy) return 'easy'
+  if (roll < DIFFICULTY_WEIGHTS.easy + DIFFICULTY_WEIGHTS.medium) return 'medium'
+  return 'hard'
 }
 
 function shuffle<T>(arr: T[], rnd: () => number): T[] {
@@ -64,14 +98,19 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const seed = options.seed ?? Date.now()
   const rnd = mulberry32(seed)
 
+  // ==================== SELECT DIFFICULTY ====================
+  // Randomly select difficulty level like solitaire (varies each game)
+  const difficulty = selectDifficulty(rnd)
+  const config = DIFFICULTY_CONFIG[difficulty]
+
   // ==================== PRIORITY 1: Column count ====================
-  // Randomly choose between 3, 4, or 5 columns
-  const tableauColumns = COLUMN_OPTIONS[Math.floor(rnd() * COLUMN_OPTIONS.length)]
+  // Choose columns based on difficulty
+  const tableauColumns = config.columnOptions[Math.floor(rnd() * config.columnOptions.length)]
 
   // ==================== PRIORITY 2: Pattern selection ====================
-  // Randomly select a starting number for the leftmost column
+  // Select starting card count based on difficulty
   // Each column will have exactly 1 more card than the column to its left
-  const startingCardCount = PATTERN_START_OPTIONS[Math.floor(rnd() * PATTERN_START_OPTIONS.length)]
+  const startingCardCount = config.patternStartOptions[Math.floor(rnd() * config.patternStartOptions.length)]
   
   // Build pattern: each column has exactly 1 more card than the previous
   const tableauDealPattern: number[] = []
@@ -84,10 +123,10 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
 
   // ==================== PRIORITY 3: Stock pile majority ====================
   // Calculate total cards needed to ensure stock has majority
+  // Stock size varies by difficulty (harder = less stock = less flexibility)
   // Stock must have more cards than tableau (>50%)
-  // Aim for TARGET_STOCK_SIZE cards in stock
   const minStockSize = cardsInTableau + 1 // Stock must have at least tableau + 1 to ensure majority
-  const targetStockSize = Math.max(TARGET_STOCK_SIZE, minStockSize)
+  const targetStockSize = Math.max(config.targetStockSize, minStockSize)
   const totalCardsNeeded = cardsInTableau + targetStockSize
 
   // ==================== Select categories and word counts ====================
@@ -140,29 +179,29 @@ export function generateLevel(options: GenerateLevelOptions = {}): LevelState {
   const categories: CategoryDef[] = selectedCategories.map((c) => ({ id: c.id, label: c.label }))
 
   // ==================== Distribute word counts per category ====================
-  // Rules: Majority have 4 words, some have 3 words, max 2 have 5 words
+  // Distribution varies by difficulty (harder = more 5-word categories)
   const wordCounts: number[] = []
   
-  // Determine how many categories get 5 words (max 2)
-  const maxFiveWordCategories = Math.min(WORDS_PER_CATEGORY_DISTRIBUTION.fiveWords.maxCount, actualCategoryCount)
+  // Determine how many categories get 5 words based on difficulty
+  const maxFiveWordCategories = Math.min(config.wordDistribution.fiveWords.maxCount, actualCategoryCount)
   const fiveWordCount = Math.floor(rnd() * (maxFiveWordCategories + 1))
   
   // Add categories with 5 words
   for (let i = 0; i < fiveWordCount; i++) {
-    wordCounts.push(WORDS_PER_CATEGORY_DISTRIBUTION.fiveWords.count)
+    wordCounts.push(config.wordDistribution.fiveWords.count)
   }
   
-  // For remaining categories, distribute between 3 and 4 words
+  // For remaining categories, distribute between 3 and 4 words based on difficulty
   const remainingCategories = actualCategoryCount - fiveWordCount
-  // Majority should have 4 words, some should have 3
-  const fourWordCategories = Math.ceil(remainingCategories * WORDS_PER_CATEGORY_DISTRIBUTION.fourWords.weight)
+  // Distribution weight varies by difficulty
+  const fourWordCategories = Math.ceil(remainingCategories * config.wordDistribution.fourWords.weight)
   const threeWordCategories = remainingCategories - fourWordCategories
   
   for (let i = 0; i < fourWordCategories; i++) {
-    wordCounts.push(WORDS_PER_CATEGORY_DISTRIBUTION.fourWords.count)
+    wordCounts.push(config.wordDistribution.fourWords.count)
   }
   for (let i = 0; i < threeWordCategories; i++) {
-    wordCounts.push(WORDS_PER_CATEGORY_DISTRIBUTION.threeWords.count)
+    wordCounts.push(config.wordDistribution.threeWords.count)
   }
   
   // Shuffle word counts to distribute randomly
