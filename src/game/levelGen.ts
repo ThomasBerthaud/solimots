@@ -28,7 +28,7 @@ const DIFFICULTY_CONFIG = {
     targetStockSize: 10, // Standard stock
     wordDistribution: {
       fourWords: { weight: 0.6, count: 4 },
-      threeWords: { weight: 0.3, count: 3 },
+      threeWords: { weight: 0.4, count: 3 }, // Weight adjusted to sum to 1.0 with fourWords
       fiveWords: { maxCount: 2, count: 5 }, // Max 2 categories with 5 words
     },
   },
@@ -38,7 +38,7 @@ const DIFFICULTY_CONFIG = {
     targetStockSize: 8, // Fewer cards in stock (less flexibility)
     wordDistribution: {
       fourWords: { weight: 0.5, count: 4 },
-      threeWords: { weight: 0.2, count: 3 },
+      threeWords: { weight: 0.5, count: 3 }, // Weight adjusted to sum to 1.0 with fourWords
       fiveWords: { maxCount: 3, count: 5 }, // Max 3 categories with 5 words (harder to complete)
     },
   },
