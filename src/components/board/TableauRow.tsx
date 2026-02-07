@@ -34,24 +34,22 @@ export function TableauRow({
   const columnCount = level.tableau.length
 
   return (
-    <section className="rounded-[24px] bg-black/15 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:rounded-[28px] lg:p-3">
-      <div className="grid gap-1.5 lg:gap-3" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
-        {level.tableau.map((ids, colIdx) => (
-          <TableauCell
-            key={colIdx}
-            level={level}
-            columnIndex={colIdx}
-            ids={ids}
-            selected={selected}
-            selectedCard={selectedCard}
-            onSelectSource={onSelectSource}
-            tryMoveTo={tryMoveTo}
-            onDropCard={onDropCard}
-            errorCardId={errorCardId}
-            errorAt={errorAt}
-          />
-        ))}
-      </div>
-    </section>
+    <div className="grid gap-1.5 lg:gap-3" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
+      {level.tableau.map((ids, colIdx) => (
+        <TableauCell
+          key={colIdx}
+          level={level}
+          columnIndex={colIdx}
+          ids={ids}
+          selected={selected}
+          selectedCard={selectedCard}
+          onSelectSource={onSelectSource}
+          tryMoveTo={tryMoveTo}
+          onDropCard={onDropCard}
+          errorCardId={errorCardId}
+          errorAt={errorAt}
+        />
+      ))}
+    </div>
   )
 }
