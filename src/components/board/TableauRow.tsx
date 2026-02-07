@@ -34,7 +34,7 @@ export function TableauRow({
   const columnCount = level.tableau.length
 
   return (
-    <div className="grid gap-1.5 lg:gap-3" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
+    <div className="grid gap-1 lg:gap-3" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
       {level.tableau.map((ids, colIdx) => (
         <TableauCell
           key={colIdx}

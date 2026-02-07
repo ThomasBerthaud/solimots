@@ -27,7 +27,7 @@ export function SlotsRow({
 
   return (
     <LayoutGroup>
-      <div className="grid gap-1.5 lg:gap-3" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
+      <div className="grid gap-1 lg:gap-3" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {level.slots.map((slot, idx) => (
           <SlotCell
             key={idx}

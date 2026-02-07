@@ -74,13 +74,13 @@ body {
 
 /* Mobile game sizing variables */
 .mobile-game {
-  --gap: clamp(6px, 1.4vw, 10px);
+  --gap: clamp(4px, 1.2vw, 8px);
   /* Card width calculated for max 5 columns - will have more space with fewer columns */
-  --cardW: clamp(56px, calc((100vw - 24px - (var(--gap) * 4)) / 5), 88px);
+  --cardW: clamp(60px, calc((100vw - 16px - (var(--gap) * 4)) / 5), 92px);
   --cardH: calc(var(--cardW) * 1.38);
   --stackStep: clamp(18px, 4vw, 28px);
 
-  --dockCardW: clamp(64px, 20vw, 84px);
+  --dockCardW: clamp(68px, 21vw, 88px);
   --dockCardH: calc(var(--dockCardW) * 1.28);
 }
 

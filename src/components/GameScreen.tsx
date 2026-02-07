@@ -339,8 +339,8 @@ export function GameScreen() {
 
   return (
     <div
-      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col px-2 pb-2 lg:pb-8"
-      style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col px-1 pb-1 lg:pb-8"
+      style={{ paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom))' }}
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
@@ -349,7 +349,7 @@ export function GameScreen() {
         style={feltBackgroundStyle}
       />
 
-      <header className="mb-2 flex shrink-0 items-center justify-between pt-2 lg:mb-4 lg:pt-4">
+      <header className="mb-1 flex shrink-0 items-center justify-between pt-1 lg:mb-4 lg:pt-4">
         <Link
           to="/"
           data-ui-control="true"
@@ -400,7 +400,7 @@ export function GameScreen() {
         {/* Flex spacer to push game content to bottom on mobile, stays at top on desktop */}
         <div className="order-1 min-h-0 flex-1 lg:order-2 lg:hidden" />
 
-        <div className="order-2 mb-2 shrink-0 space-y-2 lg:order-3 lg:mb-0 lg:space-y-4">
+        <div className="order-2 mb-1 shrink-0 space-y-1 lg:order-3 lg:mb-0 lg:space-y-4">
           <SlotsRow
             level={level}
             selected={selected}
