@@ -98,7 +98,7 @@ export function ThumbDock({
           </AnimatePresence>
 
           <motion.div
-            className="pointer-events-auto flex items-center justify-between rounded-[26px] border border-white/10 bg-black/55 px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.55)] backdrop-blur"
+            className="pointer-events-auto flex items-center justify-between rounded-[26px] border border-white/10 bg-black/55 px-3 py-2 shadow-[0_26px_80px_rgba(0,0,0,0.55)] backdrop-blur"
             initial={false}
             animate={reduceMotion ? undefined : { y: [6, 0] }}
             transition={reduceMotion ? undefined : { duration: 0.2, ease: 'easeOut' }}

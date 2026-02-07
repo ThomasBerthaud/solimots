@@ -102,7 +102,7 @@ export function SlotCell({
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
             <div
-              className="w-[calc(var(--cardW)-12px)] overflow-hidden whitespace-normal break-words rounded-2xl border border-amber-200/60 bg-amber-300 px-3 py-1 text-center text-[10px] font-extrabold leading-snug tracking-wide text-amber-950 shadow-[0_10px_24px_rgba(0,0,0,0.18)] [word-break:break-word]"
+              className="w-[calc(var(--cardW)-12px)] overflow-hidden whitespace-normal break-words rounded-2xl border border-amber-200/60 bg-amber-300 px-2 py-0.5 text-center text-[10px] font-extrabold leading-snug tracking-wide text-amber-950 shadow-[0_10px_24px_rgba(0,0,0,0.18)] [word-break:break-word]"
               aria-label={`Catégorie: ${categoryCard.word}`}
             >
               {categoryCard.word}
