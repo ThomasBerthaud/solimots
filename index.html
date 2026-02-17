@@ -6,15 +6,58 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b0f1a" />
-    <meta name="description" content="Solitaire d’associations de mots." />
+    <meta name="description" content="Solitaire d'associations de mots." />
     <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- SEO Meta Tags -->
+    <meta name="keywords" content="jeu, solitaire, mots, français, vocabulaire, catégories, jeu de cartes, puzzle, en ligne" />
+    <meta name="author" content="Solimots" />
+    <link rel="canonical" href="https://solimots.vercel.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://solimots.vercel.app/" />
+    <meta property="og:title" content="Solimots - Solitaire d'associations de mots" />
+    <meta property="og:description" content="Jeu de patience où vous devez associer des mots français à leurs catégories. Plus de 30 catégories, progression par niveaux, et mode hors ligne disponible." />
+    <meta property="og:image" content="https://solimots.vercel.app/pwa-512.png" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Solimots" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://solimots.vercel.app/" />
+    <meta name="twitter:title" content="Solimots - Solitaire d'associations de mots" />
+    <meta name="twitter:description" content="Jeu de patience où vous devez associer des mots français à leurs catégories. Plus de 30 catégories, progression par niveaux, et mode hors ligne disponible." />
+    <meta name="twitter:image" content="https://solimots.vercel.app/pwa-512.png" />
 
     <!-- iOS installability -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Solimots" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Solimots</title>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Solimots",
+      "description": "Jeu de patience où vous devez associer des mots français à leurs catégories. Plus de 30 catégories, progression par niveaux, et mode hors ligne disponible.",
+      "url": "https://solimots.vercel.app/",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any",
+      "inLanguage": "fr-FR",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "screenshot": "https://solimots.vercel.app/pwa-512.png"
+    }
+    </script>
+
+    <title>Solimots - Solitaire d'associations de mots</title>
   </head>
   <body>
     <div id="root"></div>
