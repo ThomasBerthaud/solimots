@@ -1,4 +1,4 @@
-import { GraduationCap, Play, RotateCcw, ScrollText, Settings, TrendingUp } from 'lucide-react'
+import { GraduationCap, Play, RotateCcw, Settings, TrendingUp } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
 import { useGameStore } from '../store/gameStore'
@@ -67,14 +67,6 @@ export function Home() {
             title="Mini tutoriel"
           >
             <IconLabel icon={GraduationCap} label="Mini tutoriel" hideLabelOnMobile={false} />
-          </Link>
-          <Link
-            to="/how-to"
-            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
-            aria-label="Voir les règles"
-            title="Voir les règles"
-          >
-            <IconLabel icon={ScrollText} label="Voir les règles" hideLabelOnMobile={false} />
           </Link>
           <Link
             to="/settings"

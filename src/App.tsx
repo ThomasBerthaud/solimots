@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { GraduationCap, Play, ScrollText, Settings } from 'lucide-react'
+import { GraduationCap, Play, Settings } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { IconLabel } from './components/ui/IconLabel'
@@ -58,14 +58,6 @@ function App() {
                 title="Tutoriel"
               >
                 <IconLabel icon={GraduationCap} label="Tutoriel" />
-              </Link>
-              <Link
-                className="inline-flex items-center hover:text-white"
-                to="/how-to"
-                aria-label="Règles"
-                title="Règles"
-              >
-                <IconLabel icon={ScrollText} label="Règles" />
               </Link>
               <Link
                 className="inline-flex items-center hover:text-white"
