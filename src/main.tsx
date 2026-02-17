@@ -7,7 +7,6 @@ import './index.css'
 import { CustomCategories } from './routes/CustomCategories.tsx'
 import { Game } from './routes/Game.tsx'
 import { Home } from './routes/Home.tsx'
-import { HowTo } from './routes/HowTo.tsx'
 import { NotFound } from './routes/NotFound.tsx'
 import { Settings } from './routes/Settings.tsx'
 import { Tutorial } from './routes/Tutorial.tsx'
@@ -26,7 +25,6 @@ const router = createBrowserRouter([
     children: [
       { path: '/', element: <Home /> },
       { path: '/game', element: <Game /> },
-      { path: '/how-to', element: <HowTo /> },
       { path: '/tutorial', element: <Tutorial /> },
       { path: '/settings', element: <Settings /> },
       { path: '/custom-categories', element: <CustomCategories /> },
