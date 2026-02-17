@@ -20,7 +20,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
       aria-label="Aide"
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/70 p-5 text-white shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/70 p-4 sm:p-5 text-white shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
@@ -29,8 +29,8 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Aide</p>
-            <h2 className="mt-1 text-lg font-bold">Comment jouer</h2>
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-white/70">Aide</p>
+            <h2 className="mt-1 text-lg sm:text-xl font-bold">Comment jouer</h2>
           </div>
           <button
             type="button"
@@ -44,7 +44,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="mt-4 space-y-3 text-sm text-white/80">
+        <div className="mt-4 space-y-3 text-sm sm:text-base text-white/80">
           <p>
             - <span className="font-semibold text-white">Pioche</span>: appuie sur Stock pour tirer une carte dans la
             Défausse.

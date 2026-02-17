@@ -31,10 +31,10 @@ export function CustomCategories() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+      <section className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
         <Link
           to="/settings"
-          className="inline-flex items-center gap-2 text-sm text-white/75 hover:text-white mb-4"
+          className="inline-flex items-center gap-2 text-sm sm:text-base text-white/75 hover:text-white mb-4"
           aria-label="Retour aux paramètres"
           title="Retour aux paramètres"
         >
@@ -42,24 +42,24 @@ export function CustomCategories() {
           <span>Retour</span>
         </Link>
         <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Catégories personnalisées</h1>
-        <p className="mt-2 text-white/75">
+        <p className="mt-2 text-base sm:text-lg text-white/75">
           Ajoute tes propres catégories et mots pour personnaliser tes parties.
         </p>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
-        <h2 className="text-lg font-semibold">Ajouter une catégorie</h2>
+      <section className="rounded-2xl border border-white/10 bg-black/10 p-4 sm:p-5">
+        <h2 className="text-lg sm:text-xl font-semibold">Ajouter une catégorie</h2>
         <form onSubmit={handleAddCategory} className="mt-4 flex flex-col gap-3 sm:flex-row">
           <input
             type="text"
             value={newCategoryLabel}
             onChange={(e) => setNewCategoryLabel(e.target.value)}
             placeholder="Nom de la catégorie..."
-            className="flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-amber-400/40 focus:bg-amber-400/5 focus:outline-none"
+            className="flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-white placeholder:text-white/40 focus:border-amber-400/40 focus:bg-amber-400/5 focus:outline-none"
           />
           <button
             type="submit"
-            className="flex items-center justify-center gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-amber-300 hover:bg-amber-400/20 transition-colors sm:justify-start"
+            className="flex items-center justify-center gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-amber-300 hover:bg-amber-400/20 transition-colors sm:justify-start"
             aria-label="Ajouter la catégorie"
             title="Ajouter la catégorie"
           >
@@ -70,9 +70,9 @@ export function CustomCategories() {
       </section>
 
       {customCategories.length === 0 ? (
-        <section className="rounded-2xl border border-white/10 bg-black/10 p-8 text-center">
-          <p className="text-white/60">Aucune catégorie personnalisée pour le moment.</p>
-          <p className="mt-2 text-sm text-white/40">
+        <section className="rounded-2xl border border-white/10 bg-black/10 p-6 sm:p-8 text-center">
+          <p className="text-base sm:text-lg text-white/60">Aucune catégorie personnalisée pour le moment.</p>
+          <p className="mt-2 text-sm sm:text-base text-white/40">
             Commence par ajouter une catégorie ci-dessus !
           </p>
         </section>
@@ -81,12 +81,12 @@ export function CustomCategories() {
           {customCategories.map((category) => (
             <section
               key={category.id}
-              className="rounded-2xl border border-white/10 bg-black/10 p-5"
+              className="rounded-2xl border border-white/10 bg-black/10 p-4 sm:p-5"
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold">{category.label}</h3>
-                  <p className="text-sm text-white/60">
+                  <h3 className="text-lg sm:text-xl font-semibold">{category.label}</h3>
+                  <p className="text-sm sm:text-base text-white/60">
                     {category.words.length} mot{category.words.length !== 1 ? 's' : ''}
                     {category.words.length >= 8 ? ' (maximum atteint)' : ''}
                   </p>
@@ -94,7 +94,7 @@ export function CustomCategories() {
                 <button
                   type="button"
                   onClick={() => removeCategory(category.id)}
-                  className="flex items-center gap-2 rounded-lg border border-red-400/40 bg-red-400/10 px-3 py-2 text-sm text-red-300 hover:bg-red-400/20 transition-colors"
+                  className="flex items-center gap-2 rounded-lg border border-red-400/40 bg-red-400/10 px-3 py-2 text-sm sm:text-base text-red-300 hover:bg-red-400/20 transition-colors"
                   aria-label="Supprimer la catégorie"
                   title="Supprimer la catégorie"
                 >
@@ -110,7 +110,7 @@ export function CustomCategories() {
                       key={index}
                       className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5"
                     >
-                      <span className="text-sm">{word}</span>
+                      <span className="text-sm sm:text-base">{word}</span>
                       <button
                         type="button"
                         onClick={() => removeWordFromCategory(category.id, index)}
@@ -140,11 +140,11 @@ export function CustomCategories() {
                       setNewWords((prev) => ({ ...prev, [category.id]: e.target.value }))
                     }
                     placeholder="Ajouter un mot..."
-                    className="flex-1 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-amber-400/40 focus:bg-amber-400/5 focus:outline-none"
+                    className="flex-1 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm sm:text-base text-white placeholder:text-white/40 focus:border-amber-400/40 focus:bg-amber-400/5 focus:outline-none"
                   />
                   <button
                     type="submit"
-                    className="flex items-center justify-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm text-amber-300 hover:bg-amber-400/20 transition-colors sm:justify-start"
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm sm:text-base text-amber-300 hover:bg-amber-400/20 transition-colors sm:justify-start"
                     aria-label="Ajouter le mot"
                     title="Ajouter le mot"
                   >

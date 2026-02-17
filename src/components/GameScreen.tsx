@@ -353,7 +353,7 @@ export function GameScreen() {
         <Link
           to="/"
           data-ui-control="true"
-          className="inline-flex h-10 items-center gap-2 rounded-2xl bg-black/25 px-3 text-xs font-semibold text-white/85 active:bg-black/35 lg:h-12 lg:px-4 lg:text-sm"
+          className="inline-flex h-10 items-center gap-2 rounded-2xl bg-black/25 px-3 text-xs sm:text-sm font-semibold text-white/85 active:bg-black/35 lg:h-12 lg:px-4 lg:text-sm"
           aria-label="Retour à l'accueil"
           title="Retour à l'accueil"
         >
@@ -362,10 +362,10 @@ export function GameScreen() {
         </Link>
 
         <div className="text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60 lg:text-xs">
+          <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-white/60 lg:text-xs">
             {getTitleForLevel(currentLevel)} • Niv. {currentLevel}
           </p>
-          <p className="text-sm font-semibold text-white/90 lg:text-base">Partie #{level.seed}</p>
+          <p className="text-sm sm:text-base font-semibold text-white/90 lg:text-base">Partie #{level.seed}</p>
         </div>
 
         <button
@@ -504,7 +504,7 @@ function WinOverlay({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-5 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-4 sm:p-5 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
@@ -526,9 +526,9 @@ function WinOverlay({
           />
         ) : (
           <>
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Victoire</p>
-            <h2 className="mt-2 text-2xl font-bold text-white">Bravo !</h2>
-            <p className="mt-2 text-sm text-white/75">Toutes les cartes sont rangées.</p>
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-white/70">Victoire</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-white">Bravo !</h2>
+            <p className="mt-2 text-sm sm:text-base text-white/75">Toutes les cartes sont rangées.</p>
 
             <motion.div
               className="pointer-events-none mt-5 h-10"
@@ -544,7 +544,7 @@ function WinOverlay({
                 type="button"
                 data-ui-control="true"
                 onClick={onReplay}
-                className="w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-bold text-black shadow active:bg-amber-500"
+                className="w-full rounded-2xl bg-amber-400 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base font-bold text-black shadow active:bg-amber-500"
                 aria-label="Rejouer"
                 title="Rejouer"
               >
@@ -585,22 +585,22 @@ function LostOverlay({
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-5 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-4 sm:p-5 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
       >
-        <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Défaite</p>
-        <h2 className="mt-2 text-2xl font-bold text-white">Bloqué…</h2>
-        <p className="mt-2 text-sm text-white/75">Impossible de compléter une catégorie déjà posée.</p>
+        <p className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-white/70">Défaite</p>
+        <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-white">Bloqué…</h2>
+        <p className="mt-2 text-sm sm:text-base text-white/75">Impossible de compléter une catégorie déjà posée.</p>
 
         <div className="mt-6 grid gap-2">
           <button
             type="button"
             data-ui-control="true"
             onClick={onReplaySameSeed}
-            className="w-full rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-black shadow active:bg-white"
+            className="w-full rounded-2xl bg-white/90 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base font-bold text-black shadow active:bg-white"
             aria-label="Recommencer la même partie"
             title="Recommencer la même partie"
           >

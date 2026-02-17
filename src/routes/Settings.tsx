@@ -16,10 +16,10 @@ export function Settings() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+      <section className="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-sm text-white/75 hover:text-white mb-4"
+          className="inline-flex items-center gap-2 text-sm sm:text-base text-white/75 hover:text-white mb-4"
           aria-label="Retour"
           title="Retour"
         >
@@ -27,39 +27,39 @@ export function Settings() {
           <span>Retour</span>
         </Link>
         <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Configuration</h1>
-        <p className="mt-2 text-white/75">Personnalise ton expérience de jeu.</p>
+        <p className="mt-2 text-base sm:text-lg text-white/75">Personnalise ton expérience de jeu.</p>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
-        <h2 className="text-lg font-semibold">Contenu du jeu</h2>
-        <p className="mt-1 text-sm text-white/75">Personnalise les catégories et mots utilisés dans le jeu.</p>
+      <section className="rounded-2xl border border-white/10 bg-black/10 p-4 sm:p-5">
+        <h2 className="text-lg sm:text-xl font-semibold">Contenu du jeu</h2>
+        <p className="mt-1 text-sm sm:text-base text-white/75">Personnalise les catégories et mots utilisés dans le jeu.</p>
 
         <div className="mt-4">
           <Link
             to="/custom-categories"
-            className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-left transition-colors hover:bg-white/10"
+            className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 sm:px-4 sm:py-3 text-left transition-colors hover:bg-white/10"
             aria-label="Catégories personnalisées"
             title="Catégories personnalisées"
           >
             <div>
-              <p className="font-semibold">Catégories personnalisées</p>
-              <p className="text-sm text-white/60">Ajoute tes propres catégories et mots</p>
+              <p className="font-semibold text-sm sm:text-base">Catégories personnalisées</p>
+              <p className="text-sm sm:text-base text-white/60">Ajoute tes propres catégories et mots</p>
             </div>
             <ChevronRight size={20} className="text-white/40" aria-hidden="true" />
           </Link>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
-        <h2 className="text-lg font-semibold">Mode de jeu</h2>
-        <p className="mt-1 text-sm text-white/75">Choisis la position de la pioche selon ta main préférée.</p>
+      <section className="rounded-2xl border border-white/10 bg-black/10 p-4 sm:p-5">
+        <h2 className="text-lg sm:text-xl font-semibold">Mode de jeu</h2>
+        <p className="mt-1 text-sm sm:text-base text-white/75">Choisis la position de la pioche selon ta main préférée.</p>
 
         <div className="mt-4 space-y-3">
           <button
             type="button"
             onClick={() => setHandedness('right')}
             className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+              'flex w-full items-center justify-between rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 text-left transition-colors',
               handedness === 'right'
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
                 : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
@@ -68,8 +68,8 @@ export function Settings() {
             title="Mode droitier"
           >
             <div>
-              <p className="font-semibold">Droitier</p>
-              <p className="text-sm text-white/60">Pioche à droite</p>
+              <p className="font-semibold text-sm sm:text-base">Droitier</p>
+              <p className="text-sm sm:text-base text-white/60">Pioche à droite</p>
             </div>
             {handedness === 'right' ? (
               <div className="text-lg" aria-hidden="true">
@@ -82,7 +82,7 @@ export function Settings() {
             type="button"
             onClick={() => setHandedness('left')}
             className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+              'flex w-full items-center justify-between rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 text-left transition-colors',
               handedness === 'left'
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
                 : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
@@ -91,8 +91,8 @@ export function Settings() {
             title="Mode gaucher"
           >
             <div>
-              <p className="font-semibold">Gaucher</p>
-              <p className="text-sm text-white/60">Pioche à gauche</p>
+              <p className="font-semibold text-sm sm:text-base">Gaucher</p>
+              <p className="text-sm sm:text-base text-white/60">Pioche à gauche</p>
             </div>
             {handedness === 'left' ? (
               <div className="text-lg" aria-hidden="true">
@@ -103,9 +103,9 @@ export function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
-        <h2 className="text-lg font-semibold">Thème visuel</h2>
-        <p className="mt-1 text-sm text-white/75">Personnalise l'apparence du jeu.</p>
+      <section className="rounded-2xl border border-white/10 bg-black/10 p-4 sm:p-5">
+        <h2 className="text-lg sm:text-xl font-semibold">Thème visuel</h2>
+        <p className="mt-1 text-sm sm:text-base text-white/75">Personnalise l'apparence du jeu.</p>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           {themeOptions.map((theme) => (
@@ -114,7 +114,7 @@ export function Settings() {
               type="button"
               onClick={() => setTheme(theme.id)}
               className={[
-                'flex flex-col items-start rounded-xl border p-3 text-left transition-colors',
+                'flex flex-col items-start rounded-xl border p-3 sm:p-4 text-left transition-colors',
                 currentTheme === theme.id
                   ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
                   : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
@@ -129,8 +129,8 @@ export function Settings() {
                 }}
               />
               <div className="w-full">
-                <p className="font-semibold">{theme.name}</p>
-                <p className="text-xs text-white/60">{theme.description}</p>
+                <p className="font-semibold text-sm sm:text-base">{theme.name}</p>
+                <p className="text-xs sm:text-sm text-white/60">{theme.description}</p>
               </div>
               {currentTheme === theme.id ? (
                 <div className="ml-auto mt-1 text-lg" aria-hidden="true">
@@ -142,16 +142,16 @@ export function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
-        <h2 className="text-lg font-semibold">Audio</h2>
-        <p className="mt-1 text-sm text-white/75">Active ou désactive les sons et la musique.</p>
+      <section className="rounded-2xl border border-white/10 bg-black/10 p-4 sm:p-5">
+        <h2 className="text-lg sm:text-xl font-semibold">Audio</h2>
+        <p className="mt-1 text-sm sm:text-base text-white/75">Active ou désactive les sons et la musique.</p>
 
         <div className="mt-4 space-y-3">
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
             className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+              'flex w-full items-center justify-between rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 text-left transition-colors',
               soundEnabled
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
                 : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
@@ -160,8 +160,8 @@ export function Settings() {
             title="Effets sonores"
           >
             <div>
-              <p className="font-semibold">Effets sonores</p>
-              <p className="text-sm text-white/60">Sons des actions de jeu</p>
+              <p className="font-semibold text-sm sm:text-base">Effets sonores</p>
+              <p className="text-sm sm:text-base text-white/60">Sons des actions de jeu</p>
             </div>
             {soundEnabled ? (
               <div className="text-lg" aria-hidden="true">
@@ -174,7 +174,7 @@ export function Settings() {
             type="button"
             onClick={() => setMusicEnabled(!musicEnabled)}
             className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+              'flex w-full items-center justify-between rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 text-left transition-colors',
               musicEnabled
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
                 : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
@@ -183,8 +183,8 @@ export function Settings() {
             title="Musique"
           >
             <div>
-              <p className="font-semibold">Musique</p>
-              <p className="text-sm text-white/60">Musique de fond</p>
+              <p className="font-semibold text-sm sm:text-base">Musique</p>
+              <p className="text-sm sm:text-base text-white/60">Musique de fond</p>
             </div>
             {musicEnabled ? (
               <div className="text-lg" aria-hidden="true">

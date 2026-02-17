@@ -51,9 +51,9 @@ export function Tutorial() {
         </button>
       </div>
 
-      <div className="surface p-5">
+      <div className="surface p-4 sm:p-5">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-white/60">
             Étape {idx + 1}/{steps.length}
           </p>
           <div className="flex gap-1">
@@ -75,9 +75,9 @@ export function Tutorial() {
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="mt-4 space-y-2"
           >
-            <h2 className="text-lg font-semibold">{step.title}</h2>
-            <p className="text-white/80">{step.body}</p>
-            <p className="text-sm text-white/60">{step.hint}</p>
+            <h2 className="text-lg sm:text-xl font-semibold">{step.title}</h2>
+            <p className="text-base sm:text-lg text-white/80">{step.body}</p>
+            <p className="text-sm sm:text-base text-white/60">{step.hint}</p>
           </motion.div>
         </AnimatePresence>
 
@@ -85,7 +85,7 @@ export function Tutorial() {
           <button
             onClick={() => setIdx((v) => Math.max(0, v - 1))}
             disabled={idx === 0}
-            className="btn-ghost w-28 px-3 py-2 text-sm disabled:opacity-40"
+            className="btn-ghost w-28 px-3 py-2 text-sm sm:text-base disabled:opacity-40"
             aria-label="Précédent"
             title="Précédent"
           >
@@ -109,7 +109,7 @@ export function Tutorial() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/70">
+      <div className="rounded-2xl border border-white/10 bg-black/10 p-4 sm:p-5 text-sm sm:text-base text-white/70">
         Tu peux relancer ce tutoriel depuis l’accueil.
       </div>
     </div>
