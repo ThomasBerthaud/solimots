@@ -77,7 +77,7 @@ export function StockWaste({
             />
           )}
         </AnimatePresence>
-        <div className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/75">
+        <div className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-xs font-bold text-white/85">
           {level.waste.length}
         </div>
       </div>
@@ -115,7 +115,7 @@ export function StockWaste({
             </div>
           </div>
         ) : null}
-        <div className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/75">
+        <div className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-xs font-bold text-white/85">
           {level.stock.length}
         </div>
       </button>

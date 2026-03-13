@@ -64,7 +64,7 @@ export function ThumbDock({
         type="button"
         data-ui-control="true"
         onClick={onUndo}
-        className="relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-white/85 active:bg-white/10"
+        className="relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-white/90 active:bg-white/10"
         aria-label="Annuler"
         title="Annuler"
       >
@@ -89,7 +89,7 @@ export function ThumbDock({
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.99 }}
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
-                  <div className="rounded-2xl border border-rose-300/25 bg-rose-500/10 px-4 py-3 text-center text-sm font-semibold text-rose-100 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur">
+                  <div className="min-w-0 rounded-2xl border border-rose-300/25 bg-rose-500/10 px-3 py-2 text-center text-sm font-semibold text-rose-100 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur break-words line-clamp-2 lg:px-4 lg:py-3">
                     {toast.message}
                   </div>
                 </motion.div>
@@ -98,7 +98,7 @@ export function ThumbDock({
           </AnimatePresence>
 
           <motion.div
-            className="pointer-events-auto flex items-center justify-between rounded-[26px] border border-white/10 bg-black/55 px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.55)] backdrop-blur"
+            className="pointer-events-auto flex items-center justify-between rounded-[26px] border border-white/10 bg-black/55 px-3 py-2 shadow-[0_26px_80px_rgba(0,0,0,0.55)] backdrop-blur lg:px-4 lg:py-3"
             initial={false}
             animate={reduceMotion ? undefined : { y: [6, 0] }}
             transition={reduceMotion ? undefined : { duration: 0.2, ease: 'easeOut' }}
