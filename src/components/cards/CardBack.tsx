@@ -14,7 +14,7 @@ export function CardBack({ className, style }: CardBackProps) {
   return (
     <motion.div
       className={[
-        'rounded-[18px] border border-white/10 bg-gradient-to-br shadow-[0_12px_30px_rgba(0,0,0,0.25)]',
+        'rounded-[18px] border border-border bg-gradient-to-br shadow-card-back',
         theme.cardBack.gradient,
         className ?? '',
       ].join(' ')}

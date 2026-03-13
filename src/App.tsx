@@ -36,23 +36,23 @@ function App() {
   return (
     <div className="min-h-dvh">
       {isGame ? null : (
-        <header className="sticky top-0 z-20 border-b border-white/10 bg-black/20 backdrop-blur">
+        <header className="header">
           <div className="mx-auto flex max-w-screen-md items-center justify-between px-4 py-3 md:max-w-4xl">
             <Link to="/" className="text-lg font-semibold tracking-wide">
               Solimots
             </Link>
-            <nav className="flex items-center gap-3 text-sm text-white/80">
+            <nav className="flex items-center gap-1 text-sm text-muted sm:gap-3">
               <button
                 type="button"
                 onClick={handlePlay}
-                className="inline-flex items-center hover:text-white"
+                className="inline-flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center rounded-lg hover:text-primary focus:outline-none"
                 aria-label="Jouer"
                 title="Jouer"
               >
                 <IconLabel icon={Play} label="Jouer" />
               </button>
               <Link
-                className="inline-flex items-center hover:text-white"
+                className="inline-flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center rounded-lg hover:text-primary"
                 to="/tutorial"
                 aria-label="Tutoriel"
                 title="Tutoriel"
@@ -60,7 +60,7 @@ function App() {
                 <IconLabel icon={GraduationCap} label="Tutoriel" />
               </Link>
               <Link
-                className="inline-flex items-center hover:text-white"
+                className="inline-flex min-h-[44px] min-w-[44px] flex-shrink-0 items-center justify-center rounded-lg hover:text-primary"
                 to="/settings"
                 aria-label="Configuration"
                 title="Configuration"

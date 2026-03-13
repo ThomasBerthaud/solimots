@@ -339,8 +339,11 @@ export function GameScreen() {
 
   return (
     <div
-      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col px-2 pb-2 lg:px-3 lg:pb-8"
-      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col pb-2 lg:pb-8"
+      style={{
+        paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+        paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
+      }}
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
@@ -357,7 +360,7 @@ export function GameScreen() {
         <Link
           to="/"
           data-ui-control="true"
-          className="inline-flex h-11 min-w-[44px] items-center gap-2 rounded-2xl bg-black/25 px-3 text-xs font-semibold text-white/90 active:bg-black/35 lg:h-12 lg:px-4 lg:text-sm"
+          className="inline-flex h-11 min-w-[44px] items-center gap-2 rounded-2xl bg-surface-strong px-3 text-xs font-semibold text-secondary active:bg-surface-badge lg:h-12 lg:px-4 lg:text-sm"
           aria-label="Retour à l'accueil"
           title="Retour à l'accueil"
         >
@@ -366,17 +369,17 @@ export function GameScreen() {
         </Link>
 
         <div className="min-w-0 flex-1 shrink-0 text-center">
-          <p className="truncate text-xs font-semibold uppercase tracking-widest text-white/80 lg:text-sm" title={`${getTitleForLevel(currentLevel)} • Niv. ${currentLevel}`}>
+          <p className="truncate text-xs font-semibold uppercase tracking-widest text-muted lg:text-sm" title={`${getTitleForLevel(currentLevel)} • Niv. ${currentLevel}`}>
             {getTitleForLevel(currentLevel)} • Niv. {currentLevel}
           </p>
-          <p className="truncate text-base font-semibold text-white/90 lg:text-base" title={`Partie #${level.seed}`}>Partie #{level.seed}</p>
+          <p className="truncate text-base font-semibold text-secondary lg:text-base" title={`Partie #${level.seed}`}>Partie #{level.seed}</p>
         </div>
 
         <button
           type="button"
           data-ui-control="true"
           onClick={() => setHelpOpen(true)}
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-black/25 text-white/90 active:bg-black/35 lg:h-12 lg:w-12"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-strong text-secondary active:bg-surface-badge lg:h-12 lg:w-12"
           aria-label="Aide"
           title="Aide"
         >
@@ -504,13 +507,13 @@ function WinOverlay({
 }) {
   return (
     <motion.div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      className="modal-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-4 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)] lg:p-5"
+        className="modal-panel"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
@@ -532,9 +535,9 @@ function WinOverlay({
           />
         ) : (
           <>
-            <p className="text-sm font-semibold uppercase tracking-widest text-white/80">Victoire</p>
-            <h2 className="mt-2 text-2xl font-bold text-white">Bravo !</h2>
-            <p className="mt-2 text-base text-white/85">Toutes les cartes sont rangées.</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-muted">Victoire</p>
+            <h2 className="mt-2 text-2xl font-bold text-primary">Bravo !</h2>
+            <p className="mt-2 text-base text-muted">Toutes les cartes sont rangées.</p>
 
             <motion.div
               className="pointer-events-none mt-5 h-10"
@@ -550,7 +553,7 @@ function WinOverlay({
                 type="button"
                 data-ui-control="true"
                 onClick={onReplay}
-                className="w-full rounded-2xl bg-amber-400 px-4 py-3 text-base font-bold text-black shadow active:bg-amber-500"
+                className="min-h-[44px] w-full rounded-2xl bg-amber-400 px-4 py-3 text-base font-bold text-black shadow active:bg-amber-500"
                 aria-label="Rejouer"
                 title="Rejouer"
               >
@@ -560,7 +563,7 @@ function WinOverlay({
               <Link
                 to="/"
                 data-ui-control="true"
-                className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-base font-bold text-white/90 shadow active:bg-black/45"
+                className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-surface-badge px-4 py-3 text-base font-bold text-secondary shadow active:bg-surface-badge-strong"
                 aria-label="Retour à l'accueil"
                 title="Retour à l'accueil"
               >
@@ -585,28 +588,28 @@ function LostOverlay({
 }) {
   return (
     <motion.div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      className="modal-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-4 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)] lg:p-5"
+        className="modal-panel"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
       >
-        <p className="text-sm font-semibold uppercase tracking-widest text-white/80">Défaite</p>
-        <h2 className="mt-2 text-2xl font-bold text-white">Bloqué…</h2>
-        <p className="mt-2 text-base text-white/85">Impossible de compléter une catégorie déjà posée.</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-muted">Défaite</p>
+        <h2 className="mt-2 text-2xl font-bold text-primary">Bloqué…</h2>
+        <p className="mt-2 text-base text-muted">Impossible de compléter une catégorie déjà posée.</p>
 
         <div className="mt-6 grid gap-2">
           <button
             type="button"
             data-ui-control="true"
             onClick={onReplaySameSeed}
-            className="w-full rounded-2xl bg-white/90 px-4 py-3 text-base font-bold text-black shadow active:bg-white"
+            className="min-h-[44px] w-full rounded-2xl bg-white/90 px-4 py-3 text-base font-bold text-black shadow active:bg-white"
             aria-label="Recommencer la même partie"
             title="Recommencer la même partie"
           >
@@ -617,7 +620,7 @@ function LostOverlay({
             type="button"
             data-ui-control="true"
             onClick={onReplay}
-            className="w-full rounded-2xl bg-white/70 px-4 py-3 text-base font-bold text-black shadow active:bg-white/80"
+            className="min-h-[44px] w-full rounded-2xl bg-white/70 px-4 py-3 text-base font-bold text-black shadow active:bg-white/80"
             aria-label="Nouvelle partie"
             title="Nouvelle partie"
           >
@@ -627,7 +630,7 @@ function LostOverlay({
           <Link
             to="/"
             data-ui-control="true"
-            className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-base font-bold text-white/90 shadow active:bg-black/45"
+            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-surface-badge px-4 py-3 text-base font-bold text-secondary shadow active:bg-surface-badge-strong"
             aria-label="Retour à l’accueil"
             title="Retour à l'accueil"
           >

@@ -110,9 +110,9 @@ export function Card({
         }
       }}
       className={[
-        'relative select-none rounded-[18px] border shadow-[0_14px_34px_rgba(0,0,0,0.22)]',
+        'relative select-none rounded-[18px] border shadow-card',
         isCategory
-          ? 'border-amber-200/60 bg-[linear-gradient(135deg,rgba(253,230,138,0.92),rgba(251,191,36,0.80))] text-amber-950'
+          ? 'border-[var(--card-category-border)] bg-[var(--card-category-bg)] text-[var(--card-category-text)]'
           : 'border-black/5 bg-white text-slate-900',
         selected ? (isCategory ? 'ring-2 ring-amber-200/90' : 'ring-2 ring-white/80') : '',
         draggable ? 'cursor-grab active:cursor-grabbing' : '',

@@ -85,7 +85,7 @@ export function Tutorial() {
           <button
             onClick={() => setIdx((v) => Math.max(0, v - 1))}
             disabled={idx === 0}
-            className="btn-ghost w-28 px-3 py-2 text-sm disabled:opacity-40"
+            className="btn-ghost min-w-[7rem] px-3 py-2 text-sm disabled:opacity-40"
             aria-label="Précédent"
             title="Précédent"
           >
@@ -95,21 +95,21 @@ export function Tutorial() {
           {idx < steps.length - 1 ? (
             <button
               onClick={() => setIdx((v) => Math.min(steps.length - 1, v + 1))}
-              className="btn-primary w-28"
-              aria-label="Suivant"
+            className="btn-primary min-w-[7rem]"
+            aria-label="Suivant"
               title="Suivant"
             >
               <IconLabel icon={ChevronRight} label="Suivant" />
             </button>
           ) : (
-            <Link to="/game" className="btn-primary w-28" aria-label="Jouer" title="Jouer">
+            <Link to="/game" className="btn-primary min-w-[7rem]" aria-label="Jouer" title="Jouer">
               <IconLabel icon={Play} label="Jouer" />
             </Link>
           )}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/70">
+      <div className="surface-subtle p-4 text-sm text-muted">
         Tu peux relancer ce tutoriel depuis l’accueil.
       </div>
     </div>

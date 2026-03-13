@@ -32,19 +32,19 @@ export function Home() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
-        <p className="text-sm uppercase tracking-wider text-white/70">Solitaire d'associations</p>
+      <section className="surface p-5">
+        <p className="text-sm uppercase tracking-wider text-subtle">Solitaire d'associations</p>
         <h1 className="mt-2 text-2xl font-semibold leading-tight md:text-3xl">
           Associe les mots à la bonne catégorie.
         </h1>
-        <p className="mt-2 text-white/75">Un feeling "solitaire", mais avec des mots. Déplace, teste, progresse.</p>
+        <p className="mt-2 text-muted">Un feeling "solitaire", mais avec des mots. Déplace, teste, progresse.</p>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           {hasSavedGame ? (
             <button
               type="button"
               onClick={handleResume}
-              className="inline-flex items-center justify-center rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 shadow hover:bg-amber-400/20 hover:border-amber-400/60 active:bg-amber-400/15"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 shadow hover:bg-amber-400/20 hover:border-amber-400/60 active:bg-amber-400/15"
               aria-label="Reprendre la partie"
               title="Reprendre la partie"
             >
@@ -54,7 +54,7 @@ export function Home() {
           <button
             type="button"
             onClick={handlePlay}
-            className="inline-flex items-center justify-center rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-black shadow hover:bg-amber-300 active:bg-amber-500"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-black shadow hover:bg-amber-300 active:bg-amber-500"
             aria-label="Jouer une partie"
             title="Jouer une partie"
           >
@@ -62,7 +62,7 @@ export function Home() {
           </button>
           <Link
             to="/tutorial"
-            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
             aria-label="Mini tutoriel"
             title="Mini tutoriel"
           >
@@ -70,7 +70,7 @@ export function Home() {
           </Link>
           <Link
             to="/settings"
-            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
             aria-label="Configuration"
             title="Configuration"
           >
@@ -80,35 +80,35 @@ export function Home() {
       </section>
 
       {/* Progression Section */}
-      <section className="rounded-2xl border border-amber-400/20 bg-gradient-to-br from-amber-400/10 to-orange-500/10 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+      <section className="surface-accent p-5">
         <div className="flex items-start justify-between">
           <div>
             <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400/90">
               <TrendingUp size={14} aria-hidden="true" />
               <span>Progression</span>
             </p>
-            <h2 className="mt-1 text-xl font-bold text-white">
+            <h2 className="mt-1 text-xl font-bold text-primary">
               {currentTitle} • Niveau {currentLevel}
             </h2>
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-amber-400">{totalPoints.toLocaleString()}</p>
-            <p className="text-xs text-white/60">Points totaux</p>
+            <p className="text-xs text-subtle">Points totaux</p>
           </div>
         </div>
 
         <div className="mt-4">
-          <div className="mb-2 flex items-center justify-between text-xs text-white/70">
+          <div className="mb-2 flex items-center justify-between text-xs text-muted">
             <span>Niveau {currentLevel + 1}</span>
             <span>{pointsToNextLevel} points restants</span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-black/30">
+          <div className="h-3 overflow-hidden rounded-full bg-surface-strong">
             <div
               className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
-          <div className="mt-2 text-center text-xs text-white/60">
+          <div className="mt-2 text-center text-xs text-subtle">
             {pointsInCurrentLevel} / {pointsForNextLevel} points
           </div>
         </div>

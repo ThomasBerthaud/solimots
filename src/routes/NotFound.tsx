@@ -6,7 +6,7 @@ export function NotFound() {
   return (
     <div className="space-y-3">
       <h1 className="text-xl font-semibold">Page introuvable</h1>
-      <p className="text-white/75">Cette page n’existe pas.</p>
+      <p className="text-muted">Cette page n’existe pas.</p>
       <Link
         className="inline-flex items-center text-amber-300 hover:text-amber-200"
         to="/"

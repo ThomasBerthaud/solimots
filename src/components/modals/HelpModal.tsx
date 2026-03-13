@@ -1,13 +1,70 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { X } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+}
 
 // English comments per project rule.
 export function HelpModal({ onClose }: { onClose: () => void }) {
   const reduceMotion = useReducedMotion()
+  const panelRef = useRef<HTMLDivElement>(null)
+  const previousActiveElementRef = useRef<HTMLElement | null>(null)
+
+  // Restore focus to trigger on unmount; handle Escape key
+  useEffect(() => {
+    previousActiveElementRef.current = document.activeElement as HTMLElement | null
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      e.preventDefault()
+      onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      previousActiveElementRef.current?.focus()
+    }
+  }, [onClose])
+
+  // Focus first focusable (close button) when panel is visible; trap focus inside modal
+  useEffect(() => {
+    const panel = panelRef.current
+    if (!panel) return
+    const focusFirst = () => {
+      const focusable = getFocusableElements(panel)
+      focusable[0]?.focus()
+    }
+    focusFirst()
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      const focusable = getFocusableElements(panel)
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const current = document.activeElement as HTMLElement | null
+      if (e.shiftKey) {
+        if (current === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (current === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    panel.addEventListener('keydown', handleKeyDown)
+    return () => panel.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <motion.div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      className="modal-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -20,7 +77,8 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
       aria-label="Aide"
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/70 p-4 text-white shadow-[0_40px_120px_rgba(0,0,0,0.65)] lg:p-5"
+        ref={panelRef}
+        className="modal-panel text-primary"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
@@ -29,14 +87,14 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold uppercase tracking-widest text-white/80">Aide</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-muted">Aide</p>
             <h2 className="mt-1 text-lg font-bold">Comment jouer</h2>
           </div>
           <button
             type="button"
             data-ui-control="true"
             onClick={onClose}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-white/90 active:bg-white/10"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-subtle text-secondary active:bg-white/10"
             aria-label="Fermer l’aide"
             title="Fermer"
           >
@@ -44,20 +102,20 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-base text-white/85">
+        <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-base text-muted">
           <p>
-            - <span className="font-semibold text-white">Pioche</span>: appuie sur Stock pour tirer une carte dans la
+            - <span className="font-semibold text-primary">Pioche</span>: appuie sur Stock pour tirer une carte dans la
             Défausse.
           </p>
           <p>
-            - <span className="font-semibold text-white">Déplacer</span>: tape une carte du dessus (tableau ou défausse)
+            - <span className="font-semibold text-primary">Déplacer</span>: tape une carte du dessus (tableau ou défausse)
             pour la sélectionner, puis tape une destination.
           </p>
           <p>
-            - <span className="font-semibold text-white">Slots</span>: pose une catégorie sur un slot vide, puis pose
+            - <span className="font-semibold text-primary">Slots</span>: pose une catégorie sur un slot vide, puis pose
             uniquement les mots de cette catégorie dessus.
           </p>
-          <p className="text-white/80">Astuce: tape sur le fond (en dehors des cartes) pour annuler la sélection.</p>
+          <p className="text-muted">Astuce: tape sur le fond (en dehors des cartes) pour annuler la sélection.</p>
         </div>
       </motion.div>
     </motion.div>
