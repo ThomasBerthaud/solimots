@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useSettingsStore } from '../store/settingsStore'
-import { soundManager, type MusicTrack, type SoundEffect } from './soundManager'
+import { soundManager, type MusicTrack, type PlayMusicOptions, type SoundEffect } from './soundManager'
 
 export function useSoundEffects() {
   const soundEnabled = useSettingsStore((s) => s.soundEnabled)
@@ -15,9 +15,9 @@ export function useSoundEffects() {
   )
 
   const playMusic = useCallback(
-    (track: MusicTrack, volume = 0.3) => {
+    (track: MusicTrack, volume = 0.3, options?: PlayMusicOptions) => {
       if (!musicEnabled) return
-      soundManager.playMusic(track, volume)
+      soundManager.playMusic(track, volume, options ?? {})
     },
     [musicEnabled],
   )
@@ -45,9 +45,8 @@ export function useStartupMusic() {
 
   useEffect(() => {
     if (musicEnabled && !hasPlayedRef.current) {
-      // Delay slightly to ensure user interaction
       const timer = setTimeout(() => {
-        playMusic('startup', 0.2)
+        playMusic('startup', 0.18, { fadeInMs: 1200 })
         hasPlayedRef.current = true
       }, 500)
 

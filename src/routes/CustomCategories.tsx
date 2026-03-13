@@ -45,7 +45,7 @@ export function CustomCategories() {
           <ArrowLeft size={16} aria-hidden="true" />
           <span>Retour</span>
         </Link>
-        <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Catégories personnalisées</h1>
+        <h1 className="font-display text-2xl font-bold leading-tight tracking-tight md:text-3xl">Catégories personnalisées</h1>
         <p className="mt-2 text-muted">
           Crée des catégories et ajoute des mots pour les utiliser en partie.
         </p>
@@ -89,7 +89,7 @@ export function CustomCategories() {
         <section className="surface-subtle p-8 text-center">
           <p className="text-subtle">Aucune catégorie personnalisée.</p>
           <p className="mt-2 text-sm text-subtle">
-            Ajoute une catégorie ci-dessus pour commencer.
+            Ta première catégorie t’attend juste au-dessus 👆
           </p>
         </section>
       ) : (

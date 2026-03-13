@@ -45,7 +45,7 @@ export function Tutorial() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold md:text-2xl">Tutoriel</h1>
+        <h1 className="font-display text-xl font-bold tracking-tight md:text-2xl">Tutoriel</h1>
         <button onClick={() => navigate(-1)} className="btn-ghost px-3 py-2 text-xs" aria-label="Fermer" title="Fermer">
           <IconLabel icon={X} label="Fermer" />
         </button>

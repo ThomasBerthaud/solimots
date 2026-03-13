@@ -4,6 +4,10 @@
 
 /* Solitaire-like theme tokens */
 :root {
+  /* Typography: display (headings) + body — distinctive, not system default */
+  --font-display: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+
   /* Legacy HSL tokens (for body color, etc.) */
   --felt-900: 150 45% 9%;
   --felt-800: 150 42% 12%;
@@ -20,26 +24,31 @@
   --theme-felt-from: rgba(16, 185, 129, 0.35);
   --theme-felt-to: rgba(6, 78, 59, 0.35);
 
-  /* Design system: surfaces */
-  --color-surface: rgb(0 0 0 / 0.2);
-  --color-surface-subtle: rgb(0 0 0 / 0.1);
-  --color-surface-strong: rgb(0 0 0 / 0.25);
-  --color-surface-overlay: rgb(0 0 0 / 0.55);
-  --color-surface-modal: rgb(0 0 0 / 0.65);
-  --color-surface-dock: rgb(0 0 0 / 0.55);
-  --color-surface-board: rgb(0 0 0 / 0.15);
-  --color-surface-badge: rgb(0 0 0 / 0.35);
-  --color-surface-badge-strong: rgb(0 0 0 / 0.45);
+  /* Design system: surfaces (tinted toward felt green for cohesion) */
+  --color-surface: rgb(6 24 18 / 0.35);
+  --color-surface-subtle: rgb(6 24 18 / 0.2);
+  --color-surface-strong: rgb(6 24 18 / 0.45);
+  --color-surface-overlay: rgb(4 18 14 / 0.7);
+  --color-surface-modal: rgb(4 18 14 / 0.82);
+  --color-surface-dock: rgb(6 24 18 / 0.6);
+  --color-surface-board: rgb(6 24 18 / 0.22);
+  --color-surface-badge: rgb(6 24 18 / 0.5);
+  --color-surface-badge-strong: rgb(6 24 18 / 0.6);
 
-  /* Design system: borders */
-  --color-border: rgb(255 255 255 / 0.1);
-  --color-border-strong: rgb(255 255 255 / 0.15);
+  /* Design system: borders (slight warm tint) */
+  --color-border: rgb(255 255 255 / 0.09);
+  --color-border-strong: rgb(255 255 255 / 0.14);
 
   /* Design system: text (high contrast for a11y) */
-  --color-text-primary: rgb(255 255 255 / 0.95);
-  --color-text-secondary: rgb(255 255 255 / 0.9);
-  --color-text-muted: rgb(255 255 255 / 0.8);
-  --color-text-subtle: rgb(255 255 255 / 0.7);
+  --color-text-primary: rgb(253 253 252 / 0.98);
+  --color-text-secondary: rgb(253 253 252 / 0.92);
+  --color-text-muted: rgb(253 253 252 / 0.82);
+  --color-text-subtle: rgb(253 253 252 / 0.72);
+
+  /* Accent: punchy amber (one bold accent, not washed out) */
+  --color-accent: rgb(251 191 36);
+  --color-accent-muted: rgb(253 224 71 / 0.9);
+  --color-accent-strong: rgb(245 158 11);
 
   /* Design system: shadows */
   --shadow-surface: 0 12px 40px rgb(0 0 0 / 0.35);
@@ -69,18 +78,21 @@ body {
 
 body {
   margin: 0;
-  background: radial-gradient(1200px 600px at 30% 0%, var(--theme-bg-from), var(--theme-bg-to));
+  background: radial-gradient(1400px 700px at 35% -5%, var(--theme-bg-from), var(--theme-bg-to));
   color: hsl(var(--card));
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Arial,
-    'Apple Color Emoji',
-    'Segoe UI Emoji';
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+/* Subtle grain overlay for depth (no glassmorphism) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* Improve mobile drag interactions */
@@ -90,6 +102,11 @@ body {
 }
 
 @layer components {
+  /* Display font for headings and logo (distinctive, not system default) */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
   /* Surfaces - use design tokens */
   .surface {
     border-radius: 1rem;
@@ -115,7 +132,27 @@ body {
     @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition;
   }
   .btn-primary {
-    @apply btn bg-amber-400 text-black shadow hover:bg-amber-300 active:bg-amber-500;
+    background: var(--color-accent);
+    color: hsl(43 74% 10%);
+    box-shadow: 0 4px 20px rgb(251 191 36 / 0.35);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.15s ease;
+    @apply btn;
+  }
+  .btn-primary:hover {
+    background: var(--color-accent-muted);
+    box-shadow: 0 6px 24px rgb(251 191 36 / 0.4);
+    transform: translateY(-2px);
+  }
+  .btn-primary:active {
+    background: var(--color-accent-strong);
+    transform: translateY(1px);
+    box-shadow: 0 2px 12px rgb(251 191 36 / 0.3);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary:hover,
+    .btn-primary:active {
+      transform: none;
+    }
   }
   .btn-ghost {
     border: 1px solid var(--color-border-strong);

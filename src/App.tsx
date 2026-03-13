@@ -38,7 +38,11 @@ function App() {
       {isGame ? null : (
         <header className="header">
           <div className="mx-auto flex max-w-screen-md items-center justify-between px-4 py-3 md:max-w-4xl">
-            <Link to="/" className="text-lg font-semibold tracking-wide">
+            <Link
+              to="/"
+              className="font-display text-xl font-bold tracking-tight transition-transform duration-200 hover:scale-[1.02] md:text-2xl [@media(prefers-reduced-motion:reduce)]:hover:scale-100"
+              title="Solimots — à toi de jouer"
+            >
               Solimots
             </Link>
             <nav className="flex items-center gap-1 text-sm text-muted sm:gap-3">

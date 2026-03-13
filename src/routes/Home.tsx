@@ -30,19 +30,19 @@ export function Home() {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="surface p-5">
-        <h1 className="text-2xl font-semibold leading-tight md:text-3xl">
+    <div className="space-y-8 md:space-y-10">
+      <section className="surface p-6 md:p-8">
+        <h1 className="font-display text-[clamp(1.75rem,5vw,2.5rem)] font-bold leading-tight tracking-tight">
           Associe les mots à la bonne catégorie.
         </h1>
-        <p className="mt-2 text-muted">Déplace les cartes vers la bonne case.</p>
+        <p className="mt-3 text-muted md:mt-4">Déplace les cartes vers la bonne case.</p>
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row md:mt-8">
           {hasSavedGame ? (
             <button
               type="button"
               onClick={handleResume}
-              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 shadow hover:bg-amber-400/20 hover:border-amber-400/60 active:bg-amber-400/15"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-amber-400/40 bg-amber-400/10 px-5 py-3 text-sm font-semibold text-amber-300 shadow hover:bg-amber-400/20 hover:border-amber-400/60 active:bg-amber-400/15"
               aria-label="Reprendre la partie"
               title="Reprendre la partie"
             >
@@ -52,7 +52,7 @@ export function Home() {
           <button
             type="button"
             onClick={handlePlay}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-black shadow hover:bg-amber-300 active:bg-amber-500"
+            className="btn-primary inline-flex min-h-[48px] items-center justify-center rounded-xl px-6 py-3.5 text-base font-bold md:min-h-[52px] md:px-8"
             aria-label="Jouer une partie"
             title="Jouer une partie"
           >
@@ -61,10 +61,10 @@ export function Home() {
         </div>
       </section>
 
-      {/* Progression: compact block, no hero-metric layout */}
-      <section className="surface p-5">
+      {/* Progression: compact block */}
+      <section className="surface p-6 md:p-8">
         <div className="flex items-center gap-2 text-sm text-muted">
-          <TrendingUp size={14} aria-hidden="true" />
+          <TrendingUp size={16} aria-hidden="true" />
           <span>
             {currentTitle} · Niveau {currentLevel} ({totalPoints.toLocaleString()} pts)
           </span>
@@ -76,9 +76,9 @@ export function Home() {
               {pointsInCurrentLevel} / {pointsForNextLevel}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-surface-strong">
+          <div className="h-2.5 overflow-hidden rounded-full bg-surface-strong">
             <div
-              className="h-full w-full origin-left rounded-full bg-amber-400/90 transition-[transform] duration-500 ease-out"
+              className="h-full w-full origin-left rounded-full bg-[var(--color-accent)] opacity-90 transition-[transform] duration-500 ease-out"
               style={{ transform: `scaleX(${progressPercentage / 100})` }}
               aria-hidden
             />

@@ -14,6 +14,11 @@ import { Tutorial } from './routes/Tutorial.tsx'
 // Register the service worker for offline support (PWA).
 void registerSW({ immediate: true })
 
+// Easter egg for devs who open the console
+if (typeof console !== 'undefined' && typeof console.log === 'function') {
+  console.log('Solimots — fait avec des mots. Bonne partie ! 🃏')
+}
+
 // Detect iOS standalone mode and add a class to html element for CSS targeting
 if (window.navigator.standalone === true) {
   document.documentElement.classList.add('ios-standalone')

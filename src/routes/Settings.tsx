@@ -26,7 +26,7 @@ export function Settings() {
           <ArrowLeft size={16} aria-hidden="true" />
           <span>Retour</span>
         </Link>
-        <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Configuration</h1>
+        <h1 className="font-display text-2xl font-bold leading-tight tracking-tight md:text-3xl">Configuration</h1>
       </section>
 
       <section className="surface-subtle p-5">

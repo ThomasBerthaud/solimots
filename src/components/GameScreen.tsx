@@ -165,8 +165,8 @@ export function GameScreen() {
     const now = Date.now()
     const attempt = lastAttemptRef.current
     const message = attempt && now - attempt.at < 600 && attempt.message ? attempt.message : lastError.message
-    setToast({ key: lastError.at, message })
-    playSound('error', 0.4)
+    setToast({ key: lastError.at, message: `Oups : ${message}` })
+    playSound('error', 0.32)
     const t = window.setTimeout(() => setToast(null), 1800)
     return () => window.clearTimeout(t)
   }, [lastError, playSound])
@@ -174,18 +174,23 @@ export function GameScreen() {
   useEffect(() => {
     if (!lastAction) return
     if (lastAction.type === 'slotPlaced') {
-      playSound('place', 0.5)
+      playSound('place', 0.48)
     } else if (lastAction.type === 'slotCompleted') {
-      playSound('complete', 0.6)
+      playSound('complete', 0.55)
     }
   }, [lastAction, playSound])
 
   useEffect(() => {
     if (status === 'won') {
-      playSound('win', 0.6)
-      playMusic('end', 0.25)
-    } else if (status === 'lost') {
-      playSound('lose', 0.5)
+      playSound('win', 0.55)
+      // Let the win sound shine, then fade in end music (fade out current if playing)
+      const t = window.setTimeout(() => {
+        playMusic('end', 0.22, { fadeOutCurrentMs: 450 })
+      }, 320)
+      return () => window.clearTimeout(t)
+    }
+    if (status === 'lost') {
+      playSound('lose', 0.45)
     }
   }, [status, playSound, playMusic])
 
@@ -236,7 +241,7 @@ export function GameScreen() {
     const ok = cardIdsToMove.length === 1 ? moveCard(from, to) : moveCards(from, to, cardIdsToMove)
     if (ok) {
       setSelected(null)
-      playSound('move', 0.4)
+      playSound('move', 0.38)
     }
     return ok
   }
@@ -304,18 +309,18 @@ export function GameScreen() {
     const ok = sel.cardIds.length === 1 ? moveCard(sel.source, target) : moveCards(sel.source, target, sel.cardIds)
     if (ok) {
       setSelected(null)
-      playSound('move', 0.4)
+      playSound('move', 0.38)
     }
   }
 
   const handleDraw = () => {
     draw()
-    playSound('draw', 0.4)
+    playSound('draw', 0.38)
   }
 
   const handleUndo = () => {
     undo()
-    playSound('undo', 0.4)
+    playSound('undo', 0.38)
   }
 
   const onPointerDownCapture = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -536,8 +541,15 @@ function WinOverlay({
         ) : (
           <>
             <p className="text-sm font-semibold uppercase tracking-widest text-muted">Victoire</p>
-            <h2 className="mt-2 text-2xl font-bold text-primary">Bravo !</h2>
-            <p className="mt-2 text-base text-muted">Toutes les cartes sont rangées.</p>
+            <motion.h2
+              className="mt-2 font-display text-2xl font-bold text-primary"
+              initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+            >
+              Bravo !
+            </motion.h2>
+            <p className="mt-2 text-base text-muted">Bien joué — tout est à sa place.</p>
 
             <motion.div
               className="pointer-events-none mt-5 h-10"
@@ -553,7 +565,7 @@ function WinOverlay({
                 type="button"
                 data-ui-control="true"
                 onClick={onReplay}
-                className="min-h-[44px] w-full rounded-2xl bg-amber-400 px-4 py-3 text-base font-bold text-black shadow active:bg-amber-500"
+                className="btn-primary min-h-[44px] w-full rounded-2xl px-4 py-3 text-base font-bold"
                 aria-label="Rejouer"
                 title="Rejouer"
               >
@@ -601,8 +613,8 @@ function LostOverlay({
         transition={{ duration: 0.22, ease: 'easeOut' }}
       >
         <p className="text-sm font-semibold uppercase tracking-widest text-muted">Défaite</p>
-        <h2 className="mt-2 text-2xl font-bold text-primary">Bloqué…</h2>
-        <p className="mt-2 text-base text-muted">Impossible de compléter une catégorie déjà posée.</p>
+        <h2 className="mt-2 font-display text-2xl font-bold text-primary">Bloqué…</h2>
+        <p className="mt-2 text-base text-muted">Impossible de compléter une catégorie déjà posée. La prochaine sera la bonne.</p>
 
         <div className="mt-6 grid gap-2">
           <button
