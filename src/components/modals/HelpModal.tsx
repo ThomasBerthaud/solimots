@@ -104,18 +104,20 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
 
         <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-base text-muted">
           <p>
-            - <span className="font-semibold text-primary">Pioche</span>: appuie sur Stock pour tirer une carte dans la
-            Défausse.
+            - <span className="font-semibold text-primary">Pioche</span> : appuie sur <strong>Stock</strong> pour envoyer
+            une carte vers la <strong>Défausse</strong>.
           </p>
           <p>
-            - <span className="font-semibold text-primary">Déplacer</span>: tape une carte du dessus (tableau ou défausse)
-            pour la sélectionner, puis tape une destination.
+            - <span className="font-semibold text-primary">Déplacer</span> : tape une carte du dessus (tableau ou
+            Défausse) pour la sélectionner, puis tape où la poser.
           </p>
           <p>
-            - <span className="font-semibold text-primary">Slots</span>: pose une catégorie sur un slot vide, puis pose
-            uniquement les mots de cette catégorie dessus.
+            - <span className="font-semibold text-primary">Emplacements</span> : pose une catégorie sur un emplacement
+            vide, puis pose uniquement les mots qui vont avec cette catégorie.
           </p>
-          <p className="text-muted">Astuce: tape sur le fond (en dehors des cartes) pour annuler la sélection.</p>
+          <p className="text-muted">
+            Astuce : tape en dehors des cartes pour annuler la sélection.
+          </p>
         </div>
       </motion.div>
     </motion.div>

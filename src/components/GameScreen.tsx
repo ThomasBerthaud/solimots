@@ -46,31 +46,31 @@ function explainInvalidMove(level: LevelState, cardIds: CardId[], to: MoveTarget
   if (to.type === 'tableau') return null
 
   const slot = level.slots[to.slotIndex]
-  if (!slot) return 'Ce slot n’existe pas.'
-  if (slot.isCompleting) return 'Ce slot est en cours de validation.'
+  if (!slot) return "Cet emplacement n’existe pas."
+  if (slot.isCompleting) return 'Cette catégorie est en cours de validation.'
 
   if (slot.categoryCardId == null) {
     // Check if any card in the group is a category card
     const hasCategoryCard = cardIds.some((id) => level.cardsById[id]?.kind === 'category')
-    if (!hasCategoryCard) return 'Pose d’abord une catégorie sur ce slot.'
+    if (!hasCategoryCard) return 'Pose d’abord une catégorie sur cet emplacement.'
     return null
   }
 
   const categoryCard = level.cardsById[slot.categoryCardId]
-  if (!categoryCard || categoryCard.kind !== 'category') return 'Ce slot est invalide.'
+  if (!categoryCard || categoryCard.kind !== 'category') return "Cet emplacement n'est pas utilisable."
 
   // Check if all cards are words matching the category
   for (const id of cardIds) {
     const card = level.cardsById[id]
     if (!card) return 'Carte introuvable.'
-    if (card.kind !== 'word') return 'Tu dois poser un mot sur ce slot.'
+    if (card.kind !== 'word') return 'Pose uniquement un mot sur cet emplacement.'
     if (card.categoryId !== categoryCard.categoryId) {
-      return `Ce mot n'appartient pas à la catégorie "${categoryCard.word}".`
+      return `Ce mot ne va pas dans la catégorie « ${categoryCard.word} ».`
     }
   }
 
   const required = level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
-  if (slot.pile.length >= required) return 'Cette catégorie est déjà complétée.'
+  if (slot.pile.length >= required) return 'Cette catégorie est déjà complète.'
 
   return null
 }

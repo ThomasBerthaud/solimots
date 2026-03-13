@@ -47,7 +47,7 @@ export function CustomCategories() {
         </Link>
         <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Catégories personnalisées</h1>
         <p className="mt-2 text-muted">
-          Ajoute tes propres catégories et mots pour personnaliser tes parties.
+          Crée des catégories et ajoute des mots pour les utiliser en partie.
         </p>
       </section>
 
@@ -87,9 +87,9 @@ export function CustomCategories() {
 
       {customCategories.length === 0 ? (
         <section className="surface-subtle p-8 text-center">
-          <p className="text-subtle">Aucune catégorie personnalisée pour le moment.</p>
+          <p className="text-subtle">Aucune catégorie personnalisée.</p>
           <p className="mt-2 text-sm text-subtle">
-            Commence par ajouter une catégorie ci-dessus !
+            Ajoute une catégorie ci-dessus pour commencer.
           </p>
         </section>
       ) : (

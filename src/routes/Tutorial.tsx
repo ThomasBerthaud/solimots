@@ -17,23 +17,23 @@ export function Tutorial() {
     () => [
       {
         title: '1) Tire une carte',
-        body: 'Appuie sur la Pioche pour mettre une carte dans la Défausse.',
-        hint: 'Astuce: si la Pioche est vide, la Défausse revient en Pioche.',
+        body: 'Appuie sur Stock pour envoyer une carte vers la Défausse.',
+        hint: 'Si Stock est vide, les cartes de la Défausse reviennent dans Stock.',
       },
       {
         title: '2) Déplace la carte du dessus',
-        body: 'Tu peux déplacer la carte du dessus d’une colonne, ou celle de la Défausse.',
-        hint: 'Dans ce MVP, le tableau est en empilement libre.',
+        body: 'Tu peux déplacer la carte du dessus d’une colonne du tableau, ou celle de la Défausse.',
+        hint: 'Tu peux empiler les cartes librement sur le tableau.',
       },
       {
         title: '3) Vise la bonne catégorie',
-        body: 'Dépose une carte dans une pile Catégorie seulement si elle correspond.',
-        hint: 'Si tu te trompes, la carte shake et revient.',
+        body: "Pose un mot sur un emplacement de catégorie seulement s'il correspond à cette catégorie.",
+        hint: 'Si le mot ne va pas, la carte tremble et revient à sa place.',
       },
       {
         title: '4) Gagne le niveau',
-        body: 'Quand les 24 cartes sont rangées dans les catégories, c’est gagné.',
-        hint: 'Tu peux utiliser Annuler si besoin.',
+        body: 'Quand les 24 cartes sont rangées dans les bonnes catégories, c’est gagné.',
+        hint: 'Utilise Annuler pour annuler le dernier coup.',
       },
     ],
     [],
@@ -110,7 +110,7 @@ export function Tutorial() {
       </div>
 
       <div className="surface-subtle p-4 text-sm text-muted">
-        Tu peux relancer ce tutoriel depuis l’accueil.
+        Tu peux revoir ce tutoriel depuis l’accueil à tout moment.
       </div>
     </div>
   )

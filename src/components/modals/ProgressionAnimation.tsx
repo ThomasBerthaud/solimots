@@ -183,12 +183,11 @@ export function ProgressionAnimation({
                 <span>Niveau {currentLevelBeingAnimated + 1}</span>
               </div>
               <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 relative"
-                  style={{ width: `${progressWidth}%` }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                {/* Use transform: scaleX instead of width to avoid layout thrashing (GPU-accelerated) */}
+                <div
+                  className="relative h-full w-full origin-left rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-transform duration-300 ease-out"
+                  style={{ transform: `scaleX(${progressWidth / 100})` }}
                 >
-                  {/* Shimmer effect overlay - only shown when motion is not reduced */}
                   {!reduceMotion && (
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
@@ -203,7 +202,7 @@ export function ProgressionAnimation({
                       }}
                     />
                   )}
-                </motion.div>
+                </div>
               </div>
             </div>
             

@@ -27,12 +27,11 @@ export function Settings() {
           <span>Retour</span>
         </Link>
         <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Configuration</h1>
-        <p className="mt-2 text-muted">Personnalise ton expérience de jeu.</p>
       </section>
 
       <section className="surface-subtle p-5">
         <h2 className="text-lg font-semibold">Contenu du jeu</h2>
-        <p className="mt-1 text-sm text-muted">Personnalise les catégories et mots utilisés dans le jeu.</p>
+        <p className="mt-1 text-sm text-muted">Catégories et mots utilisés en partie.</p>
 
         <div className="mt-4">
           <Link
@@ -52,7 +51,7 @@ export function Settings() {
 
       <section className="surface-subtle p-5">
         <h2 className="text-lg font-semibold">Mode de jeu</h2>
-        <p className="mt-1 text-sm text-muted">Choisis la position de la pioche selon ta main préférée.</p>
+        <p className="mt-1 text-sm text-muted">Position de la pioche (main droite ou gauche).</p>
 
         <div className="mt-4 space-y-3">
           <button
