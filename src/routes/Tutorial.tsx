@@ -17,23 +17,23 @@ export function Tutorial() {
     () => [
       {
         title: '1) Tire une carte',
-        body: 'Appuie sur la Pioche pour mettre une carte dans la Défausse.',
-        hint: 'Astuce: si la Pioche est vide, la Défausse revient en Pioche.',
+        body: 'Appuie sur Stock pour envoyer une carte vers la Défausse.',
+        hint: 'Si Stock est vide, les cartes de la Défausse reviennent dans Stock.',
       },
       {
         title: '2) Déplace la carte du dessus',
-        body: 'Tu peux déplacer la carte du dessus d’une colonne, ou celle de la Défausse.',
-        hint: 'Dans ce MVP, le tableau est en empilement libre.',
+        body: 'Tu peux déplacer la carte du dessus d’une colonne du tableau, ou celle de la Défausse.',
+        hint: 'Tu peux empiler les cartes librement sur le tableau.',
       },
       {
         title: '3) Vise la bonne catégorie',
-        body: 'Dépose une carte dans une pile Catégorie seulement si elle correspond.',
-        hint: 'Si tu te trompes, la carte shake et revient.',
+        body: "Pose un mot sur un emplacement de catégorie seulement s'il correspond à cette catégorie.",
+        hint: 'Si le mot ne va pas, la carte tremble et revient à sa place.',
       },
       {
         title: '4) Gagne le niveau',
-        body: 'Quand les 24 cartes sont rangées dans les catégories, c’est gagné.',
-        hint: 'Tu peux utiliser Annuler si besoin.',
+        body: 'Quand les 24 cartes sont rangées dans les bonnes catégories, c’est gagné.',
+        hint: 'Utilise Annuler pour annuler le dernier coup.',
       },
     ],
     [],
@@ -45,7 +45,7 @@ export function Tutorial() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold md:text-2xl">Tutoriel</h1>
+        <h1 className="font-display text-xl font-bold tracking-tight md:text-2xl">Tutoriel</h1>
         <button onClick={() => navigate(-1)} className="btn-ghost px-3 py-2 text-xs" aria-label="Fermer" title="Fermer">
           <IconLabel icon={X} label="Fermer" />
         </button>
@@ -85,7 +85,7 @@ export function Tutorial() {
           <button
             onClick={() => setIdx((v) => Math.max(0, v - 1))}
             disabled={idx === 0}
-            className="btn-ghost w-28 px-3 py-2 text-sm disabled:opacity-40"
+            className="btn-ghost min-w-[7rem] px-3 py-2 text-sm disabled:opacity-40"
             aria-label="Précédent"
             title="Précédent"
           >
@@ -95,22 +95,22 @@ export function Tutorial() {
           {idx < steps.length - 1 ? (
             <button
               onClick={() => setIdx((v) => Math.min(steps.length - 1, v + 1))}
-              className="btn-primary w-28"
-              aria-label="Suivant"
+            className="btn-primary min-w-[7rem]"
+            aria-label="Suivant"
               title="Suivant"
             >
               <IconLabel icon={ChevronRight} label="Suivant" />
             </button>
           ) : (
-            <Link to="/game" className="btn-primary w-28" aria-label="Jouer" title="Jouer">
+            <Link to="/game" className="btn-primary min-w-[7rem]" aria-label="Jouer" title="Jouer">
               <IconLabel icon={Play} label="Jouer" />
             </Link>
           )}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm text-white/70">
-        Tu peux relancer ce tutoriel depuis l’accueil.
+      <div className="surface-subtle p-4 text-sm text-muted">
+        Tu peux revoir ce tutoriel depuis l’accueil à tout moment.
       </div>
     </div>
   )

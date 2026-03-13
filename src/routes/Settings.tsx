@@ -16,43 +16,42 @@ export function Settings() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+      <section className="surface p-5">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-sm text-white/75 hover:text-white mb-4"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-muted hover:text-primary"
           aria-label="Retour"
           title="Retour"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           <span>Retour</span>
         </Link>
-        <h1 className="text-2xl font-semibold leading-tight md:text-3xl">Configuration</h1>
-        <p className="mt-2 text-white/75">Personnalise ton expérience de jeu.</p>
+        <h1 className="font-display text-2xl font-bold leading-tight tracking-tight md:text-3xl">Configuration</h1>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
+      <section className="surface-subtle p-5">
         <h2 className="text-lg font-semibold">Contenu du jeu</h2>
-        <p className="mt-1 text-sm text-white/75">Personnalise les catégories et mots utilisés dans le jeu.</p>
+        <p className="mt-1 text-sm text-muted">Catégories et mots utilisés en partie.</p>
 
         <div className="mt-4">
           <Link
             to="/custom-categories"
-            className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-left transition-colors hover:bg-white/10"
+            className="flex w-full items-center justify-between rounded-xl border border-strong bg-surface-subtle px-4 py-3 text-left text-secondary transition-colors hover:bg-white/10"
             aria-label="Catégories personnalisées"
             title="Catégories personnalisées"
           >
             <div>
               <p className="font-semibold">Catégories personnalisées</p>
-              <p className="text-sm text-white/60">Ajoute tes propres catégories et mots</p>
+              <p className="text-sm text-subtle">Ajoute tes propres catégories et mots</p>
             </div>
-            <ChevronRight size={20} className="text-white/40" aria-hidden="true" />
+            <ChevronRight size={20} className="text-subtle" aria-hidden="true" />
           </Link>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
+      <section className="surface-subtle p-5">
         <h2 className="text-lg font-semibold">Mode de jeu</h2>
-        <p className="mt-1 text-sm text-white/75">Choisis la position de la pioche selon ta main préférée.</p>
+        <p className="mt-1 text-sm text-muted">Position de la pioche (main droite ou gauche).</p>
 
         <div className="mt-4 space-y-3">
           <button
@@ -62,14 +61,14 @@ export function Settings() {
               'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
               handedness === 'right'
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
+                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
             ].join(' ')}
             aria-label="Mode droitier"
             title="Mode droitier"
           >
             <div>
               <p className="font-semibold">Droitier</p>
-              <p className="text-sm text-white/60">Pioche à droite</p>
+              <p className="text-sm text-subtle">Pioche à droite</p>
             </div>
             {handedness === 'right' ? (
               <div className="text-lg" aria-hidden="true">
@@ -85,14 +84,14 @@ export function Settings() {
               'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
               handedness === 'left'
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
+                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
             ].join(' ')}
             aria-label="Mode gaucher"
             title="Mode gaucher"
           >
             <div>
               <p className="font-semibold">Gaucher</p>
-              <p className="text-sm text-white/60">Pioche à gauche</p>
+              <p className="text-sm text-subtle">Pioche à gauche</p>
             </div>
             {handedness === 'left' ? (
               <div className="text-lg" aria-hidden="true">
@@ -103,9 +102,9 @@ export function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
+      <section className="surface-subtle p-5">
         <h2 className="text-lg font-semibold">Thème visuel</h2>
-        <p className="mt-1 text-sm text-white/75">Personnalise l'apparence du jeu.</p>
+        <p className="mt-1 text-sm text-muted">Personnalise l'apparence du jeu.</p>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           {themeOptions.map((theme) => (
@@ -117,7 +116,7 @@ export function Settings() {
                 'flex flex-col items-start rounded-xl border p-3 text-left transition-colors',
                 currentTheme === theme.id
                   ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                  : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
+                  : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
               ].join(' ')}
               aria-label={`Thème ${theme.name}`}
               title={`Thème ${theme.name}`}
@@ -130,7 +129,7 @@ export function Settings() {
               />
               <div className="w-full">
                 <p className="font-semibold">{theme.name}</p>
-                <p className="text-xs text-white/60">{theme.description}</p>
+                <p className="text-xs text-subtle">{theme.description}</p>
               </div>
               {currentTheme === theme.id ? (
                 <div className="ml-auto mt-1 text-lg" aria-hidden="true">
@@ -142,9 +141,9 @@ export function Settings() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-black/10 p-5">
+      <section className="surface-subtle p-5">
         <h2 className="text-lg font-semibold">Audio</h2>
-        <p className="mt-1 text-sm text-white/75">Active ou désactive les sons et la musique.</p>
+        <p className="mt-1 text-sm text-muted">Active ou désactive les sons et la musique.</p>
 
         <div className="mt-4 space-y-3">
           <button
@@ -154,14 +153,15 @@ export function Settings() {
               'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
               soundEnabled
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
+                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
             ].join(' ')}
             aria-label="Effets sonores"
+            aria-pressed={soundEnabled}
             title="Effets sonores"
           >
             <div>
               <p className="font-semibold">Effets sonores</p>
-              <p className="text-sm text-white/60">Sons des actions de jeu</p>
+              <p className="text-sm text-subtle">Sons des actions de jeu</p>
             </div>
             {soundEnabled ? (
               <div className="text-lg" aria-hidden="true">
@@ -177,14 +177,15 @@ export function Settings() {
               'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
               musicEnabled
                 ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10',
+                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
             ].join(' ')}
             aria-label="Musique"
+            aria-pressed={musicEnabled}
             title="Musique"
           >
             <div>
               <p className="font-semibold">Musique</p>
-              <p className="text-sm text-white/60">Musique de fond</p>
+              <p className="text-sm text-subtle">Musique de fond</p>
             </div>
             {musicEnabled ? (
               <div className="text-lg" aria-hidden="true">

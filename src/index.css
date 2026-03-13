@@ -4,6 +4,11 @@
 
 /* Solitaire-like theme tokens */
 :root {
+  /* Typography: display (headings) + body — distinctive, not system default */
+  --font-display: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Legacy HSL tokens (for body color, etc.) */
   --felt-900: 150 45% 9%;
   --felt-800: 150 42% 12%;
   --felt-700: 150 38% 16%;
@@ -18,6 +23,59 @@
   --theme-bg-to: hsl(150 45% 9%);
   --theme-felt-from: rgba(16, 185, 129, 0.35);
   --theme-felt-to: rgba(6, 78, 59, 0.35);
+
+  /* Design system: surfaces (tinted toward felt green for cohesion) */
+  --color-surface: rgb(6 24 18 / 0.35);
+  --color-surface-subtle: rgb(6 24 18 / 0.2);
+  --color-surface-strong: rgb(6 24 18 / 0.45);
+  --color-surface-overlay: rgb(4 18 14 / 0.7);
+  --color-surface-modal: rgb(4 18 14 / 0.82);
+  --color-surface-dock: rgb(6 24 18 / 0.6);
+  --color-surface-board: rgb(6 24 18 / 0.22);
+  --color-surface-badge: rgb(6 24 18 / 0.5);
+  --color-surface-badge-strong: rgb(6 24 18 / 0.6);
+
+  /* Design system: borders (slight warm tint) */
+  --color-border: rgb(255 255 255 / 0.09);
+  --color-border-strong: rgb(255 255 255 / 0.14);
+
+  /* Design system: text (high contrast for a11y) */
+  --color-text-primary: rgb(253 253 252 / 0.98);
+  --color-text-secondary: rgb(253 253 252 / 0.92);
+  --color-text-muted: rgb(253 253 252 / 0.82);
+  --color-text-subtle: rgb(253 253 252 / 0.72);
+
+  /* Accent: punchy amber (one bold accent, not washed out) */
+  --color-accent: rgb(251 191 36);
+  --color-accent-muted: rgb(253 224 71 / 0.9);
+  --color-accent-strong: rgb(245 158 11);
+
+  /* Design system: shadows */
+  --shadow-surface: 0 12px 40px rgb(0 0 0 / 0.35);
+  --shadow-modal: 0 40px 120px rgb(0 0 0 / 0.65);
+  --shadow-card: 0 14px 34px rgb(0 0 0 / 0.22);
+  --shadow-card-back: 0 12px 30px rgb(0 0 0 / 0.25);
+  --shadow-slot-empty: 0 12px 26px rgb(0 0 0 / 0.18);
+  --shadow-category-tab: 0 10px 24px rgb(0 0 0 / 0.18);
+  --shadow-inset-board: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --shadow-dock: 0 26px 80px rgb(0 0 0 / 0.55);
+  --shadow-toast: 0 18px 60px rgb(0 0 0 / 0.35);
+
+  /* Category card: opaque background for visibility (no transparency) */
+  --card-category-bg: linear-gradient(
+    135deg,
+    hsl(45 96% 64%),
+    hsl(43 92% 52%)
+  );
+  --card-category-border: hsl(40 85% 45%);
+  --card-category-text: hsl(43 74% 12%);
+}
+
+/* Category card: apply opaque background via class (Tailwind arbitrary var() can fail with gradients) */
+.card-category {
+  background: linear-gradient(135deg, hsl(45 96% 64%), hsl(43 92% 52%));
+  border-color: hsl(40 85% 45%);
+  color: hsl(43 74% 12%);
 }
 
 html,
@@ -27,18 +85,21 @@ body {
 
 body {
   margin: 0;
-  background: radial-gradient(1200px 600px at 30% 0%, var(--theme-bg-from), var(--theme-bg-to));
+  background: radial-gradient(1400px 700px at 35% -5%, var(--theme-bg-from), var(--theme-bg-to));
   color: hsl(var(--card));
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Arial,
-    'Apple Color Emoji',
-    'Segoe UI Emoji';
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+/* Subtle grain overlay for depth (no glassmorphism) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* Improve mobile drag interactions */
@@ -48,22 +109,147 @@ body {
 }
 
 @layer components {
-  .surface {
-    @apply rounded-2xl border border-white/10 bg-black/20 shadow-[0_12px_40px_rgba(0,0,0,0.35)];
+  /* Display font for headings and logo (distinctive, not system default) */
+  .font-display {
+    font-family: var(--font-display);
   }
+
+  /* Surfaces - use design tokens */
+  .surface {
+    border-radius: 1rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
+  }
+  .surface-subtle {
+    border-radius: 1rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-subtle);
+  }
+  .surface-accent {
+    border-radius: 1rem;
+    border: 1px solid rgb(251 191 36 / 0.2);
+    background: linear-gradient(to bottom right, rgb(251 191 36 / 0.1), rgb(249 115 22 / 0.1));
+    box-shadow: var(--shadow-surface);
+  }
+
+  /* Buttons - semantic, use tokens for ghost; min 44px height for touch targets */
   .btn {
+    min-height: 44px;
     @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition;
   }
   .btn-primary {
-    @apply btn bg-amber-400 text-black shadow hover:bg-amber-300 active:bg-amber-500;
+    background: var(--color-accent);
+    color: hsl(43 74% 10%);
+    box-shadow: 0 4px 20px rgb(251 191 36 / 0.35);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.15s ease;
+    @apply btn;
+  }
+  .btn-primary:hover {
+    background: var(--color-accent-muted);
+    box-shadow: 0 6px 24px rgb(251 191 36 / 0.4);
+    transform: translateY(-2px);
+  }
+  .btn-primary:active {
+    background: var(--color-accent-strong);
+    transform: translateY(1px);
+    box-shadow: 0 2px 12px rgb(251 191 36 / 0.3);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary:hover,
+    .btn-primary:active {
+      transform: none;
+    }
   }
   .btn-ghost {
-    @apply btn border border-white/15 bg-white/5 text-white/90 hover:bg-white/10 active:bg-white/15;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-surface-subtle);
+    color: var(--color-text-secondary);
+    @apply btn rounded-xl;
+  }
+  .btn-ghost:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+  .btn-ghost:active {
+    background: rgb(255 255 255 / 0.15);
+  }
+
+  /* Modal - consistent backdrop and panel */
+  .modal-backdrop {
+    background: var(--color-surface-overlay);
+    @apply fixed inset-0 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm;
+  }
+  .modal-panel {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-modal);
+    box-shadow: var(--shadow-modal);
+    @apply w-full max-w-sm rounded-3xl p-4 text-center lg:p-5;
+  }
+
+  /* Board sections (tableau/slots container) */
+  .board-section {
+    background: var(--color-surface-board);
+    box-shadow: var(--shadow-inset-board);
+    @apply rounded-[24px] p-2 lg:rounded-[28px] lg:p-3;
+  }
+
+  /* Slot category label tab (above slot when category is placed) */
+  .slot-category-tab {
+    width: calc(var(--cardW) - 12px);
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid var(--card-category-border);
+    background: var(--card-category-bg);
+    color: var(--card-category-text);
+    box-shadow: var(--shadow-category-tab);
+    @apply px-2 py-0.5 text-center text-xs font-extrabold leading-snug tracking-wide line-clamp-1 [word-break:break-word] lg:py-1;
+  }
+
+  /* Badge / pill (counts, labels) */
+  .badge {
+    background: var(--color-surface-badge);
+    color: var(--color-text-muted);
+    @apply pointer-events-none rounded-full px-2 py-1 text-xs font-bold lg:px-2 lg:py-1;
+  }
+  .badge-strong {
+    background: var(--color-surface-badge-strong);
+    color: var(--color-text-secondary);
+    @apply pointer-events-none rounded-full px-3 py-2 text-xs font-extrabold tracking-wide;
+  }
+
+  /* App header — no blur to avoid glassmorphism overload */
+  .header {
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    @apply sticky top-0 z-20;
+  }
+
+  /* Game dock bar */
+  .dock-bar {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-dock);
+    box-shadow: var(--shadow-dock);
+    @apply pointer-events-auto flex items-center justify-between rounded-[26px] px-3 py-2 backdrop-blur lg:px-4 lg:py-3;
+  }
+
+  /* Toast (error/info) */
+  .toast {
+    border: 1px solid rgb(251 113 133 / 0.25);
+    background: rgb(244 63 94 / 0.1);
+    box-shadow: var(--shadow-toast);
+    @apply min-w-0 rounded-2xl px-3 py-2 text-center text-sm font-semibold backdrop-blur break-words line-clamp-2 text-rose-100 lg:px-4 lg:py-3;
   }
 }
 
 @layer utilities {
   /* Tailwind line-clamp plugin is not enabled; provide minimal clamps used by the UI. */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -72,28 +258,81 @@ body {
   }
 }
 
-/* Mobile game sizing variables */
+/* Focus visible for accessibility - do not remove outline without visible replacement */
+:root {
+  --focus-ring: 2px solid rgba(251, 191, 36, 0.9);
+  --focus-offset: 2px;
+}
+button:focus-visible,
+a:focus-visible,
+[role='button']:focus-visible,
+[data-card-interactive='true']:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Mobile game sizing variables (default: phone) */
 .mobile-game {
   --gap: clamp(6px, 1.4vw, 10px);
-  /* Card width calculated for max 5 columns - will have more space with fewer columns */
+  --text-game-mobile: 0.75rem;
   --cardW: clamp(56px, calc((100vw - 24px - (var(--gap) * 4)) / 5), 88px);
   --cardH: calc(var(--cardW) * 1.38);
   --stackStep: clamp(18px, 4vw, 28px);
-
   --dockCardW: clamp(64px, 20vw, 84px);
   --dockCardH: calc(var(--dockCardW) * 1.28);
+  padding-left: max(0.5rem, env(safe-area-inset-left));
+  padding-right: max(0.5rem, env(safe-area-inset-right));
+}
+
+/* Very small viewports: prevent horizontal overflow, keep touch targets usable */
+@media (max-width: 380px) {
+  .mobile-game {
+    --gap: clamp(4px, 1vw, 6px);
+    --cardW: clamp(48px, calc((100vw - 16px - (var(--gap) * 4)) / 5), 88px);
+    --dockCardW: clamp(56px, 18vw, 80px);
+  }
+}
+
+/* Tablet: intermediate sizing between phone and desktop */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mobile-game {
+    --gap: 10px;
+    --cardW: clamp(80px, calc((100vw - 48px - (var(--gap) * 4)) / 5), 100px);
+    --cardH: calc(var(--cardW) * 1.38);
+    --stackStep: 28px;
+    --dockCardW: 88px;
+    --dockCardH: calc(var(--dockCardW) * 1.28);
+  }
 }
 
 /* Desktop game sizing - larger cards and spacing */
 @media (min-width: 1024px) {
   .mobile-game {
     --gap: 12px;
-    /* Larger cards on desktop for better comfort */
     --cardW: clamp(100px, calc((100vw - 80px - (var(--gap) * 4)) / 5), 120px);
     --cardH: calc(var(--cardW) * 1.38);
     --stackStep: 32px;
-
     --dockCardW: 100px;
     --dockCardH: calc(var(--dockCardW) * 1.28);
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+}
+
+/* Short viewport (e.g. landscape on phone): tighten vertical spacing */
+@media (max-height: 500px) and (orientation: landscape) {
+  .mobile-game {
+    --stackStep: clamp(14px, 3vh, 22px);
+  }
+}
+
+/* Respect user preference for reduced motion (accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -102,7 +102,7 @@ export function SlotCell({
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
             <div
-              className="w-[calc(var(--cardW)-12px)] overflow-hidden whitespace-normal break-words rounded-2xl border border-amber-200/60 bg-amber-300 px-3 py-1 text-center text-[10px] font-extrabold leading-snug tracking-wide text-amber-950 shadow-[0_10px_24px_rgba(0,0,0,0.18)] [word-break:break-word]"
+              className="slot-category-tab"
               aria-label={`Catégorie: ${categoryCard.word}`}
             >
               {categoryCard.word}
@@ -114,10 +114,10 @@ export function SlotCell({
       <div className="relative h-[var(--cardH)] w-[var(--cardW)]">
         {/* Empty */}
         {!categoryCard ? (
-          <div className="h-full w-full rounded-[18px] border border-white/10 bg-black/20 shadow-[0_12px_26px_rgba(0,0,0,0.18)]">
-            <div className="flex h-full flex-col items-center justify-center gap-2 rounded-[16px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.10))]">
+          <div className="h-full w-full rounded-[18px] border border-border bg-surface shadow-slot-empty">
+            <div className="flex h-full flex-col items-center justify-center gap-2 rounded-[16px] border border-border bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.10))]">
               <Crown size={18} className="text-white/35" aria-hidden="true" />
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-white/35">Slot</div>
+              <div className="text-xs font-semibold uppercase tracking-widest text-white/35">Slot</div>
             </div>
           </div>
         ) : (
@@ -160,7 +160,7 @@ export function SlotCell({
             </AnimatePresence>
 
             {/* Progress badge - centered at bottom */}
-            <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/85">
+            <div className="badge absolute bottom-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 lg:px-2 lg:py-1">
               {progress}
             </div>
 

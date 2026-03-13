@@ -172,23 +172,22 @@ export function ProgressionAnimation({
               <TrendingUp size={24} />
               <span className="text-2xl font-bold">+{pointsEarned} points</span>
             </div>
-            <p className="text-center text-sm text-white/70">
+            <p className="text-center text-base text-muted">
               {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
             </p>
             
             {/* Progress bar */}
             <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between text-xs text-white/60">
+              <div className="flex items-center justify-between text-sm text-muted">
                 <span>Niveau {currentLevelBeingAnimated}</span>
                 <span>Niveau {currentLevelBeingAnimated + 1}</span>
               </div>
               <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 relative"
-                  style={{ width: `${progressWidth}%` }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                {/* Use transform: scaleX instead of width to avoid layout thrashing (GPU-accelerated) */}
+                <div
+                  className="relative h-full w-full origin-left rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-transform duration-300 ease-out"
+                  style={{ transform: `scaleX(${progressWidth / 100})` }}
                 >
-                  {/* Shimmer effect overlay - only shown when motion is not reduced */}
                   {!reduceMotion && (
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
@@ -203,13 +202,13 @@ export function ProgressionAnimation({
                       }}
                     />
                   )}
-                </motion.div>
+                </div>
               </div>
             </div>
             
             <div className="mt-4 text-center">
-              <div className="text-3xl font-bold text-white">{displayPoints.toLocaleString()}</div>
-              <div className="text-xs text-white/50">Points totaux</div>
+              <div className="text-3xl font-bold text-primary">{displayPoints.toLocaleString()}</div>
+              <div className="text-sm text-muted">Points totaux</div>
             </div>
           </motion.div>
         )}
@@ -231,10 +230,10 @@ export function ProgressionAnimation({
             </motion.div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">
+              <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
                 {levelsGained > 1 ? `+${levelsGained} niveaux` : 'Niveau supérieur'}
               </p>
-              <h3 className="mt-2 text-3xl font-bold text-white">Niveau {newLevel}</h3>
+              <h3 className="mt-2 text-3xl font-bold text-primary">Niveau {newLevel}</h3>
             </div>
 
             {newTitle && (
@@ -248,7 +247,7 @@ export function ProgressionAnimation({
                   <Zap size={18} />
                   <span className="text-lg font-bold">{newTitle}</span>
                 </div>
-                <p className="mt-1 text-xs text-white/60">Nouveau titre débloqué !</p>
+                <p className="mt-1 text-sm text-muted">Nouveau titre débloqué !</p>
               </motion.div>
             )}
           </motion.div>
@@ -266,12 +265,12 @@ export function ProgressionAnimation({
               <TrendingUp size={24} />
               <span className="text-2xl font-bold">+{pointsEarned} points</span>
             </div>
-            <p className="text-center text-sm text-white/70">
+            <p className="text-center text-base text-white/85">
               {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
             </p>
             <div className="mt-4 text-center">
-              <div className="text-3xl font-bold text-white">{displayPoints.toLocaleString()}</div>
-              <div className="text-xs text-white/50">Points totaux</div>
+              <div className="text-3xl font-bold text-primary">{displayPoints.toLocaleString()}</div>
+              <div className="text-sm text-muted">Points totaux</div>
             </div>
           </motion.div>
         )}
@@ -283,7 +282,7 @@ export function ProgressionAnimation({
           onClick={onComplete}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-4 w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-bold text-black shadow active:bg-amber-500"
+          className="mt-4 min-h-[44px] w-full rounded-2xl bg-amber-400 px-4 py-3 text-base font-bold text-black shadow active:bg-amber-500"
           aria-label="Continuer"
         >
           Continuer
