@@ -61,14 +61,21 @@
   --shadow-dock: 0 26px 80px rgb(0 0 0 / 0.55);
   --shadow-toast: 0 18px 60px rgb(0 0 0 / 0.35);
 
-  /* Category card gradient (semantic token) */
+  /* Category card: opaque background for visibility (no transparency) */
   --card-category-bg: linear-gradient(
     135deg,
-    rgb(253 230 138 / 0.92),
-    rgb(251 191 36 / 0.8)
+    hsl(45 96% 64%),
+    hsl(43 92% 52%)
   );
-  --card-category-border: rgb(253 230 138 / 0.6);
+  --card-category-border: hsl(40 85% 45%);
   --card-category-text: hsl(43 74% 12%);
+}
+
+/* Category card: apply opaque background via class (Tailwind arbitrary var() can fail with gradients) */
+.card-category {
+  background: linear-gradient(135deg, hsl(45 96% 64%), hsl(43 92% 52%));
+  border-color: hsl(40 85% 45%);
+  color: hsl(43 74% 12%);
 }
 
 html,

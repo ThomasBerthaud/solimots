@@ -112,7 +112,7 @@ export function Card({
       className={[
         'relative select-none rounded-[18px] border shadow-card',
         isCategory
-          ? 'border-[var(--card-category-border)] bg-[var(--card-category-bg)] text-[var(--card-category-text)]'
+          ? 'card-category border'
           : 'border-black/5 bg-white text-slate-900',
         selected ? (isCategory ? 'ring-2 ring-amber-200/90' : 'ring-2 ring-white/80') : '',
         draggable ? 'cursor-grab active:cursor-grabbing' : '',
@@ -165,7 +165,9 @@ export function Card({
           </div>
 
           {!card.imageUrl && (
-            <div className="mt-1 flex min-w-0 items-end text-xs font-semibold text-black/40 lg:mt-2">
+            <div
+              className={`mt-1 flex min-w-0 items-end text-xs font-semibold lg:mt-2 ${isCategory ? 'text-[var(--card-category-text)]/80' : 'text-black/40'}`}
+            >
               <span className="truncate">{isCategory ? 'Catégorie' : 'Mot'}</span>
             </div>
           )}
