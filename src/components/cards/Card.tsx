@@ -79,7 +79,7 @@ export function Card({
       data-card-interactive={draggable || onClick ? 'true' : 'false'}
       role="button"
       tabIndex={0}
-      aria-label={`Carte: ${card.word}`}
+      aria-label={isCategory ? `Carte catégorie: ${card.word}` : `Carte mot: ${card.word}`}
       onClick={(e) => {
         e.stopPropagation()
         onClick?.()
@@ -148,7 +148,7 @@ export function Card({
           </div>
         ) : null}
 
-        <div className="relative flex min-w-0 h-full w-full flex-col justify-between overflow-hidden p-1.5 lg:p-3">
+        <div className="relative flex min-w-0 h-full w-full flex-col justify-between overflow-hidden p-1 lg:p-2">
           <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden">
             {card.imageUrl ? (
               <span className="text-center text-[clamp(24px,8vw,40px)] lg:text-[clamp(32px,3vw,48px)]" role="img" aria-label={card.word}>
@@ -157,20 +157,12 @@ export function Card({
             ) : (
               <span
                 lang="fr"
-                className="line-clamp-2 min-w-0 overflow-hidden whitespace-normal break-words px-0 text-center font-extrabold leading-[1.05] tracking-tighter [font-size:clamp(11px,3.5vw,14px)] lg:px-1 lg:leading-snug lg:tracking-tight lg:[font-size:clamp(12px,1.2vw,16px)] [hyphens:auto] [word-break:break-word]"
+                className="min-w-0 whitespace-normal break-words px-0.5 text-center font-extrabold leading-[1.08] tracking-tighter [font-size:clamp(10px,3.2vw,13px)] lg:leading-snug lg:tracking-tight lg:[font-size:clamp(11px,1.1vw,15px)] [hyphens:auto] [word-break:break-word]"
               >
                 {card.word}
               </span>
             )}
           </div>
-
-          {!card.imageUrl && (
-            <div
-              className={`mt-1 flex min-w-0 items-end text-xs font-semibold lg:mt-2 ${isCategory ? 'text-[var(--card-category-text)]/80' : 'text-black/40'}`}
-            >
-              <span className="truncate">{isCategory ? 'Catégorie' : 'Mot'}</span>
-            </div>
-          )}
         </div>
       </motion.div>
     </motion.div>

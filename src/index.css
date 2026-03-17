@@ -62,11 +62,7 @@
   --shadow-toast: 0 18px 60px rgb(0 0 0 / 0.35);
 
   /* Category card: opaque background for visibility (no transparency) */
-  --card-category-bg: linear-gradient(
-    135deg,
-    hsl(45 96% 64%),
-    hsl(43 92% 52%)
-  );
+  --card-category-bg: linear-gradient(135deg, hsl(45 96% 64%), hsl(43 92% 52%));
   --card-category-border: hsl(40 85% 45%);
   --card-category-text: hsl(43 74% 12%);
 }
@@ -142,7 +138,10 @@ body::before {
     background: var(--color-accent);
     color: hsl(43 74% 10%);
     box-shadow: 0 4px 20px rgb(251 191 36 / 0.35);
-    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.15s ease;
+    transition:
+      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 0.2s ease,
+      background 0.15s ease;
     @apply btn;
   }
   .btn-primary:hover {
@@ -190,27 +189,26 @@ body::before {
   .board-section {
     background: var(--color-surface-board);
     box-shadow: var(--shadow-inset-board);
-    @apply rounded-[24px] p-2 lg:rounded-[28px] lg:p-3;
+    @apply rounded-[24px] p-1 lg:rounded-[28px] lg:p-3;
   }
 
   /* Slot category label tab (above slot when category is placed) */
   .slot-category-tab {
-    width: calc(var(--cardW) - 12px);
+    width: calc(var(--cardW) - 8px);
     min-width: 0;
-    overflow: hidden;
     border-radius: 1rem;
     border: 1px solid var(--card-category-border);
     background: var(--card-category-bg);
     color: var(--card-category-text);
     box-shadow: var(--shadow-category-tab);
-    @apply px-2 py-0.5 text-center text-xs font-extrabold leading-snug tracking-wide line-clamp-1 [word-break:break-word] lg:py-1;
+    @apply px-2.5 py-1 text-center text-xs font-extrabold leading-snug tracking-wide [word-break:break-word] lg:py-1.5 lg:text-sm;
   }
 
   /* Badge / pill (counts, labels) */
   .badge {
     background: var(--color-surface-badge);
     color: var(--color-text-muted);
-    @apply pointer-events-none rounded-full px-2 py-1 text-xs font-bold lg:px-2 lg:py-1;
+    @apply pointer-events-none rounded-full px-2.5 py-1 text-xs font-bold lg:px-3 lg:py-1.5;
   }
   .badge-strong {
     background: var(--color-surface-badge-strong);
@@ -284,6 +282,14 @@ a:focus-visible,
   padding-right: max(0.5rem, env(safe-area-inset-right));
 }
 
+/* In-game small text (badges, slot label) driven by --text-game-mobile for responsive scaling */
+.mobile-game .text-game {
+  font-size: var(--text-game-mobile);
+}
+.mobile-game .badge {
+  font-size: var(--text-game-mobile);
+}
+
 /* Very small viewports: prevent horizontal overflow, keep touch targets usable */
 @media (max-width: 380px) {
   .mobile-game {
@@ -297,6 +303,7 @@ a:focus-visible,
 @media (min-width: 768px) and (max-width: 1023px) {
   .mobile-game {
     --gap: 10px;
+    --text-game-mobile: 0.8125rem;
     --cardW: clamp(80px, calc((100vw - 48px - (var(--gap) * 4)) / 5), 100px);
     --cardH: calc(var(--cardW) * 1.38);
     --stackStep: 28px;
@@ -309,6 +316,7 @@ a:focus-visible,
 @media (min-width: 1024px) {
   .mobile-game {
     --gap: 12px;
+    --text-game-mobile: 0.875rem;
     --cardW: clamp(100px, calc((100vw - 80px - (var(--gap) * 4)) / 5), 120px);
     --cardH: calc(var(--cardW) * 1.38);
     --stackStep: 32px;

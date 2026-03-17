@@ -248,7 +248,7 @@ export function TableauCell({
 
       {/* Extra count indicator (subtle) */}
       {ids.length > visible.length ? (
-        <div className="badge absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-1 text-[10px]">
+        <div className="badge absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-1">
           +{ids.length - visible.length}
         </div>
       ) : null}
