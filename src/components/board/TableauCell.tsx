@@ -240,7 +240,7 @@ export function TableauCell({
             }
           })
         ) : (
-          <div className="h-[var(--cardH)] w-[var(--cardW)] rounded-[18px] border border-dashed border-white/15 bg-black/10" />
+          <div className="h-[var(--cardH)] w-[var(--cardW)] rounded-[18px] border border-dashed border-strong bg-surface-subtle" />
         )}
         {/* Reserve height for stack */}
         <div style={{ height: `calc(var(--cardH) + var(--stackStep) * ${Math.max(1, visible.length) - 1})` }} />
@@ -248,7 +248,7 @@ export function TableauCell({
 
       {/* Extra count indicator (subtle) */}
       {ids.length > visible.length ? (
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/75">
+        <div className="badge absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-1">
           +{ids.length - visible.length}
         </div>
       ) : null}

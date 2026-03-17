@@ -11,7 +11,7 @@ import { useTheme } from '../utils/useTheme'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
 import { ThumbDock } from './dock/ThumbDock'
-import { HelpModal } from './modals/HelpModal'
+import { HelpPanel } from './modals/HelpPanel'
 import { ProgressionAnimation } from './modals/ProgressionAnimation'
 
 type Selected = { source: MoveSource; cardIds: CardId[] } | null
@@ -46,31 +46,31 @@ function explainInvalidMove(level: LevelState, cardIds: CardId[], to: MoveTarget
   if (to.type === 'tableau') return null
 
   const slot = level.slots[to.slotIndex]
-  if (!slot) return 'Ce slot n’existe pas.'
-  if (slot.isCompleting) return 'Ce slot est en cours de validation.'
+  if (!slot) return "Cet emplacement n’existe pas."
+  if (slot.isCompleting) return 'Cette catégorie est en cours de validation.'
 
   if (slot.categoryCardId == null) {
     // Check if any card in the group is a category card
     const hasCategoryCard = cardIds.some((id) => level.cardsById[id]?.kind === 'category')
-    if (!hasCategoryCard) return 'Pose d’abord une catégorie sur ce slot.'
+    if (!hasCategoryCard) return 'Pose d’abord une catégorie sur cet emplacement.'
     return null
   }
 
   const categoryCard = level.cardsById[slot.categoryCardId]
-  if (!categoryCard || categoryCard.kind !== 'category') return 'Ce slot est invalide.'
+  if (!categoryCard || categoryCard.kind !== 'category') return "Cet emplacement n'est pas utilisable."
 
   // Check if all cards are words matching the category
   for (const id of cardIds) {
     const card = level.cardsById[id]
     if (!card) return 'Carte introuvable.'
-    if (card.kind !== 'word') return 'Tu dois poser un mot sur ce slot.'
+    if (card.kind !== 'word') return 'Pose uniquement un mot sur cet emplacement.'
     if (card.categoryId !== categoryCard.categoryId) {
-      return `Ce mot n'appartient pas à la catégorie "${categoryCard.word}".`
+      return `Ce mot ne va pas dans la catégorie « ${categoryCard.word} ».`
     }
   }
 
   const required = level.requiredWordsByCategoryId[categoryCard.categoryId] ?? 0
-  if (slot.pile.length >= required) return 'Cette catégorie est déjà complétée.'
+  if (slot.pile.length >= required) return 'Cette catégorie est déjà complète.'
 
   return null
 }
@@ -101,6 +101,7 @@ export function GameScreen() {
 
   const [selected, setSelected] = useState<Selected>(null)
   const [helpOpen, setHelpOpen] = useState(false)
+  const helpButtonRef = useRef<HTMLButtonElement>(null)
   const [toast, setToast] = useState<Toast>(null)
   const [showProgression, setShowProgression] = useState(false)
   const [progressionData, setProgressionData] = useState<{
@@ -165,8 +166,8 @@ export function GameScreen() {
     const now = Date.now()
     const attempt = lastAttemptRef.current
     const message = attempt && now - attempt.at < 600 && attempt.message ? attempt.message : lastError.message
-    setToast({ key: lastError.at, message })
-    playSound('error', 0.4)
+    setToast({ key: lastError.at, message: `Oups : ${message}` })
+    playSound('error', 0.32)
     const t = window.setTimeout(() => setToast(null), 1800)
     return () => window.clearTimeout(t)
   }, [lastError, playSound])
@@ -174,18 +175,23 @@ export function GameScreen() {
   useEffect(() => {
     if (!lastAction) return
     if (lastAction.type === 'slotPlaced') {
-      playSound('place', 0.5)
+      playSound('place', 0.48)
     } else if (lastAction.type === 'slotCompleted') {
-      playSound('complete', 0.6)
+      playSound('complete', 0.55)
     }
   }, [lastAction, playSound])
 
   useEffect(() => {
     if (status === 'won') {
-      playSound('win', 0.6)
-      playMusic('end', 0.25)
-    } else if (status === 'lost') {
-      playSound('lose', 0.5)
+      playSound('win', 0.55)
+      // Let the win sound shine, then fade in end music (fade out current if playing)
+      const t = window.setTimeout(() => {
+        playMusic('end', 0.22, { fadeOutCurrentMs: 450 })
+      }, 320)
+      return () => window.clearTimeout(t)
+    }
+    if (status === 'lost') {
+      playSound('lose', 0.45)
     }
   }, [status, playSound, playMusic])
 
@@ -236,7 +242,7 @@ export function GameScreen() {
     const ok = cardIdsToMove.length === 1 ? moveCard(from, to) : moveCards(from, to, cardIdsToMove)
     if (ok) {
       setSelected(null)
-      playSound('move', 0.4)
+      playSound('move', 0.38)
     }
     return ok
   }
@@ -304,18 +310,18 @@ export function GameScreen() {
     const ok = sel.cardIds.length === 1 ? moveCard(sel.source, target) : moveCards(sel.source, target, sel.cardIds)
     if (ok) {
       setSelected(null)
-      playSound('move', 0.4)
+      playSound('move', 0.38)
     }
   }
 
   const handleDraw = () => {
     draw()
-    playSound('draw', 0.4)
+    playSound('draw', 0.38)
   }
 
   const handleUndo = () => {
     undo()
-    playSound('undo', 0.4)
+    playSound('undo', 0.38)
   }
 
   const onPointerDownCapture = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -339,8 +345,11 @@ export function GameScreen() {
 
   return (
     <div
-      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col px-3 pb-3 lg:pb-8"
-      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      className="mobile-game relative mx-auto flex h-dvh w-full max-w-screen-sm lg:max-w-4xl flex-col pb-2 lg:pb-8"
+      style={{
+        paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+        paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
+      }}
       onPointerDownCapture={onPointerDownCapture}
     >
       {/* Felt background panel */}
@@ -349,11 +358,15 @@ export function GameScreen() {
         style={feltBackgroundStyle}
       />
 
-      <header className="mb-3 flex shrink-0 items-center justify-between pt-3 lg:mb-4 lg:pt-4">
+      <h1 className="sr-only">
+        Partie en cours — {getTitleForLevel(currentLevel)} niveau {currentLevel}
+      </h1>
+
+      <header className="mb-3 flex shrink-0 items-center justify-between gap-2 pt-2 lg:mb-4 lg:pt-4">
         <Link
           to="/"
           data-ui-control="true"
-          className="inline-flex h-10 items-center gap-2 rounded-2xl bg-black/25 px-3 text-xs font-semibold text-white/85 active:bg-black/35 lg:h-12 lg:px-4 lg:text-sm"
+          className="inline-flex h-11 min-w-[44px] items-center gap-2 rounded-2xl bg-surface-strong px-3 text-xs font-semibold text-secondary active:bg-surface-badge lg:h-12 lg:px-4 lg:text-sm"
           aria-label="Retour à l'accueil"
           title="Retour à l'accueil"
         >
@@ -361,25 +374,28 @@ export function GameScreen() {
           <span>Accueil</span>
         </Link>
 
-        <div className="text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60 lg:text-xs">
+        <div className="min-w-0 flex-1 shrink-0 text-center">
+          <p className="truncate text-xs font-semibold uppercase tracking-widest text-muted lg:text-sm" title={`${getTitleForLevel(currentLevel)} • Niv. ${currentLevel}`}>
             {getTitleForLevel(currentLevel)} • Niv. {currentLevel}
           </p>
-          <p className="text-sm font-semibold text-white/90 lg:text-base">Partie #{level.seed}</p>
+          <p className="truncate text-base font-semibold text-secondary lg:text-base" title={`Partie #${level.seed}`}>Partie #{level.seed}</p>
         </div>
 
         <button
+          ref={helpButtonRef}
           type="button"
           data-ui-control="true"
-          onClick={() => setHelpOpen(true)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/25 text-white/85 active:bg-black/35 lg:h-12 lg:w-12"
+          onClick={() => setHelpOpen((v) => !v)}
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-strong text-secondary active:bg-surface-badge lg:h-12 lg:w-12"
           aria-label="Aide"
+          aria-expanded={helpOpen}
           title="Aide"
         >
           <HelpCircle size={18} className="lg:h-5 lg:w-5" aria-hidden="true" />
         </button>
       </header>
 
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col">
       <LayoutGroup>
         {/* Dock at top on desktop, bottom on mobile */}
         <div className="order-3 lg:order-1 lg:mb-4">
@@ -422,8 +438,13 @@ export function GameScreen() {
           />
         </div>
       </LayoutGroup>
+      </main>
 
-      <AnimatePresence>{helpOpen ? <HelpModal key="help" onClose={() => setHelpOpen(false)} /> : null}</AnimatePresence>
+      <HelpPanel
+        isOpen={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        triggerRef={helpButtonRef}
+      />
 
       <AnimatePresence>
         {status === 'won' && showProgression && progressionData ? (
@@ -498,13 +519,13 @@ function WinOverlay({
 }) {
   return (
     <motion.div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      className="modal-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-5 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        className="modal-panel"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
@@ -526,9 +547,16 @@ function WinOverlay({
           />
         ) : (
           <>
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Victoire</p>
-            <h2 className="mt-2 text-2xl font-bold text-white">Bravo !</h2>
-            <p className="mt-2 text-sm text-white/75">Toutes les cartes sont rangées.</p>
+            <p className="text-sm font-semibold uppercase tracking-widest text-muted">Victoire</p>
+            <motion.h2
+              className="mt-2 font-display text-2xl font-bold text-primary"
+              initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+            >
+              Bravo !
+            </motion.h2>
+            <p className="mt-2 text-base text-muted">Bien joué — tout est à sa place.</p>
 
             <motion.div
               className="pointer-events-none mt-5 h-10"
@@ -544,7 +572,7 @@ function WinOverlay({
                 type="button"
                 data-ui-control="true"
                 onClick={onReplay}
-                className="w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-bold text-black shadow active:bg-amber-500"
+                className="btn-primary min-h-[44px] w-full rounded-2xl px-4 py-3 text-base font-bold"
                 aria-label="Rejouer"
                 title="Rejouer"
               >
@@ -554,7 +582,7 @@ function WinOverlay({
               <Link
                 to="/"
                 data-ui-control="true"
-                className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-sm font-bold text-white/90 shadow active:bg-black/45"
+                className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-surface-badge px-4 py-3 text-base font-bold text-secondary shadow active:bg-surface-badge-strong"
                 aria-label="Retour à l'accueil"
                 title="Retour à l'accueil"
               >
@@ -579,28 +607,28 @@ function LostOverlay({
 }) {
   return (
     <motion.div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      className="modal-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="w-full max-w-sm rounded-3xl border border-white/10 bg-black/60 p-5 text-center shadow-[0_40px_120px_rgba(0,0,0,0.65)]"
+        className="modal-panel"
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
         animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
         exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.99 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
       >
-        <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Défaite</p>
-        <h2 className="mt-2 text-2xl font-bold text-white">Bloqué…</h2>
-        <p className="mt-2 text-sm text-white/75">Impossible de compléter une catégorie déjà posée.</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-muted">Défaite</p>
+        <h2 className="mt-2 font-display text-2xl font-bold text-primary">Bloqué…</h2>
+        <p className="mt-2 text-base text-muted">Impossible de compléter une catégorie déjà posée. La prochaine sera la bonne.</p>
 
         <div className="mt-6 grid gap-2">
           <button
             type="button"
             data-ui-control="true"
             onClick={onReplaySameSeed}
-            className="w-full rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-black shadow active:bg-white"
+            className="min-h-[44px] w-full rounded-2xl bg-white/90 px-4 py-3 text-base font-bold text-black shadow active:bg-white"
             aria-label="Recommencer la même partie"
             title="Recommencer la même partie"
           >
@@ -611,7 +639,7 @@ function LostOverlay({
             type="button"
             data-ui-control="true"
             onClick={onReplay}
-            className="w-full rounded-2xl bg-white/70 px-4 py-3 text-sm font-bold text-black shadow active:bg-white/80"
+            className="min-h-[44px] w-full rounded-2xl bg-white/70 px-4 py-3 text-base font-bold text-black shadow active:bg-white/80"
             aria-label="Nouvelle partie"
             title="Nouvelle partie"
           >
@@ -621,7 +649,7 @@ function LostOverlay({
           <Link
             to="/"
             data-ui-control="true"
-            className="inline-flex w-full items-center justify-center rounded-2xl bg-black/35 px-4 py-3 text-sm font-bold text-white/90 shadow active:bg-black/45"
+            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-surface-badge px-4 py-3 text-base font-bold text-secondary shadow active:bg-surface-badge-strong"
             aria-label="Retour à l’accueil"
             title="Retour à l'accueil"
           >

@@ -69,7 +69,7 @@ export function StockWaste({
           ) : (
             <motion.div
               key="empty-waste"
-              className="h-[var(--dockCardH)] w-[var(--dockCardW)] rounded-[16px] border border-dashed border-white/15 bg-black/15"
+              className="h-[var(--dockCardH)] w-[var(--dockCardW)] rounded-[16px] border border-dashed border-strong bg-surface-board"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -77,7 +77,7 @@ export function StockWaste({
             />
           )}
         </AnimatePresence>
-        <div className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/75">
+        <div className="badge absolute -bottom-2 left-1/2 -translate-x-1/2">
           {level.waste.length}
         </div>
       </div>
@@ -104,18 +104,14 @@ export function StockWaste({
         {/* Make stock state explicit when empty. */}
         {canRecycle ? (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="rounded-full bg-black/45 px-3 py-2 text-xs font-extrabold tracking-wide text-white/90">
-              ↻ Recycler
-            </div>
+            <div className="badge-strong">↻ Recycler</div>
           </div>
         ) : isDeckEmpty ? (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="rounded-full bg-black/45 px-3 py-2 text-xs font-extrabold tracking-wide text-white/90">
-              ∅ Vide
-            </div>
+            <div className="badge-strong">∅ Vide</div>
           </div>
         ) : null}
-        <div className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/35 px-2 py-1 text-[10px] font-bold text-white/75">
+        <div className="badge absolute -bottom-2 left-1/2 -translate-x-1/2">
           {level.stock.length}
         </div>
       </button>

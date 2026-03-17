@@ -1,5 +1,5 @@
-import { GraduationCap, Play, RotateCcw, Settings, TrendingUp } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Play, RotateCcw, TrendingUp } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { IconLabel } from '../components/ui/IconLabel'
 import { useGameStore } from '../store/gameStore'
 import { getTitleForLevel, getPointsForLevel, useProgressionStore } from '../store/progressionStore'
@@ -18,7 +18,6 @@ export function Home() {
 
   const pointsForNextLevel = getPointsForLevel(currentLevel + 1)
   const progressPercentage = (pointsInCurrentLevel / pointsForNextLevel) * 100
-  const pointsToNextLevel = pointsForNextLevel - pointsInCurrentLevel
   const currentTitle = getTitleForLevel(currentLevel)
 
   const handlePlay = () => {
@@ -31,88 +30,70 @@ export function Home() {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
-        <p className="text-sm uppercase tracking-wider text-white/70">Solitaire d'associations</p>
-        <h1 className="mt-2 text-2xl font-semibold leading-tight md:text-3xl">
+    <div className="space-y-6 md:space-y-8">
+      <section className="surface p-6 md:p-8">
+        <h1 className="font-display text-[clamp(1.75rem,5vw,2.5rem)] font-bold leading-tight tracking-tight">
           Associe les mots à la bonne catégorie.
         </h1>
-        <p className="mt-2 text-white/75">Un feeling "solitaire", mais avec des mots. Déplace, teste, progresse.</p>
+        <p className="mt-3 text-muted md:mt-4">Déplace les cartes vers la bonne case.</p>
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-6 flex flex-col gap-3 md:mt-8">
+          <button
+            type="button"
+            onClick={handlePlay}
+            className="btn-primary inline-flex min-h-[52px] w-full items-center justify-center rounded-xl px-6 py-3.5 text-base font-bold md:min-h-[56px] md:py-4"
+            aria-label="Jouer une partie"
+            title="Jouer une partie"
+          >
+            <IconLabel icon={Play} label="Jouer" hideLabelOnMobile={false} />
+          </button>
           {hasSavedGame ? (
             <button
               type="button"
               onClick={handleResume}
-              className="inline-flex items-center justify-center rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-300 shadow hover:bg-amber-400/20 hover:border-amber-400/60 active:bg-amber-400/15"
+              className="btn-ghost inline-flex min-h-[44px] w-full items-center justify-center rounded-xl text-sm font-semibold"
               aria-label="Reprendre la partie"
               title="Reprendre la partie"
             >
-              <IconLabel icon={RotateCcw} label="Reprendre la partie" hideLabelOnMobile={false} />
+              <IconLabel icon={RotateCcw} label="Reprendre" hideLabelOnMobile={false} />
             </button>
           ) : null}
-          <button
-            type="button"
-            onClick={handlePlay}
-            className="inline-flex items-center justify-center rounded-xl bg-amber-400 px-4 py-3 text-sm font-semibold text-black shadow hover:bg-amber-300 active:bg-amber-500"
-            aria-label="Jouer une partie"
-            title="Jouer une partie"
-          >
-            <IconLabel icon={Play} label="Jouer une partie" hideLabelOnMobile={false} />
-          </button>
-          <Link
-            to="/tutorial"
-            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
-            aria-label="Mini tutoriel"
-            title="Mini tutoriel"
-          >
-            <IconLabel icon={GraduationCap} label="Mini tutoriel" hideLabelOnMobile={false} />
-          </Link>
-          <Link
-            to="/settings"
-            className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:bg-white/15"
-            aria-label="Configuration"
-            title="Configuration"
-          >
-            <IconLabel icon={Settings} label="Configuration" hideLabelOnMobile={false} />
-          </Link>
         </div>
       </section>
 
-      {/* Progression Section */}
-      <section className="rounded-2xl border border-amber-400/20 bg-gradient-to-br from-amber-400/10 to-orange-500/10 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400/90">
-              <TrendingUp size={14} aria-hidden="true" />
-              <span>Progression</span>
-            </p>
-            <h2 className="mt-1 text-xl font-bold text-white">
-              {currentTitle} • Niveau {currentLevel}
-            </h2>
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-amber-400">{totalPoints.toLocaleString()}</p>
-            <p className="text-xs text-white/60">Points totaux</p>
-          </div>
+      {/* Progression: light strip, no card */}
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] px-4 py-3 md:px-5 md:py-4">
+        <div className="flex items-center gap-2 text-sm text-muted">
+          <TrendingUp size={16} className="text-[var(--color-accent)]" aria-hidden="true" />
+          <span>
+            <span className="text-[var(--color-accent-muted)]">{currentTitle}</span>
+            {' · '}
+            Niveau {currentLevel} ({totalPoints.toLocaleString()} pts)
+          </span>
         </div>
-
-        <div className="mt-4">
-          <div className="mb-2 flex items-center justify-between text-xs text-white/70">
-            <span>Niveau {currentLevel + 1}</span>
-            <span>{pointsToNextLevel} points restants</span>
+        <div className="mt-2">
+          <div className="mb-1.5 flex items-center justify-between text-xs font-medium">
+            <span className="text-[var(--color-accent)]">Vers niveau {currentLevel + 1}</span>
+            <span className="tabular-nums text-subtle">
+              {pointsInCurrentLevel} / {pointsForNextLevel}
+            </span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-black/30">
+          <div
+            className="progress-track"
+            role="progressbar"
+            aria-valuenow={pointsInCurrentLevel}
+            aria-valuemin={0}
+            aria-valuemax={pointsForNextLevel}
+            aria-label={`Progression vers le niveau ${currentLevel + 1} : ${pointsInCurrentLevel} sur ${pointsForNextLevel} points`}
+          >
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
-              style={{ width: `${progressPercentage}%` }}
+              className={`progress-fill ${progressPercentage >= 100 ? 'progress-fill--complete' : ''}`}
+              style={{ transform: `scaleX(${progressPercentage / 100})` }}
+              aria-hidden
             />
           </div>
-          <div className="mt-2 text-center text-xs text-white/60">
-            {pointsInCurrentLevel} / {pointsForNextLevel} points
-          </div>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

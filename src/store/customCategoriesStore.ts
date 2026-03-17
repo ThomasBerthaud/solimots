@@ -2,6 +2,9 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import type { WordBankCategory } from '../game/types'
 
+export const MAX_CATEGORY_LABEL_LENGTH = 50
+export const MAX_WORD_LENGTH = 30
+
 interface CustomCategoriesState {
   customCategories: WordBankCategory[]
   addCategory: (label: string) => void
@@ -17,16 +20,20 @@ export const useCustomCategoriesStore = create<CustomCategoriesState>()(
       customCategories: [],
       
       addCategory: (label) =>
-        set((state) => ({
-          customCategories: [
-            ...state.customCategories,
-            {
-              id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-              label,
-              words: [],
-            },
-          ],
-        })),
+        set((state) => {
+          const trimmed = label.trim().slice(0, MAX_CATEGORY_LABEL_LENGTH)
+          if (!trimmed) return state
+          return {
+            customCategories: [
+              ...state.customCategories,
+              {
+                id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+                label: trimmed,
+                words: [],
+              },
+            ],
+          }
+        }),
       
       removeCategory: (id) =>
         set((state) => ({
@@ -37,14 +44,12 @@ export const useCustomCategoriesStore = create<CustomCategoriesState>()(
         set((state) => ({
           customCategories: state.customCategories.map((cat) => {
             if (cat.id === categoryId) {
-              // Prevent duplicate words (case-insensitive comparison)
-              const normalizedWord = word.trim()
+              const normalizedWord = word.trim().slice(0, MAX_WORD_LENGTH)
+              if (!normalizedWord) return cat
               const wordExists = cat.words.some(
                 (w) => w.toLowerCase() === normalizedWord.toLowerCase()
               )
-              if (wordExists) {
-                return cat
-              }
+              if (wordExists) return cat
               return { ...cat, words: [...cat.words, normalizedWord] }
             }
             return cat
@@ -63,7 +68,7 @@ export const useCustomCategoriesStore = create<CustomCategoriesState>()(
       updateCategoryLabel: (categoryId, label) =>
         set((state) => ({
           customCategories: state.customCategories.map((cat) =>
-            cat.id === categoryId ? { ...cat, label } : cat
+            cat.id === categoryId ? { ...cat, label: label.slice(0, MAX_CATEGORY_LABEL_LENGTH) } : cat
           ),
         })),
     }),
