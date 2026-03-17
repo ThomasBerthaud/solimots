@@ -245,6 +245,38 @@ body::before {
     box-shadow: var(--shadow-toast);
     @apply min-w-0 rounded-2xl px-3 py-2 text-center text-sm font-semibold backdrop-blur break-words line-clamp-2 text-rose-100 lg:px-4 lg:py-3;
   }
+
+  /* Level progression bar — bolder presence, subtle delight (amber accent, no generic gradients) */
+  .progress-track {
+    height: 0.75rem;
+    border-radius: 9999px;
+    background: var(--color-surface-strong);
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.25);
+  }
+  .progress-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 9999px;
+    background:
+      linear-gradient(
+        180deg,
+        rgb(255 255 255 / 0.15) 0%,
+        transparent 30%
+      ),
+      linear-gradient(
+        180deg,
+        var(--color-accent-muted) 0%,
+        var(--color-accent) 50%,
+        var(--color-accent-strong) 100%
+      );
+    box-shadow: 0 0 14px rgb(251 191 36 / 0.35);
+    transform-origin: left;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .progress-fill--complete {
+    box-shadow: 0 0 18px rgb(251 191 36 / 0.5);
+  }
 }
 
 @layer utilities {

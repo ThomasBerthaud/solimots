@@ -64,21 +64,30 @@ export function Home() {
       {/* Progression: light strip, no card */}
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] px-4 py-3 md:px-5 md:py-4">
         <div className="flex items-center gap-2 text-sm text-muted">
-          <TrendingUp size={16} aria-hidden="true" />
+          <TrendingUp size={16} className="text-[var(--color-accent)]" aria-hidden="true" />
           <span>
-            {currentTitle} · Niveau {currentLevel} ({totalPoints.toLocaleString()} pts)
+            <span className="text-[var(--color-accent-muted)]">{currentTitle}</span>
+            {' · '}
+            Niveau {currentLevel} ({totalPoints.toLocaleString()} pts)
           </span>
         </div>
         <div className="mt-2">
-          <div className="mb-1 flex items-center justify-between text-xs text-subtle">
-            <span>Vers niveau {currentLevel + 1}</span>
-            <span>
+          <div className="mb-1.5 flex items-center justify-between text-xs font-medium">
+            <span className="text-[var(--color-accent)]">Vers niveau {currentLevel + 1}</span>
+            <span className="tabular-nums text-subtle">
               {pointsInCurrentLevel} / {pointsForNextLevel}
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-[var(--color-surface-strong)]">
+          <div
+            className="progress-track"
+            role="progressbar"
+            aria-valuenow={pointsInCurrentLevel}
+            aria-valuemin={0}
+            aria-valuemax={pointsForNextLevel}
+            aria-label={`Progression vers le niveau ${currentLevel + 1} : ${pointsInCurrentLevel} sur ${pointsForNextLevel} points`}
+          >
             <div
-              className="h-full w-full origin-left rounded-full bg-[var(--color-accent)] opacity-90 transition-[transform] duration-500 ease-out"
+              className={`progress-fill ${progressPercentage >= 100 ? 'progress-fill--complete' : ''}`}
               style={{ transform: `scaleX(${progressPercentage / 100})` }}
               aria-hidden
             />
