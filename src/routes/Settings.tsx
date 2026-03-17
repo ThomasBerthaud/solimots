@@ -15,8 +15,9 @@ export function Settings() {
   const themeOptions = Object.values(themes)
 
   return (
-    <div className="space-y-6">
-      <section className="surface p-5">
+    <div className="space-y-8">
+      {/* Page header: no card */}
+      <div>
         <Link
           to="/"
           className="mb-4 inline-flex items-center gap-2 text-sm text-muted hover:text-primary"
@@ -26,175 +27,142 @@ export function Settings() {
           <ArrowLeft size={16} aria-hidden="true" />
           <span>Retour</span>
         </Link>
-        <h1 className="font-display text-2xl font-bold leading-tight tracking-tight md:text-3xl">Configuration</h1>
-      </section>
+        <h1 className="font-display text-2xl font-bold leading-tight tracking-tight md:text-3xl">
+          Configuration
+        </h1>
+      </div>
 
-      <section className="surface-subtle p-5">
-        <h2 className="text-lg font-semibold">Contenu du jeu</h2>
-        <p className="mt-1 text-sm text-muted">Catégories et mots utilisés en partie.</p>
+      {/* Contenu: single list row */}
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)]">
+        <Link
+          to="/custom-categories"
+          className="flex items-center justify-between gap-3 px-4 py-3 text-left text-secondary transition-colors hover:bg-white/5 active:bg-white/10 md:px-5 md:py-3.5"
+          aria-label="Catégories personnalisées"
+          title="Catégories personnalisées"
+        >
+          <div className="min-w-0">
+            <p className="font-semibold">Catégories personnalisées</p>
+            <p className="text-sm text-subtle">Ajoute tes propres catégories et mots</p>
+          </div>
+          <ChevronRight size={20} className="shrink-0 text-subtle" aria-hidden="true" />
+        </Link>
+      </div>
 
-        <div className="mt-4">
-          <Link
-            to="/custom-categories"
-            className="flex w-full items-center justify-between rounded-xl border border-strong bg-surface-subtle px-4 py-3 text-left text-secondary transition-colors hover:bg-white/10"
-            aria-label="Catégories personnalisées"
-            title="Catégories personnalisées"
-          >
-            <div>
-              <p className="font-semibold">Catégories personnalisées</p>
-              <p className="text-sm text-subtle">Ajoute tes propres catégories et mots</p>
-            </div>
-            <ChevronRight size={20} className="text-subtle" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
-
-      <section className="surface-subtle p-5">
-        <h2 className="text-lg font-semibold">Mode de jeu</h2>
-        <p className="mt-1 text-sm text-muted">Position de la pioche (main droite ou gauche).</p>
-
-        <div className="mt-4 space-y-3">
+      {/* Mode de jeu: segmented control */}
+      <div>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">Mode de jeu</h2>
+        <p className="mt-0.5 text-sm text-subtle">Position de la pioche</p>
+        <div className="mt-3 flex rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)] p-1">
           <button
             type="button"
             onClick={() => setHandedness('right')}
             className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+              'flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors',
               handedness === 'right'
-                ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
+                ? 'bg-[var(--color-accent)] text-black shadow-sm'
+                : 'text-secondary hover:bg-white/5',
             ].join(' ')}
-            aria-label="Mode droitier"
-            title="Mode droitier"
+            aria-label="Mode droitier — Pioche à droite"
+            title="Pioche à droite"
           >
-            <div>
-              <p className="font-semibold">Droitier</p>
-              <p className="text-sm text-subtle">Pioche à droite</p>
-            </div>
-            {handedness === 'right' ? (
-              <div className="text-lg" aria-hidden="true">
-                ✓
-              </div>
-            ) : null}
+            Droitier
           </button>
-
           <button
             type="button"
             onClick={() => setHandedness('left')}
             className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+              'flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors',
               handedness === 'left'
-                ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
+                ? 'bg-[var(--color-accent)] text-black shadow-sm'
+                : 'text-secondary hover:bg-white/5',
             ].join(' ')}
-            aria-label="Mode gaucher"
-            title="Mode gaucher"
+            aria-label="Mode gaucher — Pioche à gauche"
+            title="Pioche à gauche"
           >
-            <div>
-              <p className="font-semibold">Gaucher</p>
-              <p className="text-sm text-subtle">Pioche à gauche</p>
-            </div>
-            {handedness === 'left' ? (
-              <div className="text-lg" aria-hidden="true">
-                ✓
-              </div>
-            ) : null}
+            Gaucher
           </button>
         </div>
-      </section>
+      </div>
 
-      <section className="surface-subtle p-5">
-        <h2 className="text-lg font-semibold">Thème visuel</h2>
-        <p className="mt-1 text-sm text-muted">Personnalise l'apparence du jeu.</p>
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
+      {/* Thème: horizontal scroll of chips */}
+      <div>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">Thème visuel</h2>
+        <p className="mt-0.5 text-sm text-subtle">Apparence du tapis</p>
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {themeOptions.map((theme) => (
             <button
               key={theme.id}
               type="button"
               onClick={() => setTheme(theme.id)}
               className={[
-                'flex flex-col items-start rounded-xl border p-3 text-left transition-colors',
+                'flex shrink-0 flex-col items-center gap-2 rounded-xl border p-3 text-center transition-colors min-w-[100px]',
                 currentTheme === theme.id
-                  ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                  : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
+                  ? 'border-amber-400/50 bg-amber-400/15 text-amber-300'
+                  : 'border-[var(--color-border)] bg-[var(--color-surface-subtle)] text-secondary hover:bg-white/5',
               ].join(' ')}
               aria-label={`Thème ${theme.name}`}
-              title={`Thème ${theme.name}`}
+              title={theme.description}
             >
               <div
-                className="mb-2 h-8 w-full rounded-lg shadow-sm"
+                className="h-10 w-14 rounded-lg border border-white/10"
                 style={{
                   background: `linear-gradient(to bottom right, ${theme.feltBackground.from}, ${theme.feltBackground.to})`,
                 }}
               />
-              <div className="w-full">
-                <p className="font-semibold">{theme.name}</p>
-                <p className="text-xs text-subtle">{theme.description}</p>
-              </div>
-              {currentTheme === theme.id ? (
-                <div className="ml-auto mt-1 text-lg" aria-hidden="true">
-                  ✓
-                </div>
-              ) : null}
+              <span className="text-xs font-semibold leading-tight">{theme.name}</span>
             </button>
           ))}
         </div>
-      </section>
+      </div>
 
-      <section className="surface-subtle p-5">
-        <h2 className="text-lg font-semibold">Audio</h2>
-        <p className="mt-1 text-sm text-muted">Active ou désactive les sons et la musique.</p>
-
-        <div className="mt-4 space-y-3">
+      {/* Audio: compact list with two rows */}
+      <div>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">Audio</h2>
+        <div className="mt-3 divide-y divide-[var(--color-border)] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-subtle)]">
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
-              soundEnabled
-                ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
-            ].join(' ')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 active:bg-white/10 md:px-5"
             aria-label="Effets sonores"
             aria-pressed={soundEnabled}
             title="Effets sonores"
           >
             <div>
-              <p className="font-semibold">Effets sonores</p>
-              <p className="text-sm text-subtle">Sons des actions de jeu</p>
+              <p className="font-semibold text-secondary">Effets sonores</p>
+              <p className="text-xs text-subtle">Sons des actions de jeu</p>
             </div>
-            {soundEnabled ? (
-              <div className="text-lg" aria-hidden="true">
-                ✓
-              </div>
-            ) : null}
+            <span
+              className={[
+                'shrink-0 rounded-full px-3 py-1 text-xs font-semibold',
+                soundEnabled ? 'bg-amber-400/20 text-amber-300' : 'bg-white/10 text-subtle',
+              ].join(' ')}
+            >
+              {soundEnabled ? 'On' : 'Off'}
+            </span>
           </button>
-
           <button
             type="button"
             onClick={() => setMusicEnabled(!musicEnabled)}
-            className={[
-              'flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
-              musicEnabled
-                ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
-                : 'border-border-strong bg-surface-subtle text-secondary hover:bg-white/10',
-            ].join(' ')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-white/5 active:bg-white/10 md:px-5"
             aria-label="Musique"
             aria-pressed={musicEnabled}
             title="Musique"
           >
             <div>
-              <p className="font-semibold">Musique</p>
-              <p className="text-sm text-subtle">Musique de fond</p>
+              <p className="font-semibold text-secondary">Musique</p>
+              <p className="text-xs text-subtle">Musique de fond</p>
             </div>
-            {musicEnabled ? (
-              <div className="text-lg" aria-hidden="true">
-                ✓
-              </div>
-            ) : null}
+            <span
+              className={[
+                'shrink-0 rounded-full px-3 py-1 text-xs font-semibold',
+                musicEnabled ? 'bg-amber-400/20 text-amber-300' : 'bg-white/10 text-subtle',
+              ].join(' ')}
+            >
+              {musicEnabled ? 'On' : 'Off'}
+            </span>
           </button>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

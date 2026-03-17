@@ -11,7 +11,7 @@ import { useTheme } from '../utils/useTheme'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
 import { ThumbDock } from './dock/ThumbDock'
-import { HelpModal } from './modals/HelpModal'
+import { HelpPanel } from './modals/HelpPanel'
 import { ProgressionAnimation } from './modals/ProgressionAnimation'
 
 type Selected = { source: MoveSource; cardIds: CardId[] } | null
@@ -101,6 +101,7 @@ export function GameScreen() {
 
   const [selected, setSelected] = useState<Selected>(null)
   const [helpOpen, setHelpOpen] = useState(false)
+  const helpButtonRef = useRef<HTMLButtonElement>(null)
   const [toast, setToast] = useState<Toast>(null)
   const [showProgression, setShowProgression] = useState(false)
   const [progressionData, setProgressionData] = useState<{
@@ -381,11 +382,13 @@ export function GameScreen() {
         </div>
 
         <button
+          ref={helpButtonRef}
           type="button"
           data-ui-control="true"
-          onClick={() => setHelpOpen(true)}
+          onClick={() => setHelpOpen((v) => !v)}
           className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-strong text-secondary active:bg-surface-badge lg:h-12 lg:w-12"
           aria-label="Aide"
+          aria-expanded={helpOpen}
           title="Aide"
         >
           <HelpCircle size={18} className="lg:h-5 lg:w-5" aria-hidden="true" />
@@ -437,7 +440,11 @@ export function GameScreen() {
       </LayoutGroup>
       </main>
 
-      <AnimatePresence>{helpOpen ? <HelpModal key="help" onClose={() => setHelpOpen(false)} /> : null}</AnimatePresence>
+      <HelpPanel
+        isOpen={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        triggerRef={helpButtonRef}
+      />
 
       <AnimatePresence>
         {status === 'won' && showProgression && progressionData ? (

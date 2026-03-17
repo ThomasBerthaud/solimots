@@ -157,7 +157,7 @@ export function Card({
             ) : (
               <span
                 lang="fr"
-                className="min-w-0 whitespace-normal break-words px-0.5 text-center font-extrabold leading-[1.08] tracking-tighter [font-size:clamp(10px,3.2vw,13px)] lg:leading-snug lg:tracking-tight lg:[font-size:clamp(11px,1.1vw,15px)] [hyphens:auto] [word-break:break-word]"
+                className="min-w-0 whitespace-normal break-words px-0.5 text-center font-extrabold leading-[1.08] tracking-tighter [font-size:clamp(10px,3.2vw,13px)] lg:leading-snug lg:tracking-tight lg:[font-size:clamp(14px,1.5vw,28px)] [hyphens:auto] [word-break:break-word]"
               >
                 {card.word}
               </span>

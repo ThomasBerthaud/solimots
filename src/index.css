@@ -79,6 +79,13 @@ body {
   height: 100%;
 }
 
+/* Larger base font on desktop for comfortable reading */
+@media (min-width: 1024px) {
+  html {
+    font-size: 112.5%; /* 1rem = 18px when browser default is 16px */
+  }
+}
+
 body {
   margin: 0;
   background: radial-gradient(1400px 700px at 35% -5%, var(--theme-bg-from), var(--theme-bg-to));
@@ -312,11 +319,11 @@ a:focus-visible,
   }
 }
 
-/* Desktop game sizing - larger cards and spacing */
+/* Desktop game sizing - larger cards, spacing and text */
 @media (min-width: 1024px) {
   .mobile-game {
     --gap: 12px;
-    --text-game-mobile: 0.875rem;
+    --text-game-mobile: 0.9375rem; /* 1 step up from 0.875rem for badges/slot labels */
     --cardW: clamp(100px, calc((100vw - 80px - (var(--gap) * 4)) / 5), 120px);
     --cardH: calc(var(--cardW) * 1.38);
     --stackStep: 32px;
