@@ -159,11 +159,6 @@ export function SlotCell({
               ) : null}
             </AnimatePresence>
 
-            {/* Progress badge - centered at bottom */}
-            <div className="badge absolute bottom-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 lg:px-2 lg:py-1">
-              {progress}
-            </div>
-
             {/* Completion burst */}
             <AnimatePresence>
               {slot.isCompleting ? (
@@ -181,6 +176,15 @@ export function SlotCell({
           </div>
         )}
       </div>
+
+      {/* Progress badge - below the card so it doesn't overlap the category name */}
+      {progress && (
+        <div className="mt-1 flex justify-center">
+          <div className="badge px-1.5 py-0.5 lg:px-2 lg:py-1">
+            {progress}
+          </div>
+        </div>
+      )}
     </motion.div>
   )
 }

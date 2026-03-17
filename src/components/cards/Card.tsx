@@ -149,7 +149,7 @@ export function Card({
         ) : null}
 
         <div className="relative flex min-w-0 h-full w-full flex-col justify-between overflow-hidden p-1.5 lg:p-3">
-          <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden">
+          <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center">
             {card.imageUrl ? (
               <span className="text-center text-[clamp(24px,8vw,40px)] lg:text-[clamp(32px,3vw,48px)]" role="img" aria-label={card.word}>
                 {card.imageUrl}
@@ -157,7 +157,7 @@ export function Card({
             ) : (
               <span
                 lang="fr"
-                className="line-clamp-2 min-w-0 overflow-hidden whitespace-normal break-words px-0 text-center font-extrabold leading-[1.05] tracking-tighter [font-size:clamp(11px,3.5vw,14px)] lg:px-1 lg:leading-snug lg:tracking-tight lg:[font-size:clamp(12px,1.2vw,16px)] [hyphens:auto] [word-break:break-word]"
+                className="min-w-0 whitespace-normal break-words px-0 text-center font-extrabold leading-[1.05] tracking-tighter [font-size:clamp(11px,3.5vw,14px)] lg:px-1 lg:leading-snug lg:tracking-tight lg:[font-size:clamp(12px,1.2vw,16px)] [hyphens:auto] [word-break:break-word]"
               >
                 {card.word}
               </span>
