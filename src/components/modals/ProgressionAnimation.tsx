@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Award, TrendingUp, Zap } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { getPointsForLevel } from '../../store/progressionStore'
 
 type ProgressionAnimationProps = {
   cardCount: number
@@ -25,6 +26,8 @@ export function ProgressionAnimation({
   newTitle,
   onComplete,
   reduceMotion,
+  oldLevel,
+  oldPointsInLevel,
 }: ProgressionAnimationProps) {
   const [showButton, setShowButton] = useState(false)
   const [fireworks, setFireworks] = useState<Array<{ id: number; x: number; y: number }>>([])
@@ -86,6 +89,14 @@ export function ProgressionAnimation({
             <h3 className="mt-2 text-3xl font-bold text-primary">Niveau {newLevel}</h3>
           </div>
 
+          <XPBar
+            oldLevel={oldLevel}
+            oldPointsInLevel={oldPointsInLevel}
+            newLevel={newLevel}
+            pointsEarned={pointsEarned}
+            reduceMotion={reduceMotion}
+          />
+
           {newTitle ? (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -119,6 +130,13 @@ export function ProgressionAnimation({
             <TrendingUp size={24} aria-hidden />
             <span className="text-2xl font-bold">+{pointsEarned} points</span>
           </div>
+          <XPBar
+            oldLevel={oldLevel}
+            oldPointsInLevel={oldPointsInLevel}
+            newLevel={newLevel}
+            pointsEarned={pointsEarned}
+            reduceMotion={reduceMotion}
+          />
           <p className="text-base text-muted">
             {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
           </p>
@@ -141,6 +159,206 @@ export function ProgressionAnimation({
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+type XPAnimationStep = {
+  fromLevel: number
+  toLevel: number
+  maxPoints: number
+  startPoints: number
+  endPoints: number
+  levelUp: boolean
+}
+
+type XPBarProps = {
+  oldLevel: number
+  oldPointsInLevel: number
+  newLevel: number
+  pointsEarned: number
+  reduceMotion: boolean
+}
+
+type XPViewState = {
+  level: number
+  points: number
+}
+
+function buildXPAnimationSteps(
+  level: number,
+  pointsInLevel: number,
+  remainingPoints: number,
+  acc: XPAnimationStep[] = [],
+): XPAnimationStep[] {
+  if (remainingPoints <= 0) return acc
+
+  const maxPoints = getPointsForLevel(level + 1)
+  const availableSpace = Math.max(0, maxPoints - pointsInLevel)
+  const earnedForStep = Math.min(remainingPoints, availableSpace)
+  const endPoints = pointsInLevel + earnedForStep
+  const levelUp = endPoints >= maxPoints
+  const step: XPAnimationStep = {
+    fromLevel: level,
+    toLevel: levelUp ? level + 1 : level,
+    maxPoints,
+    startPoints: pointsInLevel,
+    endPoints: levelUp ? maxPoints : endPoints,
+    levelUp,
+  }
+
+  if (!levelUp) return [...acc, step]
+
+  return buildXPAnimationSteps(level + 1, 0, remainingPoints - earnedForStep, [...acc, step])
+}
+
+function computeFinalXPState(level: number, pointsInLevel: number, remainingPoints: number): XPViewState {
+  if (remainingPoints <= 0) {
+    return { level, points: pointsInLevel }
+  }
+
+  const maxPoints = getPointsForLevel(level + 1)
+  const availableSpace = Math.max(0, maxPoints - pointsInLevel)
+  const earnedNow = Math.min(remainingPoints, availableSpace)
+  const nextPoints = pointsInLevel + earnedNow
+
+  if (nextPoints < maxPoints) {
+    return { level, points: nextPoints }
+  }
+
+  return computeFinalXPState(level + 1, 0, remainingPoints - earnedNow)
+}
+
+function XPBar({ oldLevel, oldPointsInLevel, newLevel, pointsEarned, reduceMotion }: XPBarProps) {
+  const steps = useMemo(
+    () => buildXPAnimationSteps(oldLevel, oldPointsInLevel, pointsEarned),
+    [oldLevel, oldPointsInLevel, pointsEarned],
+  )
+
+  const finalState = useMemo(
+    () => computeFinalXPState(oldLevel, oldPointsInLevel, pointsEarned),
+    [oldLevel, oldPointsInLevel, pointsEarned],
+  )
+
+  const [displayLevel, setDisplayLevel] = useState(oldLevel)
+  const [displayPoints, setDisplayPoints] = useState(oldPointsInLevel)
+  const [displayMax, setDisplayMax] = useState(Math.max(1, getPointsForLevel(oldLevel + 1)))
+  const [phase, setPhase] = useState<'idle' | 'filling' | 'flash' | 'reset' | 'done'>('idle')
+  const timeoutIdsRef = useRef<number[]>([])
+
+  useEffect(() => {
+    timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
+    timeoutIdsRef.current = []
+
+    if (reduceMotion || steps.length === 0) {
+      const frameId = window.requestAnimationFrame(() => {
+        setDisplayLevel(finalState.level)
+        setDisplayPoints(finalState.points)
+        setDisplayMax(Math.max(1, getPointsForLevel(finalState.level + 1)))
+        setPhase('done')
+      })
+      return () => {
+        window.cancelAnimationFrame(frameId)
+        timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
+        timeoutIdsRef.current = []
+      }
+    }
+
+    const schedule = (callback: () => void, delay: number): void => {
+      const timeoutId = window.setTimeout(callback, delay)
+      timeoutIdsRef.current = [...timeoutIdsRef.current, timeoutId]
+    }
+
+    const runStep = (index: number): void => {
+      const step = steps[index]
+      if (!step) {
+        setDisplayLevel(finalState.level)
+        setDisplayPoints(finalState.points)
+        setDisplayMax(Math.max(1, getPointsForLevel(finalState.level + 1)))
+        setPhase('done')
+        return
+      }
+
+      setDisplayLevel(step.fromLevel)
+      setDisplayMax(Math.max(1, step.maxPoints))
+      setDisplayPoints(step.startPoints)
+      setPhase('filling')
+
+      requestAnimationFrame(() => {
+        setDisplayPoints(step.endPoints)
+      })
+
+      schedule(() => {
+        if (!step.levelUp) {
+          setPhase('done')
+          return
+        }
+
+        setPhase('flash')
+        schedule(() => {
+          setPhase('reset')
+          setDisplayLevel(step.toLevel)
+          setDisplayMax(Math.max(1, getPointsForLevel(step.toLevel + 1)))
+          setDisplayPoints(0)
+
+          schedule(() => {
+            runStep(index + 1)
+          }, 180)
+        }, 380)
+      }, 800)
+    }
+
+    runStep(0)
+
+    return () => {
+      timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
+      timeoutIdsRef.current = []
+    }
+  }, [steps, reduceMotion, finalState.level, finalState.points])
+
+  const safeMax = Math.max(1, displayMax)
+  const progressRatio = Math.min(1, Math.max(0, displayPoints / safeMax))
+  const progressPercent = Math.round(progressRatio * 100)
+  const isAnimating = phase === 'filling'
+  const isFlashing = phase === 'flash'
+  const isComplete = progressPercent >= 100
+  const levelLabel =
+    newLevel > displayLevel ? `Niveau ${displayLevel} → ${newLevel}` : `Niveau ${displayLevel}`
+
+  return (
+    <motion.div
+      className="space-y-1.5 text-left"
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0, scale: isFlashing && !reduceMotion ? [1, 1.02, 1] : 1 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
+      <div className="mb-1 flex items-center justify-between text-xs font-semibold">
+        <span className="text-[var(--color-accent)]">{levelLabel}</span>
+        <span className="tabular-nums text-subtle">
+          {displayPoints} / {safeMax}
+        </span>
+      </div>
+      <div
+        className="progress-track progress-track--modal"
+        role="progressbar"
+        aria-valuenow={displayPoints}
+        aria-valuemin={0}
+        aria-valuemax={safeMax}
+        aria-label={`Progression niveau ${displayLevel} : ${displayPoints} sur ${safeMax} points`}
+      >
+        <div
+          className={[
+            'progress-fill',
+            isComplete ? 'progress-fill--complete' : '',
+            isAnimating ? 'progress-fill--animating' : '',
+            isFlashing ? 'progress-fill--flash' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          style={{ transform: `scaleX(${progressRatio})` }}
+          aria-hidden
+        />
+      </div>
+    </motion.div>
   )
 }
 
