@@ -29,7 +29,6 @@ export function ProgressionAnimation({
   oldLevel,
   oldPointsInLevel,
 }: ProgressionAnimationProps) {
-  const [showButton, setShowButton] = useState(false)
   const [fireworks, setFireworks] = useState<Array<{ id: number; x: number; y: number }>>([])
   const nextFireworkIdRef = useRef(0)
   const triggeredRef = useRef(false)
@@ -55,10 +54,6 @@ export function ProgressionAnimation({
         }, index * 150)
       })
     }
-
-    const delay = reduceMotion ? 800 : 1800
-    const t = setTimeout(() => setShowButton(true), delay)
-    return () => clearTimeout(t)
   }, [levelsGained, reduceMotion])
 
   return (
@@ -115,7 +110,10 @@ export function ProgressionAnimation({
           <p className="text-base text-muted">
             +{pointsEarned} points
             {cardCount > 0 && (
-              <> · {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}</>
+              <>
+                {' '}
+                · {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
+              </>
             )}
           </p>
         </motion.div>
@@ -144,19 +142,18 @@ export function ProgressionAnimation({
       )}
 
       <AnimatePresence>
-        {showButton && (
-          <motion.button
-            type="button"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onComplete}
-            className="mt-4 min-h-[44px] w-full rounded-2xl bg-[var(--color-accent)] px-4 py-3 text-base font-bold text-black shadow-[0_4px_20px_rgba(251,191,36,0.35)] active:bg-amber-600"
-            aria-label="Continuer"
-          >
-            Continuer
-          </motion.button>
-        )}
+        <motion.button
+          type="button"
+          data-ui-control="true"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut', delay: reduceMotion ? 0 : 0.15 }}
+          onClick={onComplete}
+          className="mt-4 min-h-[44px] w-full rounded-2xl bg-[var(--color-accent)] px-4 py-3 text-base font-bold text-black shadow-[0_4px_20px_rgba(251,191,36,0.35)] active:bg-amber-600"
+          aria-label="Continuer"
+        >
+          Continuer
+        </motion.button>
       </AnimatePresence>
     </div>
   )
@@ -244,10 +241,17 @@ function XPBar({ oldLevel, oldPointsInLevel, newLevel, pointsEarned, reduceMotio
   const [displayMax, setDisplayMax] = useState(Math.max(1, getPointsForLevel(oldLevel + 1)))
   const [phase, setPhase] = useState<'idle' | 'filling' | 'flash' | 'reset' | 'done'>('idle')
   const timeoutIdsRef = useRef<number[]>([])
+  const animationFrameIdsRef = useRef<number[]>([])
 
   useEffect(() => {
-    timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
-    timeoutIdsRef.current = []
+    const clearScheduledEffects = (): void => {
+      timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
+      timeoutIdsRef.current = []
+      animationFrameIdsRef.current.forEach((animationFrameId) => window.cancelAnimationFrame(animationFrameId))
+      animationFrameIdsRef.current = []
+    }
+
+    clearScheduledEffects()
 
     if (reduceMotion || steps.length === 0) {
       const frameId = window.requestAnimationFrame(() => {
@@ -256,10 +260,9 @@ function XPBar({ oldLevel, oldPointsInLevel, newLevel, pointsEarned, reduceMotio
         setDisplayMax(Math.max(1, getPointsForLevel(finalState.level + 1)))
         setPhase('done')
       })
+      animationFrameIdsRef.current = [...animationFrameIdsRef.current, frameId]
       return () => {
-        window.cancelAnimationFrame(frameId)
-        timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
-        timeoutIdsRef.current = []
+        clearScheduledEffects()
       }
     }
 
@@ -283,10 +286,12 @@ function XPBar({ oldLevel, oldPointsInLevel, newLevel, pointsEarned, reduceMotio
       setDisplayPoints(step.startPoints)
       setPhase('filling')
 
-      requestAnimationFrame(() => {
+      const frameId = window.requestAnimationFrame(() => {
         setDisplayPoints(step.endPoints)
       })
+      animationFrameIdsRef.current = [...animationFrameIdsRef.current, frameId]
 
+      // Delay must exceed modal `.progress-track--modal .progress-fill` transition (~1.3s)
       schedule(() => {
         if (!step.levelUp) {
           setPhase('done')
@@ -302,27 +307,24 @@ function XPBar({ oldLevel, oldPointsInLevel, newLevel, pointsEarned, reduceMotio
 
           schedule(() => {
             runStep(index + 1)
-          }, 180)
-        }, 380)
-      }, 800)
+          }, 220)
+        }, 450)
+      }, 1450)
     }
 
     runStep(0)
 
     return () => {
-      timeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
-      timeoutIdsRef.current = []
+      clearScheduledEffects()
     }
   }, [steps, reduceMotion, finalState.level, finalState.points])
 
   const safeMax = Math.max(1, displayMax)
   const progressRatio = Math.min(1, Math.max(0, displayPoints / safeMax))
-  const progressPercent = Math.round(progressRatio * 100)
   const isAnimating = phase === 'filling'
   const isFlashing = phase === 'flash'
-  const isComplete = progressPercent >= 100
-  const levelLabel =
-    newLevel > displayLevel ? `Niveau ${displayLevel} → ${newLevel}` : `Niveau ${displayLevel}`
+  const isComplete = displayPoints >= safeMax
+  const levelLabel = newLevel > displayLevel ? `Niveau ${displayLevel} → ${newLevel}` : `Niveau ${displayLevel}`
 
   return (
     <motion.div
@@ -385,11 +387,7 @@ function Firework({ x, y, id }: { x: number; y: number; id: number }) {
   }, [id])
 
   return (
-    <div
-      className="absolute pointer-events-none z-50"
-      style={{ left: `${x}%`, top: `${y}%` }}
-      aria-hidden
-    >
+    <div className="absolute pointer-events-none z-50" style={{ left: `${x}%`, top: `${y}%` }} aria-hidden>
       {particleData.map(({ i, dx, dy, delay, hue, lightness, duration }) => (
         <motion.div
           key={i}

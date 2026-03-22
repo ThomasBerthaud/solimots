@@ -285,6 +285,15 @@ body::before {
     height: 1rem;
   }
 
+  /* Slower fill in progression modal so the XP gain reads clearly */
+  .progress-track--modal .progress-fill {
+    transition: transform 1.3s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .progress-track--modal .progress-fill--animating::after {
+    animation-duration: 1.4s;
+  }
+
   /* Shimmer sweep during fill animation */
   .progress-fill--animating::after {
     content: '';
