@@ -32,10 +32,18 @@ export function ProgressionAnimation({
   const [fireworks, setFireworks] = useState<Array<{ id: number; x: number; y: number }>>([])
   const nextFireworkIdRef = useRef(0)
   const triggeredRef = useRef(false)
+  const fireworkTimeoutIdsRef = useRef<number[]>([])
 
   // Fireworks when level-up; then reveal Continue button after a short delay
   useEffect(() => {
-    if (triggeredRef.current) return
+    const clearFireworkTimeouts = (): void => {
+      fireworkTimeoutIdsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId))
+      fireworkTimeoutIdsRef.current = []
+    }
+
+    if (triggeredRef.current) {
+      return clearFireworkTimeouts
+    }
     triggeredRef.current = true
 
     if (levelsGained > 0 && !reduceMotion) {
@@ -47,13 +55,20 @@ export function ProgressionAnimation({
         { x: 65, y: 25 },
       ]
       positions.forEach((pos, index) => {
-        setTimeout(() => {
+        const outerId = window.setTimeout(() => {
           const id = nextFireworkIdRef.current++
           setFireworks((prev) => [...prev, { id, x: pos.x, y: pos.y }])
-          setTimeout(() => setFireworks((prev) => prev.filter((f) => f.id !== id)), 1000)
+          const innerId = window.setTimeout(
+            () => setFireworks((prev) => prev.filter((f) => f.id !== id)),
+            1000,
+          )
+          fireworkTimeoutIdsRef.current = [...fireworkTimeoutIdsRef.current, innerId]
         }, index * 150)
+        fireworkTimeoutIdsRef.current = [...fireworkTimeoutIdsRef.current, outerId]
       })
     }
+
+    return clearFireworkTimeouts
   }, [levelsGained, reduceMotion])
 
   return (
