@@ -305,9 +305,10 @@ function XPBar({ oldLevel, oldPointsInLevel, newLevel, pointsEarned, reduceMotio
           setDisplayMax(Math.max(1, getPointsForLevel(step.toLevel + 1)))
           setDisplayPoints(0)
 
+          // Delay must exceed modal `.progress-track--modal .progress-fill` reset transition (~1.3s)
           schedule(() => {
             runStep(index + 1)
-          }, 220)
+          }, 1400)
         }, 450)
       }, 1450)
     }
