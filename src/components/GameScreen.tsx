@@ -602,10 +602,12 @@ function WinOverlay({
   }
   onProgressionComplete?: () => void
 }) {
-  const displayElapsedMs = progressionData?.elapsedMs ?? elapsedMs ?? 0
-  const displayPointsEarned = progressionData?.pointsEarned ?? pointsEarned ?? 0
-  const displayBasePoints = progressionData?.basePoints ?? basePoints ?? 0
-  const displayTimeBonusPoints = progressionData?.timeBonusPoints ?? timeBonusPoints ?? 0
+  const summary = progressionData ?? {
+    elapsedMs: elapsedMs ?? 0,
+    pointsEarned: pointsEarned ?? 0,
+    basePoints: basePoints ?? 0,
+    timeBonusPoints: timeBonusPoints ?? 0,
+  }
 
   return (
     <motion.div
@@ -653,13 +655,13 @@ function WinOverlay({
             <p className="mt-2 text-base text-muted">Bien joué — tout est à sa place.</p>
             <div className="mt-4 space-y-1 rounded-2xl bg-surface-badge p-3 text-sm text-secondary">
               <p>
-                Temps final : <span className="tabular-nums font-bold">{formatDuration(displayElapsedMs)}</span>
+                Temps final : <span className="tabular-nums font-bold">{formatDuration(summary.elapsedMs)}</span>
               </p>
               <p>
-                Score de la partie : <span className="font-bold">{displayPointsEarned} points</span>
+                Score de la partie : <span className="font-bold">{summary.pointsEarned} points</span>
               </p>
               <p className="text-xs text-muted">
-                Base {displayBasePoints} + bonus temps {displayTimeBonusPoints}
+                Base {summary.basePoints} + bonus temps {summary.timeBonusPoints}
               </p>
             </div>
 

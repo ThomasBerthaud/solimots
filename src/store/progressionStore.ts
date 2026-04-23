@@ -10,8 +10,16 @@ export const BASE_POINTS_PER_LEVEL = 100
 // Points increase per level (5% growth rate)
 export const POINTS_GROWTH_RATE = 0.05
 
+// Time-bonus tuning: max bonus grows with game size (cards + categories).
 const TIME_BONUS_PER_CARD = 2
 const TIME_BONUS_PER_SLOT = 6
+// Ensures a meaningful positive max-bonus floor on very small generated boards.
+const MIN_MAX_TIME_BONUS_POINTS = TIME_BONUS_PER_SLOT
+
+// Time window tuning:
+// - fast target: full bonus
+// - slow target: zero bonus
+// between both, bonus decreases linearly.
 const MIN_FAST_TARGET_MS = 15_000
 const CARD_TIME_FACTOR_SECONDS = 2
 const SLOT_TIME_FACTOR_SECONDS = 10
@@ -144,7 +152,7 @@ export function computeTimeBonusPoints({ elapsedMs, cardCount, slotCount }: Time
   const safeSlotCount = Math.max(1, slotCount)
 
   const maxBonus = Math.max(
-    TIME_BONUS_PER_SLOT,
+    MIN_MAX_TIME_BONUS_POINTS,
     Math.round(safeCardCount * TIME_BONUS_PER_CARD + safeSlotCount * TIME_BONUS_PER_SLOT),
   )
   const fastTargetMs = Math.max(
