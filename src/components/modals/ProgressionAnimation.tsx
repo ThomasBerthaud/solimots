@@ -5,7 +5,10 @@ import { getPointsForLevel } from '../../store/progressionStore'
 
 type ProgressionAnimationProps = {
   cardCount: number
+  slotCount: number
   pointsEarned: number
+  basePoints: number
+  timeBonusPoints: number
   newLevel: number
   oldPoints: number
   newPoints: number
@@ -15,12 +18,16 @@ type ProgressionAnimationProps = {
   reduceMotion: boolean
   oldLevel: number
   oldPointsInLevel: number
+  elapsedMs: number
 }
 
 // Reward-focused: celebration (level-up, title) + short points line, no dashboard.
 export function ProgressionAnimation({
   cardCount,
+  slotCount,
   pointsEarned,
+  basePoints,
+  timeBonusPoints,
   newLevel,
   levelsGained,
   newTitle,
@@ -28,6 +35,7 @@ export function ProgressionAnimation({
   reduceMotion,
   oldLevel,
   oldPointsInLevel,
+  elapsedMs,
 }: ProgressionAnimationProps) {
   const [fireworks, setFireworks] = useState<Array<{ id: number; x: number; y: number }>>([])
   const nextFireworkIdRef = useRef(0)
@@ -130,6 +138,18 @@ export function ProgressionAnimation({
                 · {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
               </>
             )}
+            {slotCount > 0 && (
+              <>
+                {' '}
+                · {slotCount} {slotCount === 1 ? 'catégorie' : 'catégories'}
+              </>
+            )}
+          </p>
+          <p className="text-sm text-muted">
+            Temps final : <span className="tabular-nums">{formatDuration(elapsedMs)}</span>
+          </p>
+          <p className="text-xs text-muted">
+            Base {basePoints} + bonus temps {timeBonusPoints}
           </p>
         </motion.div>
       ) : (
@@ -153,6 +173,12 @@ export function ProgressionAnimation({
           <p className="text-base text-muted">
             {cardCount} {cardCount === 1 ? 'carte rangée' : 'cartes rangées'}
           </p>
+          <p className="text-sm text-muted">
+            Temps final : <span className="tabular-nums">{formatDuration(elapsedMs)}</span>
+          </p>
+          <p className="text-xs text-muted">
+            Base {basePoints} + bonus temps {timeBonusPoints}
+          </p>
         </motion.div>
       )}
 
@@ -172,6 +198,13 @@ export function ProgressionAnimation({
       </AnimatePresence>
     </div>
   )
+}
+
+function formatDuration(elapsedMs: number): string {
+  const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
 type XPAnimationStep = {

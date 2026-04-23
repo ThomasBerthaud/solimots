@@ -60,8 +60,14 @@ export type LevelUpResult = {
   newTitle: string | null // null if title didn't change
 }
 
+type TimeBonusInput = {
+  elapsedMs: number
+  cardCount: number
+  slotCount: number
+}
+
 type ProgressionStore = ProgressionState & {
-  awardPoints: (cardCount: number) => LevelUpResult
+  awardPoints: (pointsEarned: number) => LevelUpResult
   reset: () => void
 }
 
@@ -76,8 +82,8 @@ export const useProgressionStore = create<ProgressionStore>()(
     (set, get) => ({
       ...initialState,
 
-      awardPoints: (cardCount) => {
-        const points = cardCount * POINTS_PER_CARD
+      awardPoints: (pointsEarned) => {
+        const points = Math.max(0, Math.floor(pointsEarned))
         const state = get()
 
         const newTotalPoints = state.totalPoints + points
@@ -123,3 +129,19 @@ export const useProgressionStore = create<ProgressionStore>()(
     },
   ),
 )
+
+export function computeTimeBonusPoints({ elapsedMs, cardCount, slotCount }: TimeBonusInput): number {
+  const safeElapsedMs = Math.max(0, elapsedMs)
+  const safeCardCount = Math.max(1, cardCount)
+  const safeSlotCount = Math.max(1, slotCount)
+
+  const maxBonus = Math.max(6, Math.round(safeCardCount * 2 + safeSlotCount * 6))
+  const fastTargetMs = Math.max(15_000, (safeCardCount * 2 + safeSlotCount * 10) * 1000)
+  const slowTargetMs = Math.max(fastTargetMs + 1_000, Math.round(fastTargetMs * 3))
+
+  if (safeElapsedMs <= fastTargetMs) return maxBonus
+  if (safeElapsedMs >= slowTargetMs) return 0
+
+  const ratio = (safeElapsedMs - fastTargetMs) / (slowTargetMs - fastTargetMs)
+  return Math.max(0, Math.round(maxBonus * (1 - ratio)))
+}

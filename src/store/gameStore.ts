@@ -12,6 +12,8 @@ export type MoveTarget = { type: 'tableau'; column: number } | { type: 'slot'; s
 type HistoryEntry = {
   level: LevelState
   status: GameStatus
+  startedAt: number | null
+  endedAt: number | null
 }
 
 export type LastAction =
@@ -35,6 +37,8 @@ type GameStore = {
    * Persisted to prevent duplicate point awards when navigating back to a won game.
    */
   lastAwardedSeed: number | null
+  startedAt: number | null
+  endedAt: number | null
 
   newGame: (seed?: number) => void
   resetLevel: () => void
@@ -59,9 +63,12 @@ export const useGameStore = create<GameStore>()(
       lastAction: null,
       drawLoopSeen: {},
       lastAwardedSeed: null,
+      startedAt: null,
+      endedAt: null,
 
       newGame: (seed) => {
         const level = generateLevel({ seed })
+        const now = Date.now()
         set({
           level,
           status: 'inProgress',
@@ -70,6 +77,8 @@ export const useGameStore = create<GameStore>()(
           lastAction: null,
           drawLoopSeen: {},
           lastAwardedSeed: null,
+          startedAt: now,
+          endedAt: null,
         })
       },
 
@@ -77,6 +86,7 @@ export const useGameStore = create<GameStore>()(
         const current = get().level
         const seed = current?.seed
         const level = generateLevel({ seed })
+        const now = Date.now()
         set({
           level,
           status: 'inProgress',
@@ -85,6 +95,8 @@ export const useGameStore = create<GameStore>()(
           lastAction: null,
           drawLoopSeen: {},
           lastAwardedSeed: null,
+          startedAt: now,
+          endedAt: null,
         })
       },
 
@@ -94,7 +106,13 @@ export const useGameStore = create<GameStore>()(
 
         set((state) => {
           if (!state.level) return state
-          const prev: HistoryEntry = { level: state.level, status: state.status }
+          const prev: HistoryEntry = {
+            level: state.level,
+            status: state.status,
+            startedAt: state.startedAt,
+            endedAt: state.endedAt,
+          }
+          const now = Date.now()
 
           const nextLevel = cloneLevel(state.level)
 
@@ -142,6 +160,7 @@ export const useGameStore = create<GameStore>()(
                 history: [prev, ...state.history].slice(0, 200),
                 level: nextLevel,
                 status: 'lost',
+                endedAt: state.endedAt ?? now,
                 lastError: null,
                 lastAction: null,
                 // Keep drawLoopSeen as-is for debugging/consistency (not persisted anyway).
@@ -164,6 +183,7 @@ export const useGameStore = create<GameStore>()(
             history: [prev, ...state.history].slice(0, 200),
             level: nextLevel,
             status: wonOrInProgress,
+            endedAt: wonOrInProgress === 'won' ? state.endedAt ?? now : state.endedAt,
             lastError: null,
             lastAction: null,
             drawLoopSeen: {},
@@ -178,7 +198,12 @@ export const useGameStore = create<GameStore>()(
         let ok = false
         set((state) => {
           if (!state.level) return state
-          const prev: HistoryEntry = { level: state.level, status: state.status }
+          const prev: HistoryEntry = {
+            level: state.level,
+            status: state.status,
+            startedAt: state.startedAt,
+            endedAt: state.endedAt,
+          }
 
           const next = cloneLevel(state.level)
           const cardId = popFrom(next, from)
@@ -226,6 +251,7 @@ export const useGameStore = create<GameStore>()(
             history: [prev, ...state.history].slice(0, 200),
             level: next,
             status: nextStatus,
+            endedAt: nextStatus === 'won' || nextStatus === 'lost' ? state.endedAt ?? now : state.endedAt,
             lastError: null,
             lastAction: nextAction,
             // Only slot progress breaks a draw loop (tableau moves shouldn't prevent a loss).
@@ -243,7 +269,12 @@ export const useGameStore = create<GameStore>()(
         let ok = false
         set((state) => {
           if (!state.level) return state
-          const prev: HistoryEntry = { level: state.level, status: state.status }
+          const prev: HistoryEntry = {
+            level: state.level,
+            status: state.status,
+            startedAt: state.startedAt,
+            endedAt: state.endedAt,
+          }
           const next = cloneLevel(state.level)
 
           const now = Date.now()
@@ -456,6 +487,7 @@ export const useGameStore = create<GameStore>()(
             history: [prev, ...state.history].slice(0, 200),
             level: next,
             status: nextStatus,
+            endedAt: nextStatus === 'won' || nextStatus === 'lost' ? state.endedAt ?? now : state.endedAt,
             lastError: null,
             lastAction: action,
             drawLoopSeen: to.type === 'slot' ? {} : state.drawLoopSeen,
@@ -484,11 +516,13 @@ export const useGameStore = create<GameStore>()(
           nextSlot.categoryCardId = null
           nextSlot.pile = []
           delete nextSlot.isCompleting
+          const nextStatus = computeStatus(next)
 
           return {
             ...state,
             level: next,
-            status: computeStatus(next),
+            status: nextStatus,
+            endedAt: nextStatus === 'won' || nextStatus === 'lost' ? state.endedAt ?? Date.now() : state.endedAt,
             lastError: null,
             // Keep lastAction so the UI can still reference the completion timestamp if needed.
             lastAction: state.lastAction,
@@ -505,6 +539,8 @@ export const useGameStore = create<GameStore>()(
             ...state,
             level: entry.level,
             status: entry.status,
+            startedAt: entry.startedAt,
+            endedAt: entry.endedAt,
             history: state.history.slice(1),
             lastError: null,
             lastAction: null,
@@ -531,6 +567,8 @@ export const useGameStore = create<GameStore>()(
         level: state.level,
         status: state.status,
         lastAwardedSeed: state.lastAwardedSeed,
+        startedAt: state.startedAt,
+        endedAt: state.endedAt,
       }),
     },
   ),
