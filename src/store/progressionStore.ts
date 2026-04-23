@@ -10,8 +10,8 @@ export const BASE_POINTS_PER_LEVEL = 100
 // Points increase per level (5% growth rate)
 export const POINTS_GROWTH_RATE = 0.05
 
-const CARD_BONUS_MULTIPLIER = 2
-const SLOT_BONUS_MULTIPLIER = 6
+const TIME_BONUS_PER_CARD = 2
+const TIME_BONUS_PER_SLOT = 6
 const MIN_FAST_TARGET_MS = 15_000
 const CARD_TIME_FACTOR_SECONDS = 2
 const SLOT_TIME_FACTOR_SECONDS = 10
@@ -144,8 +144,8 @@ export function computeTimeBonusPoints({ elapsedMs, cardCount, slotCount }: Time
   const safeSlotCount = Math.max(1, slotCount)
 
   const maxBonus = Math.max(
-    SLOT_BONUS_MULTIPLIER,
-    Math.round(safeCardCount * CARD_BONUS_MULTIPLIER + safeSlotCount * SLOT_BONUS_MULTIPLIER),
+    TIME_BONUS_PER_SLOT,
+    Math.round(safeCardCount * TIME_BONUS_PER_CARD + safeSlotCount * TIME_BONUS_PER_SLOT),
   )
   const fastTargetMs = Math.max(
     MIN_FAST_TARGET_MS,
