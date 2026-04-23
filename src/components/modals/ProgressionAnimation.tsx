@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Award, TrendingUp, Zap } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getPointsForLevel } from '../../store/progressionStore'
+import { formatDuration } from '../../utils/formatDuration'
 
 type ProgressionAnimationProps = {
   cardCount: number
@@ -198,13 +199,6 @@ export function ProgressionAnimation({
       </AnimatePresence>
     </div>
   )
-}
-
-function formatDuration(elapsedMs: number): string {
-  const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000))
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
 type XPAnimationStep = {

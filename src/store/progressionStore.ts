@@ -10,6 +10,14 @@ export const BASE_POINTS_PER_LEVEL = 100
 // Points increase per level (5% growth rate)
 export const POINTS_GROWTH_RATE = 0.05
 
+const CARD_BONUS_MULTIPLIER = 2
+const SLOT_BONUS_MULTIPLIER = 6
+const MIN_FAST_TARGET_MS = 15_000
+const CARD_TIME_FACTOR_SECONDS = 2
+const SLOT_TIME_FACTOR_SECONDS = 10
+const MS_PER_SECOND = 1000
+const SLOW_TARGET_MULTIPLIER = 3
+
 // Title definitions: every 10 levels gets a new title
 export const TITLES = [
   { minLevel: 0, name: 'Débutant' },
@@ -135,9 +143,15 @@ export function computeTimeBonusPoints({ elapsedMs, cardCount, slotCount }: Time
   const safeCardCount = Math.max(1, cardCount)
   const safeSlotCount = Math.max(1, slotCount)
 
-  const maxBonus = Math.max(6, Math.round(safeCardCount * 2 + safeSlotCount * 6))
-  const fastTargetMs = Math.max(15_000, (safeCardCount * 2 + safeSlotCount * 10) * 1000)
-  const slowTargetMs = Math.max(fastTargetMs + 1_000, Math.round(fastTargetMs * 3))
+  const maxBonus = Math.max(
+    SLOT_BONUS_MULTIPLIER,
+    Math.round(safeCardCount * CARD_BONUS_MULTIPLIER + safeSlotCount * SLOT_BONUS_MULTIPLIER),
+  )
+  const fastTargetMs = Math.max(
+    MIN_FAST_TARGET_MS,
+    (safeCardCount * CARD_TIME_FACTOR_SECONDS + safeSlotCount * SLOT_TIME_FACTOR_SECONDS) * MS_PER_SECOND,
+  )
+  const slowTargetMs = Math.max(fastTargetMs + MS_PER_SECOND, Math.round(fastTargetMs * SLOW_TARGET_MULTIPLIER))
 
   if (safeElapsedMs <= fastTargetMs) return maxBonus
   if (safeElapsedMs >= slowTargetMs) return 0

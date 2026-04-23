@@ -12,6 +12,7 @@ import {
   useProgressionStore,
 } from '../store/progressionStore'
 import { useSoundEffects } from '../utils/useSoundEffects'
+import { formatDuration } from '../utils/formatDuration'
 import { useTheme } from '../utils/useTheme'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
@@ -45,13 +46,6 @@ function getCardsToMove(from: MoveSource, draggedCardId: CardId, level: LevelSta
     return computeContiguousSelection(level, from, draggedCardId)
   }
   return [draggedCardId]
-}
-
-function formatDuration(elapsedMs: number): string {
-  const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000))
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
 function explainInvalidMove(level: LevelState, cardIds: CardId[], to: MoveTarget): string | null {
@@ -448,7 +442,7 @@ export function GameScreen() {
           </p>
           <p className="truncate text-base font-semibold text-secondary lg:text-base" title={`Partie #${level.seed}`}>Partie #{level.seed}</p>
           <p
-            className="truncate text-xs font-semibold uppercase tracking-widest text-muted lg:text-sm"
+            className="truncate text-xs font-semibold text-muted lg:text-sm"
             aria-live="polite"
             aria-label={`Temps de la partie : ${formatDuration(elapsedMs)}`}
           >
