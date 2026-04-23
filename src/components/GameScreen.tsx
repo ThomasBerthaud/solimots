@@ -5,8 +5,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { CardId, LevelState } from '../game/types'
 import { useGameStore, type MoveSource, type MoveTarget } from '../store/gameStore'
-import { getTitleForLevel, POINTS_PER_CARD, useProgressionStore } from '../store/progressionStore'
+import {
+  computeTimeBonusPoints,
+  getTitleForLevel,
+  POINTS_PER_CARD,
+  useProgressionStore,
+} from '../store/progressionStore'
 import { useSoundEffects } from '../utils/useSoundEffects'
+import { formatDuration } from '../utils/formatDuration'
 import { useTheme } from '../utils/useTheme'
 import { SlotsRow } from './board/SlotsRow'
 import { TableauRow } from './board/TableauRow'
@@ -90,6 +96,8 @@ export function GameScreen() {
   const moveCards = useGameStore((s) => s.moveCards)
   const markPointsAwarded = useGameStore((s) => s.markPointsAwarded)
   const lastAwardedSeed = useGameStore((s) => s.lastAwardedSeed)
+  const startedAt = useGameStore((s) => s.startedAt)
+  const endedAt = useGameStore((s) => s.endedAt)
 
   const currentLevel = useProgressionStore((s) => s.currentLevel)
   const currentPoints = useProgressionStore((s) => s.totalPoints)
@@ -104,9 +112,13 @@ export function GameScreen() {
   const helpButtonRef = useRef<HTMLButtonElement>(null)
   const [toast, setToast] = useState<Toast>(null)
   const [showProgression, setShowProgression] = useState(false)
+  const [nowMs, setNowMs] = useState(() => Date.now())
   const [progressionData, setProgressionData] = useState<{
     cardCount: number
+    slotCount: number
     pointsEarned: number
+    basePoints: number
+    timeBonusPoints: number
     newLevel: number
     oldPoints: number
     newPoints: number
@@ -114,12 +126,50 @@ export function GameScreen() {
     newTitle: string | null
     oldLevel: number
     oldPointsInLevel: number
+    elapsedMs: number
   } | null>(null)
   const lastAttemptRef = useRef<{ at: number; message: string | null } | null>(null)
 
   const lastActionAt = lastAction?.at
   const placedSlotIndex = lastAction?.type === 'slotPlaced' ? lastAction.slotIndex : undefined
   const completedSlotIndex = lastAction?.type === 'slotCompleted' ? lastAction.slotIndex : undefined
+
+  useEffect(() => {
+    if (status !== 'inProgress') return
+    const id = window.setInterval(() => setNowMs(Date.now()), 1000)
+    return () => window.clearInterval(id)
+  }, [status])
+
+  const elapsedMs = useMemo(() => {
+    if (!startedAt) return 0
+    const end = endedAt ?? nowMs
+    return Math.max(0, end - startedAt)
+  }, [startedAt, endedAt, nowMs])
+
+  const gameScoreData = useMemo(() => {
+    if (!level) {
+      return {
+        cardCount: 0,
+        slotCount: 0,
+        basePoints: 0,
+        timeBonusPoints: 0,
+        pointsEarned: 0,
+      }
+    }
+
+    const cardCount = Object.keys(level.cardsById).length
+    const slotCount = level.slots.length
+    const basePoints = cardCount * POINTS_PER_CARD
+    const timeBonusPoints = computeTimeBonusPoints({ elapsedMs, cardCount, slotCount })
+
+    return {
+      cardCount,
+      slotCount,
+      basePoints,
+      timeBonusPoints,
+      pointsEarned: basePoints + timeBonusPoints,
+    }
+  }, [level, elapsedMs])
 
   useEffect(() => {
     if (!level) newGame()
@@ -136,30 +186,42 @@ export function GameScreen() {
     // Award points and show progression when winning (only once per win)
     // Check that we haven't already awarded points for this specific game seed
     if (status === 'won' && level && level.seed !== lastAwardedSeed) {
-      // Calculate total cards in the game
-      const cardCount = Object.keys(level.cardsById).length
       const oldPoints = currentPoints
       const oldLevel = currentLevel
       const oldPointsInLevel = currentPointsInLevel
-      
-      const result = awardPoints(cardCount)
-      const pointsEarned = cardCount * POINTS_PER_CARD
-      
+
+      const result = awardPoints(gameScoreData.pointsEarned)
+
       setProgressionData({
-        cardCount,
-        pointsEarned,
+        cardCount: gameScoreData.cardCount,
+        slotCount: gameScoreData.slotCount,
+        pointsEarned: gameScoreData.pointsEarned,
+        basePoints: gameScoreData.basePoints,
+        timeBonusPoints: gameScoreData.timeBonusPoints,
         newLevel: result.newLevel,
         oldPoints,
-        newPoints: oldPoints + pointsEarned,
+        newPoints: oldPoints + gameScoreData.pointsEarned,
         levelsGained: result.levelsGained,
         newTitle: result.newTitle,
         oldLevel,
         oldPointsInLevel,
+        elapsedMs,
       })
       setShowProgression(true)
       markPointsAwarded()
     }
-  }, [status, level, lastAwardedSeed, currentPoints, currentLevel, currentPointsInLevel, awardPoints, markPointsAwarded])
+  }, [
+    status,
+    level,
+    lastAwardedSeed,
+    currentPoints,
+    currentLevel,
+    currentPointsInLevel,
+    awardPoints,
+    markPointsAwarded,
+    gameScoreData,
+    elapsedMs,
+  ])
 
   useEffect(() => {
     if (!lastError) return
@@ -379,6 +441,13 @@ export function GameScreen() {
             {getTitleForLevel(currentLevel)} • Niv. {currentLevel}
           </p>
           <p className="truncate text-base font-semibold text-secondary lg:text-base" title={`Partie #${level.seed}`}>Partie #{level.seed}</p>
+          <p
+            className="truncate text-xs font-semibold text-muted lg:text-sm"
+            aria-live="polite"
+            aria-label={`Temps de la partie : ${formatDuration(elapsedMs)}`}
+          >
+            Temps : {formatDuration(elapsedMs)}
+          </p>
         </div>
 
         <button
@@ -466,6 +535,10 @@ export function GameScreen() {
             key="win-final"
             reduceMotion={reduceMotion}
             showProgression={false}
+            elapsedMs={elapsedMs}
+            pointsEarned={gameScoreData.pointsEarned}
+            basePoints={gameScoreData.basePoints}
+            timeBonusPoints={gameScoreData.timeBonusPoints}
             onReplay={() => {
               setSelected(null)
               newGame()
@@ -499,14 +572,25 @@ function WinOverlay({
   onReplay,
   showProgression = false,
   progressionData,
+  elapsedMs,
+  pointsEarned,
+  basePoints,
+  timeBonusPoints,
   onProgressionComplete,
 }: {
   reduceMotion: boolean
   onReplay: () => void
   showProgression?: boolean
+  elapsedMs?: number
+  pointsEarned?: number
+  basePoints?: number
+  timeBonusPoints?: number
   progressionData?: {
     cardCount: number
+    slotCount: number
     pointsEarned: number
+    basePoints: number
+    timeBonusPoints: number
     newLevel: number
     oldPoints: number
     newPoints: number
@@ -514,9 +598,22 @@ function WinOverlay({
     newTitle: string | null
     oldLevel: number
     oldPointsInLevel: number
+    elapsedMs: number
   }
   onProgressionComplete?: () => void
 }) {
+  const scoreSummary: {
+    elapsedMs: number
+    pointsEarned: number
+    basePoints: number
+    timeBonusPoints: number
+  } = progressionData ?? {
+    elapsedMs: elapsedMs ?? 0,
+    pointsEarned: pointsEarned ?? 0,
+    basePoints: basePoints ?? 0,
+    timeBonusPoints: timeBonusPoints ?? 0,
+  }
+
   return (
     <motion.div
       className="modal-backdrop"
@@ -534,7 +631,10 @@ function WinOverlay({
         {showProgression && progressionData && onProgressionComplete ? (
           <ProgressionAnimation
             cardCount={progressionData.cardCount}
+            slotCount={progressionData.slotCount}
             pointsEarned={progressionData.pointsEarned}
+            basePoints={progressionData.basePoints}
+            timeBonusPoints={progressionData.timeBonusPoints}
             newLevel={progressionData.newLevel}
             oldPoints={progressionData.oldPoints}
             newPoints={progressionData.newPoints}
@@ -544,6 +644,7 @@ function WinOverlay({
             reduceMotion={reduceMotion}
             oldLevel={progressionData.oldLevel}
             oldPointsInLevel={progressionData.oldPointsInLevel}
+            elapsedMs={progressionData.elapsedMs}
           />
         ) : (
           <>
@@ -557,6 +658,17 @@ function WinOverlay({
               Bravo !
             </motion.h2>
             <p className="mt-2 text-base text-muted">Bien joué — tout est à sa place.</p>
+            <div className="mt-4 space-y-1 rounded-2xl bg-surface-badge p-3 text-sm text-secondary">
+              <p>
+                Temps final : <span className="tabular-nums font-bold">{formatDuration(scoreSummary.elapsedMs)}</span>
+              </p>
+              <p>
+                Score de la partie : <span className="font-bold">{scoreSummary.pointsEarned} points</span>
+              </p>
+              <p className="text-xs text-muted">
+                Base {scoreSummary.basePoints} + bonus temps {scoreSummary.timeBonusPoints}
+              </p>
+            </div>
 
             <motion.div
               className="pointer-events-none mt-5 h-10"

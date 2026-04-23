@@ -10,6 +10,22 @@ export const BASE_POINTS_PER_LEVEL = 100
 // Points increase per level (5% growth rate)
 export const POINTS_GROWTH_RATE = 0.05
 
+// Time-bonus tuning: max bonus grows with game size (cards + categories).
+const TIME_BONUS_PER_CARD = 2
+const TIME_BONUS_PER_SLOT = 6
+// Ensures a meaningful positive max-bonus floor on very small generated boards.
+const MIN_MAX_TIME_BONUS_POINTS = TIME_BONUS_PER_SLOT
+
+// Time window tuning:
+// - fast target: full bonus
+// - slow target: zero bonus
+// between both, bonus decreases linearly.
+const FAST_TARGET_BASELINE_MS = 15_000
+const CARD_TIME_FACTOR_SECONDS = 2
+const SLOT_TIME_FACTOR_SECONDS = 10
+const MS_PER_SECOND = 1000
+const SLOW_TARGET_MULTIPLIER = 3
+
 // Title definitions: every 10 levels gets a new title
 export const TITLES = [
   { minLevel: 0, name: 'Débutant' },
@@ -60,8 +76,14 @@ export type LevelUpResult = {
   newTitle: string | null // null if title didn't change
 }
 
+type TimeBonusInput = {
+  elapsedMs: number
+  cardCount: number
+  slotCount: number
+}
+
 type ProgressionStore = ProgressionState & {
-  awardPoints: (cardCount: number) => LevelUpResult
+  awardPoints: (pointsEarned: number) => LevelUpResult
   reset: () => void
 }
 
@@ -76,8 +98,8 @@ export const useProgressionStore = create<ProgressionStore>()(
     (set, get) => ({
       ...initialState,
 
-      awardPoints: (cardCount) => {
-        const points = cardCount * POINTS_PER_CARD
+      awardPoints: (pointsEarned) => {
+        const points = Math.max(0, Math.floor(pointsEarned))
         const state = get()
 
         const newTotalPoints = state.totalPoints + points
@@ -123,3 +145,25 @@ export const useProgressionStore = create<ProgressionStore>()(
     },
   ),
 )
+
+export function computeTimeBonusPoints({ elapsedMs, cardCount, slotCount }: TimeBonusInput): number {
+  const safeElapsedMs = Math.max(0, elapsedMs)
+  const safeCardCount = Math.max(1, cardCount)
+  const safeSlotCount = Math.max(1, slotCount)
+
+  const maxBonus = Math.max(
+    MIN_MAX_TIME_BONUS_POINTS,
+    Math.round(safeCardCount * TIME_BONUS_PER_CARD + safeSlotCount * TIME_BONUS_PER_SLOT),
+  )
+  const fastTargetMs = Math.max(
+    FAST_TARGET_BASELINE_MS,
+    (safeCardCount * CARD_TIME_FACTOR_SECONDS + safeSlotCount * SLOT_TIME_FACTOR_SECONDS) * MS_PER_SECOND,
+  )
+  const slowTargetMs = Math.max(fastTargetMs + MS_PER_SECOND, Math.round(fastTargetMs * SLOW_TARGET_MULTIPLIER))
+
+  if (safeElapsedMs <= fastTargetMs) return maxBonus
+  if (safeElapsedMs >= slowTargetMs) return 0
+
+  const ratio = (safeElapsedMs - fastTargetMs) / (slowTargetMs - fastTargetMs)
+  return Math.max(0, Math.round(maxBonus * (1 - ratio)))
+}

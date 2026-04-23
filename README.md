@@ -16,11 +16,12 @@ Solimots est un jeu de patience où vous devez associer des mots français à le
 - **Validation intelligente** : Messages d'erreur explicites pour les coups invalides
 
 ### 🏆 Progression
-- **Système de points** : 10 points par carte placée correctement
+- **Système de points** : 4 points de base par carte + bonus de rapidité borné
 - **Niveaux** : Un nouveau niveau tous les 100 points
 - **10 titres de progression** : De "Débutant" à "Divin"
 - **Animation de complétion** : Célébrez vos victoires avec style
 - **Génération déterministe** : Niveaux reproductibles grâce à Mulberry32 PRNG
+- **Timer de partie** : chrono affiché en haut, sans limite de temps, avec affichage du temps final en victoire
 
 ### 🎨 Personnalisation
 - **6 thèmes visuels** :
