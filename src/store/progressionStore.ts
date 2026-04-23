@@ -20,7 +20,7 @@ const MIN_MAX_TIME_BONUS_POINTS = TIME_BONUS_PER_SLOT
 // - fast target: full bonus
 // - slow target: zero bonus
 // between both, bonus decreases linearly.
-const MIN_FAST_TARGET_MS = 15_000
+const FAST_TARGET_BASELINE_MS = 15_000
 const CARD_TIME_FACTOR_SECONDS = 2
 const SLOT_TIME_FACTOR_SECONDS = 10
 const MS_PER_SECOND = 1000
@@ -156,7 +156,7 @@ export function computeTimeBonusPoints({ elapsedMs, cardCount, slotCount }: Time
     Math.round(safeCardCount * TIME_BONUS_PER_CARD + safeSlotCount * TIME_BONUS_PER_SLOT),
   )
   const fastTargetMs = Math.max(
-    MIN_FAST_TARGET_MS,
+    FAST_TARGET_BASELINE_MS,
     (safeCardCount * CARD_TIME_FACTOR_SECONDS + safeSlotCount * SLOT_TIME_FACTOR_SECONDS) * MS_PER_SECOND,
   )
   const slowTargetMs = Math.max(fastTargetMs + MS_PER_SECOND, Math.round(fastTargetMs * SLOW_TARGET_MULTIPLIER))

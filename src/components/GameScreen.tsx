@@ -602,7 +602,12 @@ function WinOverlay({
   }
   onProgressionComplete?: () => void
 }) {
-  const summary = progressionData ?? {
+  const scoreSummary: {
+    elapsedMs: number
+    pointsEarned: number
+    basePoints: number
+    timeBonusPoints: number
+  } = progressionData ?? {
     elapsedMs: elapsedMs ?? 0,
     pointsEarned: pointsEarned ?? 0,
     basePoints: basePoints ?? 0,
@@ -655,13 +660,13 @@ function WinOverlay({
             <p className="mt-2 text-base text-muted">Bien joué — tout est à sa place.</p>
             <div className="mt-4 space-y-1 rounded-2xl bg-surface-badge p-3 text-sm text-secondary">
               <p>
-                Temps final : <span className="tabular-nums font-bold">{formatDuration(summary.elapsedMs)}</span>
+                Temps final : <span className="tabular-nums font-bold">{formatDuration(scoreSummary.elapsedMs)}</span>
               </p>
               <p>
-                Score de la partie : <span className="font-bold">{summary.pointsEarned} points</span>
+                Score de la partie : <span className="font-bold">{scoreSummary.pointsEarned} points</span>
               </p>
               <p className="text-xs text-muted">
-                Base {summary.basePoints} + bonus temps {summary.timeBonusPoints}
+                Base {scoreSummary.basePoints} + bonus temps {scoreSummary.timeBonusPoints}
               </p>
             </div>
 
